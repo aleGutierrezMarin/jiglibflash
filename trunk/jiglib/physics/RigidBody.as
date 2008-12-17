@@ -41,6 +41,8 @@ package jiglib.physics
 		private var _invOrientation:JMatrix3D;
 		private var _currLinVelocity:JNumber3D;
 	    private var _currRotVelocity:JNumber3D;
+		private var _currLinVelocityAux:JNumber3D;
+		private var _currRotVelocityAux:JNumber3D;
 		 
 		private var _oldPosition:JNumber3D;
 		private var _oldOrientation:JMatrix3D;
@@ -65,6 +67,7 @@ package jiglib.physics
 		private var _velChanged:Boolean;
 		private var _activity:Boolean;
 		private var _movable:Boolean;
+		private var _origMovable:Boolean;
 		private var _inactiveTime:Number;
 		 
 		private var _bodiesToBeActivatedOnMovement:Array;
@@ -92,6 +95,8 @@ package jiglib.physics
 			_invOrientation = JMatrix3D.inverse(_currOrientation);
 			_currLinVelocity = new JNumber3D();
 			_currRotVelocity = new JNumber3D();
+			_currLinVelocityAux = new JNumber3D();
+			_currRotVelocityAux = new JNumber3D();
 			
 			_oldPosition = new JNumber3D();
 			_oldOrientation = JMatrix3D.IDENTITY;
@@ -109,8 +114,9 @@ package jiglib.physics
 			_velChanged = false;
 			_activity = mov;
 			_movable = mov;
+			_origMovable = mov;
 			_inactiveTime = 0;
-			 
+			
 			setMass(1);
 			
 			Collisions=new Array();
@@ -145,6 +151,14 @@ package jiglib.physics
 		public function SetAngVel(angVel:JNumber3D):void
 		{
 			angVel.copyTo(_currRotVelocity);
+		}
+		public function SetVelocityAux(vel:JNumber3D):void
+		{
+			vel.copyTo(_currLinVelocityAux);
+		}
+		public function SetAngVelAux(angVel:JNumber3D):void
+		{
+			angVel.copyTo(_currRotVelocityAux);
 		}
 		
 		public function AddGravity():void
@@ -222,6 +236,20 @@ package jiglib.physics
 			
 			_velChanged = true;
 		}
+		public function ApplyWorldImpulseAux(impulse:JNumber3D, pos:JNumber3D):void
+		{
+			if(!Getmovable())
+			{
+				return;
+			}
+			_currLinVelocityAux = JNumber3D.add(_currLinVelocityAux, JNumber3D.multiply(impulse, _invMass));
+			
+			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, JNumber3D.sub(pos, _currPosition));
+			JMatrix3D.multiplyVector(_worldInvInertia, rotImpulse);
+			_currRotVelocityAux = JNumber3D.add(_currRotVelocityAux, rotImpulse);
+			
+			_velChanged = true;
+		}
 		
 		public function ApplyBodyWorldImpulse(impulse:JNumber3D, delta:JNumber3D):void
 		{
@@ -234,6 +262,20 @@ package jiglib.physics
 			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, delta);
 			JMatrix3D.multiplyVector(_worldInvInertia, rotImpulse);
 			_currRotVelocity = JNumber3D.add(_currRotVelocity, rotImpulse);
+			
+			_velChanged = true;
+		}
+		public function ApplyBodyWorldImpulseAux(impulse:JNumber3D, delta:JNumber3D):void
+		{
+			if(!Getmovable())
+			{
+				return;
+			}
+			_currLinVelocityAux = JNumber3D.add(_currLinVelocityAux, JNumber3D.multiply(impulse, _invMass));
+			
+			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, delta);
+			JMatrix3D.multiplyVector(_worldInvInertia, rotImpulse);
+			_currRotVelocityAux = JNumber3D.add(_currRotVelocityAux, rotImpulse);
 			
 			_velChanged = true;
 		}
@@ -260,8 +302,6 @@ package jiglib.physics
 			{
 				return;
 			}
-			var angMomBefore:JNumber3D = _currRotVelocity.clone();
-			JMatrix3D.multiplyVector(_worldInertia, angMomBefore);
 			 
 			_currPosition = JNumber3D.add(_currPosition, JNumber3D.multiply(_currLinVelocity, dt));
 			
@@ -276,8 +316,37 @@ package jiglib.physics
 			}
 			SetOrientation(_currOrientation);
 			
-			_currRotVelocity = angMomBefore.clone();
-			JMatrix3D.multiplyVector(_worldInvInertia, _currRotVelocity);
+			updateObject3D();
+		}
+		public function UpdatePositionWithAux(dt:Number):void
+		{
+			if (!Getmovable() || !IsActive())
+			{
+				_currLinVelocityAux = JNumber3D.ZERO;
+				_currRotVelocityAux = JNumber3D.ZERO;
+				return;
+			}
+			var ga:int = PhysicsSystem.getInstance().GravityAxis;
+			if (ga != -1)
+			{
+				_currLinVelocityAux.toArray()[(ga + 1) % 3] *= 0;
+				_currLinVelocityAux.toArray()[(ga + 2) % 3] *= 0;
+			}
+			
+			_currPosition = JNumber3D.add(_currPosition, JNumber3D.multiply(JNumber3D.add(_currLinVelocity, _currLinVelocityAux), dt));
+			
+			var dir:JNumber3D = JNumber3D.add(_currRotVelocity, _currRotVelocityAux);
+			var ang:Number = dir.modulo;
+			if (ang > 0)
+			{
+				dir.normalize();
+				ang *= dt;
+				var rot:JMatrix3D = JMatrix3D.rotationMatrix(dir.x, dir.y, dir.z, ang);
+				_currOrientation = JMatrix3D.multiply(rot, _currOrientation);
+			}
+			_currLinVelocityAux = JNumber3D.ZERO;
+			_currRotVelocityAux = JNumber3D.ZERO;
+			SetOrientation(_currOrientation);
 			
 			updateObject3D();
 		}
@@ -347,6 +416,16 @@ package jiglib.physics
 			_movable=mov;
 		}
 		
+		public function InternalSetImmovable():void
+		{
+			_origMovable = _movable;
+			_movable = false;
+		}
+		public function InternalRestoreImmovable():void
+		{
+			_movable = _origMovable;
+		}
+		
 		public function GetVelChanged():Boolean
 		{
 			return _velChanged;
@@ -369,11 +448,20 @@ package jiglib.physics
 		{
 			return JNumber3D.add(_currLinVelocity,JNumber3D.cross(relPos,_currRotVelocity));
 		}
+		public function GetVelocityAux(relPos:JNumber3D):JNumber3D
+		{
+			return JNumber3D.add(_currLinVelocityAux,JNumber3D.cross(relPos,_currRotVelocityAux));
+		}
 		
 		public function GetShouldBeActive():Boolean
 		{
 			return ((_currLinVelocity.modulo > JConfig.velThreshold) || 
                     (_currRotVelocity.modulo > JConfig.angVelThreshold));
+		}
+		public function GetShouldBeActiveAux():Boolean
+		{
+			return ((_currLinVelocityAux.modulo > JConfig.velThreshold) || 
+                    (_currRotVelocityAux.modulo > JConfig.angVelThreshold));
 		}
 		
 		public function DampForDeactivation():void
@@ -426,6 +514,14 @@ package jiglib.physics
 				_storedPositionForActivation = pos;
 			}
 			_bodiesToBeActivatedOnMovement.push(otherBody);
+		}
+		
+		public function SetConstraintsAndCollisionsUnsatisfied():void
+		{
+			for (var i:String in Collisions)
+			{
+				Collisions[i].Satisfied = false;
+			}
 		}
 		
 		public function CopyCurrentStateToOld():void

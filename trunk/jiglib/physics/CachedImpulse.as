@@ -24,18 +24,21 @@ distribution.
 */
 
 package jiglib.physics {
+	
+	import jiglib.math.*;
 
-	public class MaterialProperties {
-		public var Restitution:Number;
-		public var StaticFriction:Number;
-		public var DynamicFriction:Number;
+	public class CachedImpulse {
 		
-		public function MaterialProperties(_restitution:Number = 0.2, _staticFriction:Number = 0.6, _dynamicFriction:Number = 0.6)
-		{
-			Restitution = _restitution;
-			StaticFriction = _staticFriction;
-			DynamicFriction = _dynamicFriction;
+		public var NormalImpulse:Number;
+		public var NormalImpulseAux:Number;
+		public var FrictionImpulse:JNumber3D;
+		
+		public function CachedImpulse(_normalImpulse:Number, _normalImpulseAux:Number, _frictionImpulse:JNumber3D) {
+			this.NormalImpulse = _normalImpulse;
+			this.NormalImpulseAux = _normalImpulseAux;
+			this.FrictionImpulse = _frictionImpulse;
 		}
+		
 	}
 	
 }

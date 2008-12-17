@@ -28,11 +28,11 @@ package jiglib.collision {
 	import jiglib.physics.MaterialProperties;
 	
 	public class CollisionInfo {
-		public var Mat:MaterialProperties;
+		public var Mat:MaterialProperties=new MaterialProperties();
 		public var ObjInfo:CollDetectInfo;
 		public var DirToBody:JNumber3D;
 		public var PointInfo:Array;
-		
+		public var Satisfied:Boolean;
 	}
 	
 }

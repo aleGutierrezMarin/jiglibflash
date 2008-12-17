@@ -35,6 +35,7 @@ package jiglib.collision {
 		 
 		public var MinSeparationVel:Number = 0;
 		public var Denominator:Number = 0;
+		
 		public var AccumulatedNormalImpulse:Number = 0;
 		public var AccumulatedNormalImpulseAux:Number = 0;
 		public var AccumulatedFrictionImpulse:JNumber3D = new JNumber3D();

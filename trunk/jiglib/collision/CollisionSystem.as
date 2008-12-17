@@ -84,7 +84,6 @@ package jiglib.collision {
 		{
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
-			//var tempArr:Array = new Array();
 			for (var i:String in bodies)
 			{
 				for (var j:String in collBody)
@@ -97,7 +96,7 @@ package jiglib.collision {
 					{
 						continue;
 					}
-					if (detectionFunctors[bodies[i].BodySkin.Type][collBody[j].BodySkin.Type] != undefined/* && !findDetected(collBody[j],tempArr)*/)
+					if (detectionFunctors[bodies[i].BodySkin.Type][collBody[j].BodySkin.Type] != undefined)
 					{
 						info = new CollDetectInfo();
 			        	info.body0 = bodies[i];
@@ -106,20 +105,8 @@ package jiglib.collision {
 					    fu.CollDetect(info, collArr);
 					}
 				}
-				//tempArr.push(bodies[i]);
 			}
 			
-		}
-		private function findDetected(body:RigidBody, arr:Array):Boolean
-		{
-			for (var i:String in arr)
-			{
-				if (body == arr[i])
-				{
-					return true;
-				}
-			}
-			return false;
 		}
 		 
 		private function findBody(body:RigidBody):Boolean

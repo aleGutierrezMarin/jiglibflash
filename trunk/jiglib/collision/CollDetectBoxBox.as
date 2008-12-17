@@ -181,13 +181,12 @@ package jiglib.collision {
 			{
 				N = JNumber3D.multiply(N, -1);
 			}
-			var combinationDist:Number = 0.05 * Math.min(Math.min(box0.SideLengths.x, box0.SideLengths.y, box0.SideLengths.z), Math.min(box1.SideLengths.x, box1.SideLengths.y, box1.SideLengths.z));
+			var combinationDist:Number = 0.5 * Math.min(Math.min(box0.SideLengths.x, box0.SideLengths.y, box0.SideLengths.z), Math.min(box1.SideLengths.x, box1.SideLengths.y, box1.SideLengths.z));
 			var contactPoint:Array = new Array();
 			if (minDepth > -JNumber3D.NUM_TINY)
 			{
 				GetBoxBoxIntersectionPoints(contactPoint, box0, box1, combinationDist);
 			}
-			
 			var collPts:Array = new Array();
 
 			if (contactPoint.length > 0)
@@ -197,7 +196,7 @@ package jiglib.collision {
 				for (i = 0; i < contactPoint.length; i++ )
 				{
 					depth = minDepth;
-					
+					 
 					cpInfo = new CollPointInfo();
 					cpInfo.R0 = JNumber3D.sub(contactPoint[i].pos, box0.Position);
 					cpInfo.R1 = JNumber3D.sub(contactPoint[i].pos, box1.Position);
