@@ -87,7 +87,7 @@ package jiglib.geometry {
 			return true;
 		}
 		
-		public function GetMassProperties(mass:Number):JMatrix3D
+		override public function GetInertiaProperties(mass:Number):JMatrix3D
 		{
 			var inertiaTensor:JMatrix3D = new JMatrix3D();
 			 
