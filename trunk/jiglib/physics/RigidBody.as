@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -227,7 +227,6 @@ package jiglib.physics
 			{
 				return;
 			}
-			var 
 			_currLinVelocity = JNumber3D.add(_currLinVelocity, JNumber3D.multiply(impulse, _invMass));
 			
 			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, JNumber3D.sub(pos, _currPosition));
