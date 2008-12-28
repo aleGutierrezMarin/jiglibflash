@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -86,7 +86,7 @@ package jiglib.geometry {
 			out.posOut = seg.GetPoint(frac);
 			return true;
 		}
-		
+		 
 		override public function GetInertiaProperties(mass:Number):JMatrix3D
 		{
 			var inertiaTensor:JMatrix3D = new JMatrix3D();

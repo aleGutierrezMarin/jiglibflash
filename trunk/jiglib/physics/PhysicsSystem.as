@@ -29,6 +29,7 @@ package jiglib.physics {
 	import jiglib.collision.*;
 	import jiglib.math.*;
 	import jiglib.cof.JConfig;
+	import jiglib.physics.constraint.*;
 	
 	public class PhysicsSystem {
 		
@@ -61,7 +62,7 @@ package jiglib.physics {
 		public static function getInstance():PhysicsSystem
 	    {
 	    	if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.15 beta(2008-12-17)");
+				trace("version: JigLibFlash v0.2 beta(2008-12-28)");
 			    _currentPhysicsSystem = new PhysicsSystem();
 		    }
 		    return _currentPhysicsSystem;
@@ -75,6 +76,7 @@ package jiglib.physics {
 			_bodies = new Array();
 			_collisions = new Array();
 			_activeBodies = new Array();
+			_constraints = new Array();
 			
 			_cachedContacts = new Array();
 			_collisionSystem = new CollisionSystem();
@@ -138,6 +140,21 @@ package jiglib.physics {
 			}
 		}
 		
+		public function AddConstraint(constraint:JConstraint):void
+		{
+			if (!findConstraint(constraint))
+			{
+			    _constraints.push(constraint);
+			}
+		}
+		public function RemoveConstraint(constraint:JConstraint):void
+		{
+			if (findConstraint(constraint))
+			{
+			    _constraints.splice(_constraints.indexOf(constraint), 1);
+			}
+		}
+		
 		public function SetSolverType(type:String):void
 		{
 			switch(type)
@@ -189,6 +206,17 @@ package jiglib.physics {
 			for (var i:String in _bodies)
 			{
 				if (body == _bodies[i])
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		private function findConstraint(constraint:JConstraint):Boolean
+		{
+			for (var i:String in _constraints)
+			{
+				if (constraint == _constraints[i])
 				{
 					return true;
 				}
@@ -692,6 +720,12 @@ package jiglib.physics {
 		private function HandleAllConstraints(dt:Number, iter:int, forceInelastic:Boolean):void
 		{
 			var origNumCollisions:int = _collisions.length;
+			
+			for (var k:String in _constraints)
+			{
+				_constraints[k].PreApply(dt);
+			}
+			
 			if(forceInelastic)
 			{
 				for(var i:String in _collisions)
@@ -721,13 +755,21 @@ package jiglib.physics {
 						if(forceInelastic)
 						{
 							flag = ProcessContactFn(_collisions[i], dt);
-							gotOne = gotOne||flag;
+							gotOne = gotOne || flag;
 						}
 						else
 						{
 							flag = ProcessCollisionFn(_collisions[i], dt);
-							gotOne = gotOne||flag;
+							gotOne = gotOne || flag;
 						}
+					}
+				}
+				for (k in _constraints)
+				{
+					if (!_constraints[k].Satisfied)
+					{
+						flag = _constraints[k].Apply(dt);
+						gotOne = gotOne || flag;
 					}
 				}
 				TryToActivateAllFrozenObjects();
@@ -857,6 +899,13 @@ package jiglib.physics {
 				_activeBodies[i].UpdatePositionWithAux(dt);
 			}
 		}
+		private function UpdateAllObject3D():void
+		{
+			for (var i:String in _bodies)
+			{
+				_bodies[i].updateObject3D();
+			}
+		}
 		
 		private function LimitAllVelocities():void
 		{
@@ -901,7 +950,7 @@ package jiglib.physics {
 		{
 			for(var i:String in _bodies)
 			{
-				_bodies[i].Collisions=new Array();
+				_bodies[i].Collisions = new Array();
 			}
 			_collisions=new Array();
 			_collisionSystem.DetectAllCollisions(_activeBodies, _collisions);
@@ -949,7 +998,7 @@ package jiglib.physics {
 			 
 			//LimitAllVelocities();
 			UpdateAllPositions(dt);
-			 
+			UpdateAllObject3D();
 			if (JConfig.solverType == "ACCUMULATED")
 			{
 				UpdateContactCache();

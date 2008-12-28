@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -92,10 +92,12 @@ package jiglib.collision {
 					{
 						continue;
 					}
+					
 					if (collBody[j].IsActive() && bodies[i].ID > collBody[j].ID)
 					{
 						continue;
 					}
+					
 					if (detectionFunctors[bodies[i].BodySkin.Type][collBody[j].BodySkin.Type] != undefined)
 					{
 						info = new CollDetectInfo();

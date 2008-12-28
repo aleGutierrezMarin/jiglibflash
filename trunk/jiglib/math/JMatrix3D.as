@@ -570,58 +570,52 @@ public class JMatrix3D
 	}
 */
 
-	public static function matrix2euler( t:JMatrix3D ):JNumber3D
+	public static function matrix2euler( m :JMatrix3D, euler:JNumber3D=null, scale:JNumber3D=null ) : JNumber3D
 	{
-		var rot:JNumber3D = new JNumber3D();
+		euler = euler || new JNumber3D();
+		
+		// need to get rid of scale
+		// TODO: whene scale is uniform, we can save some cycles. s = 3x3 determinant i beleive
+		var sx		:Number = (scale && scale.x == 1) ? 1 : Math.sqrt(m.n11 * m.n11 + m.n21 * m.n21 + m.n31 * m.n31);
+		var sy		:Number = (scale && scale.y == 1) ? 1 : Math.sqrt(m.n12 * m.n12 + m.n22 * m.n22 + m.n32 * m.n32);
+		var sz		:Number = (scale && scale.z == 1) ? 1 : Math.sqrt(m.n13 * m.n13 + m.n23 * m.n23 + m.n33 * m.n33);
+		
+		var n11		:Number = m.n11 / sx;
+		var n21		:Number = m.n21 / sy;
+		var n31		:Number = m.n31 / sz;
+		var n32		:Number = m.n32 / sz;
+		var n33		:Number = m.n33 / sz;
+		
+		n31 = n31 > 1 ? 1 : n31;
+		n31 = n31 < -1 ? -1 : n31;
+		
+		// zyx
+		euler.y = Math.asin(-n31);
+		euler.z = Math.atan2(n21, n11);
+		euler.x = Math.atan2(n32, n33);
 
-		// Normalize the local x, y and z axes to remove scaling.
-		var i:JNumber3D = new JNumber3D( t.n11, t.n21, t.n31 );
-		var j:JNumber3D = new JNumber3D( t.n12, t.n22, t.n32 );
-		var k:JNumber3D = new JNumber3D( t.n13, t.n23, t.n33 );
-
-		i.normalize();
-		j.normalize();
-		k.normalize();
-
-		var m:JMatrix3D = new JMatrix3D(
-		[
-			i.x, j.x, k.x, 0,
-			i.y, j.y, k.y, 0,
-			i.z, j.z, k.z, 0
-		] );
-
-	    // Extract the first angle, rot.x
-		rot.x = Math.atan2( m.n23, m.n33 ); // rot.x = Math<T>::atan2 (M[1][2], M[2][2]);
-	
-		// Remove the rot.x rotation from M, so that the remaining
-		// rotation, N, is only around two axes, and gimbal lock
-		// cannot occur.
-		var rx:JMatrix3D = JMatrix3D.rotationX( -rot.x );
-		var n:JMatrix3D = JMatrix3D.multiply( rx, m );
-
-		// Extract the other two angles, rot.y and rot.z, from N.
-		var cy:Number = Math.sqrt( n.n11 * n.n11 + n.n21 * n.n21); // T cy = Math<T>::sqrt (N[0][0]*N[0][0] + N[0][1]*N[0][1]);
-		rot.y = Math.atan2( -n.n31, cy ); // rot.y = Math<T>::atan2 (-N[0][2], cy);
-		rot.z = Math.atan2( -n.n12, n.n11 ); //rot.z = Math<T>::atan2 (-N[1][0], N[1][1]);
-
-		// Fix angles
-		if( rot.x == Math.PI )
-		{
-			if( rot.y > 0 )
-				rot.y -= Math.PI;
-			else
-				rot.y += Math.PI;
-
-			rot.x = 0;
-			rot.z += Math.PI;
-		}
-
-		// Convert to degrees if needed
-		rot.x *= toDEGREES;
-		rot.y *= toDEGREES;
-		rot.z *= toDEGREES;
-
-		return rot;
+		// TODO: fix singularities
+		
+		// yzx
+		//euler.z = Math.asin(-m.n21);
+		//euler.y = Math.atan2(m.n31, m.n11);
+		//euler.x = Math.atan2(-m.n23, m.n22);
+		
+		// zxy
+		//euler.x = Math.asin(-m.n32);
+		//euler.z = Math.atan2(-m.n12, m.n22);
+		//euler.y = Math.atan2(-m.n31, m.n33);
+		
+		euler.x *= toDEGREES;
+		euler.y *= toDEGREES;
+		euler.z *= toDEGREES;
+		
+		//  Clamp values
+       // euler.x = euler.x < 0 ? euler.x + 360 : euler.x;
+       // euler.y = euler.y < 0 ? euler.y + 360 : euler.y;
+       // euler.z = euler.z < 0 ? euler.z + 360 : euler.z;
+        
+		return euler;
 	}
 
 	

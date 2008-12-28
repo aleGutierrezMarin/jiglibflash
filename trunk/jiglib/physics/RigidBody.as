@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -28,6 +28,7 @@ package jiglib.physics
 	import jiglib.geometry.JObject3D;
 	import jiglib.math.*;
 	import jiglib.cof.JConfig;
+	import jiglib.physics.constraint.JConstraint;
 	
 	public class RigidBody
 	{
@@ -76,16 +77,17 @@ package jiglib.physics
 		private var _lastPositionForDeactivation:JNumber3D;
 		private var _lastOrientationForDeactivation:JMatrix3D;
 		
+		private var _constraints:Array;
 		public var Collisions:Array;
 	     
 	    public function RigidBody(obj:JObject3D, mov:Boolean = true)
 	    {
 			_id = idCounter++;
-			
+			 
 	    	_object3D = obj;
 			_object3D.Position = new JNumber3D();
 			_object3D.Orientation = JMatrix3D.IDENTITY;
-			
+			 
 			 
 	    	_bodyInertia = JMatrix3D.IDENTITY;
 	    	_bodyInvInertia = JMatrix3D.inverse(_bodyInertia);
@@ -97,12 +99,12 @@ package jiglib.physics
 			_currRotVelocity = new JNumber3D();
 			_currLinVelocityAux = new JNumber3D();
 			_currRotVelocityAux = new JNumber3D();
-			
+			 
 			_oldPosition = new JNumber3D();
 			_oldOrientation = JMatrix3D.IDENTITY;
 			_oldLinVelocity = new JNumber3D();
 			_oldRotVelocity = new JNumber3D();
-			
+			 
 			_storedPosition = new JNumber3D();
 			_storedOrientation = JMatrix3D.IDENTITY;
 			_storedLinVelocity = new JNumber3D();
@@ -111,21 +113,22 @@ package jiglib.physics
 	    	_force = new JNumber3D();
 	    	_torque = new JNumber3D();
 	    	 
+			_origMovable = mov;
 			_velChanged = false;
+			_inactiveTime = 0;
+			 
+			setMass(1);
 			_activity = mov;
 			_movable = mov;
-			_origMovable = mov;
-			_inactiveTime = 0;
-			
-			setMass(1);
-			
+			 
+			_constraints = new Array();
 			Collisions=new Array();
 			_storedPositionForActivation = new JNumber3D();
 			_bodiesToBeActivatedOnMovement = new Array();
 			_lastPositionForDeactivation = _currPosition.clone();
 			_lastOrientationForDeactivation = JMatrix3D.clone(_currOrientation);
 	    }
-		
+		 
 		public function SetOrientation(orient:JMatrix3D):void
 		{
 			_currOrientation.copy(orient);
@@ -133,7 +136,7 @@ package jiglib.physics
 			_worldInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currOrientation, _bodyInertia), _invOrientation);
 			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currOrientation, _bodyInvInertia), _invOrientation);
 		}
-		
+		 
 		public function MoveTo(pos:JNumber3D, orientation:JMatrix3D):void
 		{
 			pos.copyTo(_currPosition);
@@ -141,9 +144,8 @@ package jiglib.physics
 			_currLinVelocity = JNumber3D.ZERO;
 			_currRotVelocity = JNumber3D.ZERO;
 			CopyCurrentStateToOld();
-			updateObject3D();
 		}
-		
+		 
 		public function SetVelocity(vel:JNumber3D):void
 		{
 			vel.copyTo(_currLinVelocity);
@@ -169,6 +171,32 @@ package jiglib.physics
 			}
 	    	_force = JNumber3D.add(_force, JNumber3D.multiply(PhysicsSystem.getInstance().Gravity,_mass));
 			_velChanged = true;
+		}
+		
+		private function findConstraint(constraint:JConstraint):Boolean
+		{
+			for (var i:String in _constraints)
+			{
+				if (constraint == _constraints[i])
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		public function AddConstraint(constraint:JConstraint):void
+		{
+			if (!findConstraint(constraint))
+			{
+			    _constraints.push(constraint);
+			}
+		}
+		public function RemoveConstraint(constraint:JConstraint):void
+		{
+			if (findConstraint(constraint))
+			{
+			    _constraints.splice(_constraints.indexOf(constraint), 1);
+			}
 		}
 	     
 	    public function AddWorldTorque(t:JNumber3D):void
@@ -315,7 +343,7 @@ package jiglib.physics
 			}
 			SetOrientation(_currOrientation);
 			
-			updateObject3D();
+			//updateObject3D();
 		}
 		public function UpdatePositionWithAux(dt:Number):void
 		{
@@ -347,7 +375,7 @@ package jiglib.physics
 			_currRotVelocityAux = JNumber3D.ZERO;
 			SetOrientation(_currOrientation);
 			
-			updateObject3D();
+			//updateObject3D();
 		}
 		 
 		public function TryToFreeze(dt:Number):void
