@@ -112,16 +112,16 @@ package jiglib.collision {
 		 
 		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
 		{
-			var box0:JBox = info.body0.BodySkin as JBox;
-			var box1:JBox = info.body1.BodySkin as JBox;
+			var box0:JBox = info.body0 as JBox;
+			var box1:JBox = info.body1 as JBox;
 			 
 			if (!box0.hitTestObject3D(box1))
 			{
 				return;
 			}
 			 
-			var dirs0Arr:Array = box0.Orientation.getCols();
-			var dirs1Arr:Array = box1.Orientation.getCols();
+			var dirs0Arr:Array = box0.CurrentState.Orientation.getCols();
+			var dirs1Arr:Array = box1.CurrentState.Orientation.getCols();
 			 
 			var axes:Array = new Array(dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
 			                           dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
@@ -177,7 +177,7 @@ package jiglib.collision {
 				return;
 			}
 			var N:JNumber3D = axes[minAxis].clone();
-			if (JNumber3D.dot(JNumber3D.sub(box1.Position, box0.Position), N) > 0)
+			if (JNumber3D.dot(JNumber3D.sub(box1.CurrentState.Position, box0.CurrentState.Position), N) > 0)
 			{
 				N = JNumber3D.multiply(N, -1);
 			}
@@ -198,8 +198,8 @@ package jiglib.collision {
 					depth = minDepth;
 					 
 					cpInfo = new CollPointInfo();
-					cpInfo.R0 = JNumber3D.sub(contactPoint[i].pos, box0.Position);
-					cpInfo.R1 = JNumber3D.sub(contactPoint[i].pos, box1.Position);
+					cpInfo.R0 = JNumber3D.sub(contactPoint[i].pos, box0.CurrentState.Position);
+					cpInfo.R1 = JNumber3D.sub(contactPoint[i].pos, box1.CurrentState.Position);
 					cpInfo.Position = contactPoint[i].pos;
 					cpInfo.InitialPenetration = depth;
 					collPts.push(cpInfo);

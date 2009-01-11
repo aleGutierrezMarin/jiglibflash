@@ -25,7 +25,9 @@ distribution.
 
 package jiglib.physics
 {
-	import jiglib.geometry.JObject3D;
+	import org.papervision3d.core.math.*;
+	import org.papervision3d.objects.DisplayObject3D;
+	
 	import jiglib.math.*;
 	import jiglib.cof.JConfig;
 	import jiglib.physics.constraint.JConstraint;
@@ -35,25 +37,14 @@ package jiglib.physics
 		private static var idCounter:int = 0;
 		
 		private var _id:int;
-		private var _object3D:JObject3D;
+		private var _skin:DisplayObject3D;
 		 
-		private var _currPosition:JNumber3D;
-		private var _currOrientation:JMatrix3D;
+		private var _currState:PhysicsState;
+		private var _oldState:PhysicsState;
+		private var _storeState:PhysicsState;
 		private var _invOrientation:JMatrix3D;
-		private var _currLinVelocity:JNumber3D;
-	    private var _currRotVelocity:JNumber3D;
 		private var _currLinVelocityAux:JNumber3D;
 		private var _currRotVelocityAux:JNumber3D;
-		 
-		private var _oldPosition:JNumber3D;
-		private var _oldOrientation:JMatrix3D;
-		private var _oldLinVelocity:JNumber3D;
-	    private var _oldRotVelocity:JNumber3D;
-		 
-		private var _storedPosition:JNumber3D;
-		private var _storedOrientation:JMatrix3D;
-		private var _storedLinVelocity:JNumber3D;
-	    private var _storedRotVelocity:JNumber3D;
 		 
 		private var _mass:Number;
 		private var _invMass:Number;
@@ -78,37 +69,30 @@ package jiglib.physics
 		private var _lastOrientationForDeactivation:JMatrix3D;
 		
 		private var _constraints:Array;
+		
 		public var Collisions:Array;
+		public var Material:MaterialProperties;
+		
+		
+		protected var _type:String;
+		protected var _boundingSphere:Number;
 	     
-	    public function RigidBody(obj:JObject3D, mov:Boolean = true)
+	    public function RigidBody(skin:DisplayObject3D, mov:Boolean = true)
 	    {
 			_id = idCounter++;
 			 
-	    	_object3D = obj;
-			_object3D.Position = new JNumber3D();
-			_object3D.Orientation = JMatrix3D.IDENTITY;
-			 
+			_skin = skin;
+			Material = new MaterialProperties();
 			 
 	    	_bodyInertia = JMatrix3D.IDENTITY;
 	    	_bodyInvInertia = JMatrix3D.inverse(_bodyInertia);
 			 
-	    	_currPosition = new JNumber3D();
-			_currOrientation = JMatrix3D.IDENTITY;
-			_invOrientation = JMatrix3D.inverse(_currOrientation);
-			_currLinVelocity = new JNumber3D();
-			_currRotVelocity = new JNumber3D();
+			_currState = new PhysicsState();
+			_oldState = new PhysicsState();
+			_storeState = new PhysicsState();
+			_invOrientation = JMatrix3D.inverse(_currState.Orientation);
 			_currLinVelocityAux = new JNumber3D();
 			_currRotVelocityAux = new JNumber3D();
-			 
-			_oldPosition = new JNumber3D();
-			_oldOrientation = JMatrix3D.IDENTITY;
-			_oldLinVelocity = new JNumber3D();
-			_oldRotVelocity = new JNumber3D();
-			 
-			_storedPosition = new JNumber3D();
-			_storedOrientation = JMatrix3D.IDENTITY;
-			_storedLinVelocity = new JNumber3D();
-			_storedRotVelocity = new JNumber3D();
 			 
 	    	_force = new JNumber3D();
 	    	_torque = new JNumber3D();
@@ -117,7 +101,6 @@ package jiglib.physics
 			_velChanged = false;
 			_inactiveTime = 0;
 			 
-			setMass(1);
 			_activity = mov;
 			_movable = mov;
 			 
@@ -125,34 +108,37 @@ package jiglib.physics
 			Collisions=new Array();
 			_storedPositionForActivation = new JNumber3D();
 			_bodiesToBeActivatedOnMovement = new Array();
-			_lastPositionForDeactivation = _currPosition.clone();
-			_lastOrientationForDeactivation = JMatrix3D.clone(_currOrientation);
+			_lastPositionForDeactivation = _currState.Position.clone();
+			_lastOrientationForDeactivation = JMatrix3D.clone(_currState.Orientation);
+			
+			_type = "Object3D";
+			_boundingSphere = 0;
 	    }
 		 
 		public function SetOrientation(orient:JMatrix3D):void
 		{
-			_currOrientation.copy(orient);
-			_invOrientation = JMatrix3D.Transpose(_currOrientation);
-			_worldInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currOrientation, _bodyInertia), _invOrientation);
-			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currOrientation, _bodyInvInertia), _invOrientation);
+			_currState.Orientation.copy(orient);
+			_invOrientation = JMatrix3D.Transpose(_currState.Orientation);
+			_worldInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.Orientation, _bodyInertia), _invOrientation);
+			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.Orientation, _bodyInvInertia), _invOrientation);
 		}
 		 
 		public function MoveTo(pos:JNumber3D, orientation:JMatrix3D):void
 		{
-			pos.copyTo(_currPosition);
+			pos.copyTo(_currState.Position);
 			SetOrientation(orientation);
-			_currLinVelocity = JNumber3D.ZERO;
-			_currRotVelocity = JNumber3D.ZERO;
+			_currState.LinVelocity = JNumber3D.ZERO;
+			_currState.RotVelocity = JNumber3D.ZERO;
 			CopyCurrentStateToOld();
 		}
 		 
 		public function SetVelocity(vel:JNumber3D):void
 		{
-			vel.copyTo(_currLinVelocity);
+			vel.copyTo(_currState.LinVelocity);
 		}
 		public function SetAngVel(angVel:JNumber3D):void
 		{
-			angVel.copyTo(_currRotVelocity);
+			angVel.copyTo(_currState.RotVelocity);
 		}
 		public function SetVelocityAux(vel:JNumber3D):void
 		{
@@ -217,7 +203,7 @@ package jiglib.physics
 				return;
 			}
 	    	_force = JNumber3D.add(_force, f);
-	        AddWorldTorque(JNumber3D.cross(f, JNumber3D.sub(p, _currPosition)));
+	        AddWorldTorque(JNumber3D.cross(f, JNumber3D.sub(p, _currState.Position)));
 			_velChanged = true;
 			SetActive();
 	    }
@@ -228,9 +214,9 @@ package jiglib.physics
 			{
 				return;
 			}
-			JMatrix3D.multiplyVector(_currOrientation, f);
-			JMatrix3D.multiplyVector(_currOrientation, p);
-			AddWorldForce(f, JNumber3D.add(_currPosition, p));
+			JMatrix3D.multiplyVector(_currState.Orientation, f);
+			JMatrix3D.multiplyVector(_currState.Orientation, p);
+			AddWorldForce(f, JNumber3D.add(_currState.Position, p));
 		}
 		 
 		public function AddBodyTorque(t:JNumber3D):void
@@ -239,7 +225,7 @@ package jiglib.physics
 			{
 				return;
 			}
-			JMatrix3D.multiplyVector(_currOrientation, t);
+			JMatrix3D.multiplyVector(_currState.Orientation, t);
 			AddWorldTorque(t);
 		}
 		 
@@ -255,11 +241,11 @@ package jiglib.physics
 			{
 				return;
 			}
-			_currLinVelocity = JNumber3D.add(_currLinVelocity, JNumber3D.multiply(impulse, _invMass));
+			_currState.LinVelocity = JNumber3D.add(_currState.LinVelocity, JNumber3D.multiply(impulse, _invMass));
 			
-			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, JNumber3D.sub(pos, _currPosition));
+			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, JNumber3D.sub(pos, _currState.Position));
 			JMatrix3D.multiplyVector(_worldInvInertia, rotImpulse);
-			_currRotVelocity = JNumber3D.add(_currRotVelocity, rotImpulse);
+			_currState.RotVelocity = JNumber3D.add(_currState.RotVelocity, rotImpulse);
 			
 			_velChanged = true;
 		}
@@ -271,7 +257,7 @@ package jiglib.physics
 			}
 			_currLinVelocityAux = JNumber3D.add(_currLinVelocityAux, JNumber3D.multiply(impulse, _invMass));
 			
-			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, JNumber3D.sub(pos, _currPosition));
+			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, JNumber3D.sub(pos, _currState.Position));
 			JMatrix3D.multiplyVector(_worldInvInertia, rotImpulse);
 			_currRotVelocityAux = JNumber3D.add(_currRotVelocityAux, rotImpulse);
 			
@@ -284,11 +270,11 @@ package jiglib.physics
 			{
 				return;
 			}
-			_currLinVelocity = JNumber3D.add(_currLinVelocity, JNumber3D.multiply(impulse, _invMass));
+			_currState.LinVelocity = JNumber3D.add(_currState.LinVelocity, JNumber3D.multiply(impulse, _invMass));
 			
 			var rotImpulse:JNumber3D = JNumber3D.cross(impulse, delta);
 			JMatrix3D.multiplyVector(_worldInvInertia, rotImpulse);
-			_currRotVelocity = JNumber3D.add(_currRotVelocity, rotImpulse);
+			_currState.RotVelocity = JNumber3D.add(_currState.RotVelocity, rotImpulse);
 			
 			_velChanged = true;
 		}
@@ -313,14 +299,14 @@ package jiglib.physics
 			{
 				return;
 			}
-			_currLinVelocity = JNumber3D.add(_currLinVelocity, JNumber3D.multiply(_force, _invMass * dt));
+			_currState.LinVelocity = JNumber3D.add(_currState.LinVelocity, JNumber3D.multiply(_force, _invMass * dt));
 			
 			var rac:JNumber3D = JNumber3D.multiply(_torque, dt);
 			JMatrix3D.multiplyVector(_worldInvInertia, rac);
-			_currRotVelocity = JNumber3D.add(_currRotVelocity, rac);
+			_currState.RotVelocity = JNumber3D.add(_currState.RotVelocity, rac);
 			
-			_currLinVelocity = JNumber3D.multiply(_currLinVelocity, 0.995);
-	    	_currRotVelocity = JNumber3D.multiply(_currRotVelocity, 0.995);
+			_currState.LinVelocity = JNumber3D.multiply(_currState.LinVelocity, 0.995);
+	    	_currState.RotVelocity = JNumber3D.multiply(_currState.RotVelocity, 0.995);
 		}
 		 
 		public function UpdatePosition(dt:Number):void
@@ -330,20 +316,18 @@ package jiglib.physics
 				return;
 			}
 			 
-			_currPosition = JNumber3D.add(_currPosition, JNumber3D.multiply(_currLinVelocity, dt));
+			_currState.Position = JNumber3D.add(_currState.Position, JNumber3D.multiply(_currState.LinVelocity, dt));
 			
-			var dir:JNumber3D = _currRotVelocity.clone();
+			var dir:JNumber3D = _currState.RotVelocity.clone();
 			var ang:Number = dir.modulo;
 			if (ang > 0)
 			{
 				dir.normalize();
 				ang *= dt;
 				var rot:JMatrix3D = JMatrix3D.rotationMatrix(dir.x, dir.y, dir.z, ang);
-				_currOrientation = JMatrix3D.multiply(rot, _currOrientation);
+				_currState.Orientation = JMatrix3D.multiply(rot, _currState.Orientation);
 			}
-			SetOrientation(_currOrientation);
-			
-			//updateObject3D();
+			SetOrientation(_currState.Orientation);
 		}
 		public function UpdatePositionWithAux(dt:Number):void
 		{
@@ -360,22 +344,20 @@ package jiglib.physics
 				_currLinVelocityAux.toArray()[(ga + 2) % 3] *= 0;
 			}
 			
-			_currPosition = JNumber3D.add(_currPosition, JNumber3D.multiply(JNumber3D.add(_currLinVelocity, _currLinVelocityAux), dt));
+			_currState.Position = JNumber3D.add(_currState.Position, JNumber3D.multiply(JNumber3D.add(_currState.LinVelocity, _currLinVelocityAux), dt));
 			
-			var dir:JNumber3D = JNumber3D.add(_currRotVelocity, _currRotVelocityAux);
+			var dir:JNumber3D = JNumber3D.add(_currState.RotVelocity, _currRotVelocityAux);
 			var ang:Number = dir.modulo;
 			if (ang > 0)
 			{
 				dir.normalize();
 				ang *= dt;
 				var rot:JMatrix3D = JMatrix3D.rotationMatrix(dir.x, dir.y, dir.z, ang);
-				_currOrientation = JMatrix3D.multiply(rot, _currOrientation);
+				_currState.Orientation = JMatrix3D.multiply(rot, _currState.Orientation);
 			}
 			_currLinVelocityAux = JNumber3D.ZERO;
 			_currRotVelocityAux = JNumber3D.ZERO;
-			SetOrientation(_currOrientation);
-			
-			//updateObject3D();
+			SetOrientation(_currState.Orientation);
 		}
 		 
 		public function TryToFreeze(dt:Number):void
@@ -384,19 +366,19 @@ package jiglib.physics
 			{
 				return;
 			}
-			if (JNumber3D.sub(_currPosition, _lastPositionForDeactivation).modulo > JConfig.posThreshold)
+			if (JNumber3D.sub(_currState.Position, _lastPositionForDeactivation).modulo > JConfig.posThreshold)
 			{
-				_currPosition.copyTo(_lastPositionForDeactivation);
+				_currState.Position.copyTo(_lastPositionForDeactivation);
 				_inactiveTime = 0;
 				return;
 			}
 			
-			var deltaMat:JMatrix3D = JMatrix3D.sub(_currOrientation, _lastOrientationForDeactivation);
+			var deltaMat:JMatrix3D = JMatrix3D.sub(_currState.Orientation, _lastOrientationForDeactivation);
 			if (deltaMat.getCols()[0].modulo > JConfig.orientThreshold || 
 			    deltaMat.getCols()[1].modulo > JConfig.orientThreshold || 
 				deltaMat.getCols()[2].modulo > JConfig.orientThreshold)
 			{
-				_lastOrientationForDeactivation.copy(_currOrientation);
+				_lastOrientationForDeactivation.copy(_currState.Orientation);
 				_inactiveTime = 0;
 				return;
 			}
@@ -407,8 +389,8 @@ package jiglib.physics
 			_inactiveTime += dt;
 			if (_inactiveTime > JConfig.deactivationTime)
 			{
-				_currPosition.copyTo(_lastPositionForDeactivation);
-				_lastOrientationForDeactivation.copy(_currOrientation);
+				_currState.Position.copyTo(_lastPositionForDeactivation);
+				_lastOrientationForDeactivation.copy(_currState.Orientation);
 				SetInactive();
 			}
 		}
@@ -418,15 +400,15 @@ package jiglib.physics
 			_mass=m;
 			_invMass = 1 / m;
 			
-			setInertia(_object3D.GetInertiaProperties(m));
+			setInertia(GetInertiaProperties(m));
 		}
 		public function setInertia(i:JMatrix3D):void
 		{
 			_bodyInertia = JMatrix3D.clone(i);
 	    	_bodyInvInertia = JMatrix3D.inverse(i);
 			
-			_worldInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currOrientation, _bodyInertia), _invOrientation);
-			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currOrientation, _bodyInvInertia), _invOrientation);
+			_worldInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.Orientation, _bodyInertia), _invOrientation);
+			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.Orientation, _bodyInvInertia), _invOrientation);
 		}
 		
 		public function IsActive():Boolean
@@ -473,7 +455,7 @@ package jiglib.physics
 		}
 		public function GetVelocity(relPos:JNumber3D):JNumber3D
 		{
-			return JNumber3D.add(_currLinVelocity,JNumber3D.cross(relPos,_currRotVelocity));
+			return JNumber3D.add(_currState.LinVelocity,JNumber3D.cross(relPos,_currState.RotVelocity));
 		}
 		public function GetVelocityAux(relPos:JNumber3D):JNumber3D
 		{
@@ -482,8 +464,8 @@ package jiglib.physics
 		
 		public function GetShouldBeActive():Boolean
 		{
-			return ((_currLinVelocity.modulo > JConfig.velThreshold) || 
-                    (_currRotVelocity.modulo > JConfig.angVelThreshold));
+			return ((_currState.LinVelocity.modulo > JConfig.velThreshold) || 
+                    (_currState.RotVelocity.modulo > JConfig.angVelThreshold));
 		}
 		public function GetShouldBeActiveAux():Boolean
 		{
@@ -509,14 +491,14 @@ package jiglib.physics
 			{
 				scale = 1;
 			}
-			_currLinVelocity = JNumber3D.multiply(_currLinVelocity, scale);
-	    	_currRotVelocity = JNumber3D.multiply(_currRotVelocity, scale);
+			_currState.LinVelocity = JNumber3D.multiply(_currState.LinVelocity, scale);
+	    	_currState.RotVelocity = JNumber3D.multiply(_currState.RotVelocity, scale);
 		}
 		 
 		public function DoMovementActivations():void
 		{
 			if (_bodiesToBeActivatedOnMovement.length == 0 || 
-			    JNumber3D.sub(_currPosition, _storedPositionForActivation).modulo < JConfig.posThreshold)
+			    JNumber3D.sub(_currState.Position, _storedPositionForActivation).modulo < JConfig.posThreshold)
 			{
 				return;
 			}
@@ -551,62 +533,78 @@ package jiglib.physics
 			}
 		}
 		
+		public function GetInertiaProperties(mass:Number):JMatrix3D
+		{
+			return new JMatrix3D();
+		}
+		
+		public function hitTestObject3D(obj3D:RigidBody):Boolean
+		{
+			var num1:Number = JNumber3D.sub(_currState.Position, obj3D.CurrentState.Position).modulo;
+			var num2:Number = _boundingSphere + obj3D.BoundingSphere;
+			
+			if (num1 <= num2)
+			{
+				return true;
+			}
+			
+			return false;
+		}
+		
 		public function CopyCurrentStateToOld():void
 		{
-			_currPosition.copyTo(_oldPosition);
-			_oldOrientation.copy(_currOrientation);
-			_currLinVelocity.copyTo(_oldLinVelocity);
-			_currRotVelocity.copyTo(_oldRotVelocity);
+			_currState.Position.copyTo(_oldState.Position);
+			_oldState.Orientation.copy(_currState.Orientation);
+			_currState.LinVelocity.copyTo(_oldState.LinVelocity);
+			_currState.RotVelocity.copyTo(_oldState.RotVelocity);
 		}
 		
 		public function StoreState():void
 		{
-			_currPosition.copyTo(_storedPosition);
-			_storedOrientation.copy(_currOrientation);
-			_currLinVelocity.copyTo(_storedLinVelocity);
-			_currRotVelocity.copyTo(_storedRotVelocity);
+			_currState.Position.copyTo(_storeState.Position);
+			_storeState.Orientation.copy(_currState.Orientation);
+			_currState.LinVelocity.copyTo(_storeState.LinVelocity);
+			_currState.RotVelocity.copyTo(_storeState.RotVelocity);
 		}
 		 
 		public function RestoreState():void
 		{
-			_storedPosition.copyTo(_currPosition);
-			_currOrientation.copy(_storedOrientation);
-			_storedLinVelocity.copyTo(_currLinVelocity);
-			_storedRotVelocity.copyTo(_currRotVelocity);
+			_storeState.Position.copyTo(_currState.Position);
+			_currState.Orientation.copy(_storeState.Orientation);
+			_storeState.LinVelocity.copyTo(_currState.LinVelocity);
+			_storeState.RotVelocity.copyTo(_currState.RotVelocity);
 			
-			SetOrientation(_currOrientation);
+			SetOrientation(_currState.Orientation);
 		}
 		 
-		public function get CurrentState():Object
+		public function get CurrentState():PhysicsState
 		{
-			var obj:Object = new Object();
-			obj.Position = _currPosition;
-			obj.Orientation = _currOrientation;
-			obj.LinVelocity = _currLinVelocity;
-			obj.RotVelocity = _currRotVelocity;
-			 
-			return obj;
+			return _currState;
 		}
 		 
-		public function get OldState():Object
+		public function get OldState():PhysicsState
 		{
-			var obj:Object = new Object();
-			obj.Position = _oldPosition;
-			obj.Orientation = _oldOrientation;
-			obj.LinVelocity = _oldLinVelocity;
-			obj.RotVelocity = _oldRotVelocity;
-			 
-			return obj;
+			return _oldState;
 		}
 		
 		public function get ID():int
 		{
 			return _id;
 		}
-		 
-		public function get BodySkin():JObject3D
+		
+		public function get Type():String
 		{
-			return _object3D;
+			return _type;
+		}
+		 
+		public function get BodySkin():DisplayObject3D
+		{
+			return _skin;
+		}
+		
+		public function get BoundingSphere():Number
+		{
+			return _boundingSphere;
 		}
 		
 		public function get Force():JNumber3D
@@ -634,62 +632,80 @@ package jiglib.physics
 		
 		public function LimitVel():void
 		{
-			if(_currLinVelocity.x<-100)
+			if(_currState.LinVelocity.x<-100)
 			{
-				_currLinVelocity.x=-100;
+				_currState.LinVelocity.x=-100;
 			}
-			else if(_currLinVelocity.x>100)
+			else if(_currState.LinVelocity.x>100)
 			{
-				_currLinVelocity.x=100;
+				_currState.LinVelocity.x=100;
 			}
-			if(_currLinVelocity.y<-100)
+			if(_currState.LinVelocity.y<-100)
 			{
-				_currLinVelocity.y=-100;
+				_currState.LinVelocity.y=-100;
 			}
-			else if(_currLinVelocity.y>100)
+			else if(_currState.LinVelocity.y>100)
 			{
-				_currLinVelocity.y=100;
+				_currState.LinVelocity.y=100;
 			}
-			if(_currLinVelocity.z<-100)
+			if(_currState.LinVelocity.z<-100)
 			{
-				_currLinVelocity.z=-100;
+				_currState.LinVelocity.z=-100;
 			}
-			else if(_currLinVelocity.z>100)
+			else if(_currState.LinVelocity.z>100)
 			{
-				_currLinVelocity.z=100;
+				_currState.LinVelocity.z=100;
 			}
 		}
 		public function LimitAngVel():void
 		{
-			if(_currRotVelocity.x<-50)
+			if(_currState.RotVelocity.x<-50)
 			{
-				_currRotVelocity.x=-50;
+				_currState.RotVelocity.x=-50;
 			}
-			else if(_currRotVelocity.x>50)
+			else if(_currState.RotVelocity.x>50)
 			{
-				_currRotVelocity.x=50;
+				_currState.RotVelocity.x=50;
 			}
-			if(_currRotVelocity.y<-50)
+			if(_currState.RotVelocity.y<-50)
 			{
-				_currRotVelocity.y=-50;
+				_currState.RotVelocity.y=-50;
 			}
-			else if(_currRotVelocity.y>50)
+			else if(_currState.RotVelocity.y>50)
 			{
-				_currRotVelocity.y=50;
+				_currState.RotVelocity.y=50;
 			}
-			if(_currRotVelocity.z<-50)
+			if(_currState.RotVelocity.z<-50)
 			{
-				_currRotVelocity.z=-50;
+				_currState.RotVelocity.z=-50;
 			}
-			else if(_currRotVelocity.z>50)
+			else if(_currState.RotVelocity.z>50)
 			{
-				_currRotVelocity.z=50;
+				_currState.RotVelocity.z=50;
 			}
 		}
 		 
+		public function getTransform():JMatrix3D
+		{
+			var tr:JMatrix3D=new JMatrix3D();
+			tr.n11=_skin.transform.n11; tr.n12=_skin.transform.n12; tr.n13=_skin.transform.n13; tr.n14=_skin.transform.n14;
+			tr.n21=_skin.transform.n21; tr.n22=_skin.transform.n22; tr.n23=_skin.transform.n23; tr.n24=_skin.transform.n24;
+			tr.n31=_skin.transform.n31; tr.n32=_skin.transform.n32; tr.n33=_skin.transform.n33; tr.n34=_skin.transform.n34;
+			tr.n41=_skin.transform.n41; tr.n42=_skin.transform.n42; tr.n43=_skin.transform.n43; tr.n44=_skin.transform.n44;
+			 
+			return tr;
+		}
+		
 		public function updateObject3D():void
 	    {
-			_object3D.setTransform(_currPosition, _currOrientation);
+			var p:Number3D=new Number3D(_currState.Position.x,_currState.Position.y,_currState.Position.z);
+			var o:Matrix3D=new Matrix3D();
+			o.n11=_currState.Orientation.n11; o.n12=_currState.Orientation.n12; o.n13=_currState.Orientation.n13; o.n14=_currState.Orientation.n14;
+			o.n21=_currState.Orientation.n21; o.n22=_currState.Orientation.n22; o.n23=_currState.Orientation.n23; o.n24=_currState.Orientation.n24;
+			o.n31=_currState.Orientation.n31; o.n32=_currState.Orientation.n32; o.n33=_currState.Orientation.n33; o.n34=_currState.Orientation.n34;
+			o.n41=_currState.Orientation.n41; o.n42=_currState.Orientation.n42; o.n43=_currState.Orientation.n43; o.n44=_currState.Orientation.n44;
+			
+			_skin.transform=Matrix3D.multiply(Matrix3D.translationMatrix(p.x, p.y, p.z), o);
 	    }
 	}
 }

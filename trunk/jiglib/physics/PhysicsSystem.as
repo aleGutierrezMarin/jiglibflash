@@ -25,7 +25,6 @@ distribution.
 
 package jiglib.physics {
 
-	import flash.utils.getTimer;
 	import jiglib.collision.*;
 	import jiglib.math.*;
 	import jiglib.cof.JConfig;
@@ -62,7 +61,7 @@ package jiglib.physics {
 		public static function getInstance():PhysicsSystem
 	    {
 	    	if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.2 beta(2008-12-28)");
+				trace("version: JigLibFlash v0.25 (2009-1-11)");
 			    _currentPhysicsSystem = new PhysicsSystem();
 		    }
 		    return _currentPhysicsSystem;

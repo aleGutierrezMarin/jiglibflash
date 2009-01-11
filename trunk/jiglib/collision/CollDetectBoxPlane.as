@@ -28,57 +28,71 @@ package jiglib.collision {
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
+	import jiglib.physics.RigidBody;
 	import jiglib.physics.MaterialProperties;
 	
-	public class CollDetectSphereSphere extends CollDetectFunctor {
+	public class CollDetectBoxPlane extends CollDetectFunctor {
 		
-		public function CollDetectSphereSphere() {
-			Name = "SphereSphere";
-			Type0 = "SPHERE";
-			Type1 = "SPHERE";
+		public function CollDetectBoxPlane() {
+			Name = "BoxPlane";
+			Type0 = "BOX";
+			Type1 = "PLANE";
 		}
 		
 		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
 		{
-			var sphere0:JSphere = info.body0 as JSphere;
-			var sphere1:JSphere = info.body1 as JSphere;
-			
-			var delta:JNumber3D = JNumber3D.sub(sphere0.CurrentState.Position, sphere1.CurrentState.Position);
-			
-			var dist:Number = delta.modulo;
-			var radSum:Number = sphere0.Radius + sphere1.Radius;
-			
-			if (dist < radSum + JConfig.collToll)
+			var tempBody:RigidBody;
+			if(info.body0.Type=="PLANE")
 			{
-				var depth:Number = radSum - dist;
-				delta.normalize();
-				
-				var worldPos:JNumber3D = JNumber3D.add(sphere1.CurrentState.Position, JNumber3D.multiply(delta, sphere1.Radius - 0.5 * depth));
-				
-				var collPts:Array = new Array();
-				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(worldPos, sphere0.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(worldPos, sphere1.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
-				collPts.push(cpInfo);
-				
+				tempBody=info.body0;
+				info.body0=info.body1;
+				info.body1=tempBody;
+			}
+			
+			var box:JBox = info.body0 as JBox;
+			var plane:JPlane = info.body1 as JPlane;
+			
+			var centreDist:Number = plane.PointPlaneDistance(box.CurrentState.Position);
+			if (centreDist > box.BoundingSphere + JConfig.collToll)
+			{
+				return;
+			}
+			
+			var newPts:Array=box.GetCornerPoints();
+			var collPts:Array = new Array();
+			var cpInfo:CollPointInfo;
+			var pt:JNumber3D;
+			var depth:Number;
+			for(var i:String in newPts)
+			{
+				pt=newPts[i];
+				depth=-1*plane.PointPlaneDistance(pt);
+				if(depth>-JConfig.collToll)
+				{
+					cpInfo=new CollPointInfo();
+					cpInfo.R0 = JNumber3D.sub(pt, box.CurrentState.Position);
+					cpInfo.R1 = JNumber3D.sub(pt, plane.CurrentState.Position);
+					cpInfo.InitialPenetration = depth;
+					collPts.push(cpInfo);
+				}
+			}
+			if(collPts.length>0)
+			{
 				var collInfo:CollisionInfo=new CollisionInfo();
 			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = delta;
+			    collInfo.DirToBody = plane.Normal;
 			    collInfo.PointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(sphere0.Material.Restitution * sphere1.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(sphere0.Material.StaticFriction * sphere1.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(sphere0.Material.DynamicFriction * sphere1.Material.DynamicFriction);
+				mat.Restitution = Math.sqrt(box.Material.Restitution * plane.Material.Restitution);
+				mat.StaticFriction = Math.sqrt(box.Material.StaticFriction * plane.Material.StaticFriction);
+				mat.DynamicFriction = Math.sqrt(box.Material.DynamicFriction * plane.Material.DynamicFriction);
 				collInfo.Mat = mat;
 				collArr.push(collInfo);
-				
 				info.body0.Collisions.push(collInfo);
 			    info.body1.Collisions.push(collInfo);
 			}
 		}
-		
 	}
 	
 }

@@ -42,15 +42,15 @@ package jiglib.collision {
 		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
 		{
 			var tempBody:RigidBody;
-			if(info.body0.BodySkin.Type=="BOX")
+			if(info.body0.Type=="BOX")
 			{
 				tempBody=info.body0;
 				info.body0=info.body1;
 				info.body1=tempBody;
 			}
 			
-			var sphere:JSphere = info.body0.BodySkin as JSphere;
-			var box:JBox = info.body1.BodySkin as JBox;
+			var sphere:JSphere = info.body0 as JSphere;
+			var box:JBox = info.body1 as JBox;
 			
 			if (!sphere.hitTestObject3D(box))
 			{
@@ -59,7 +59,7 @@ package jiglib.collision {
 			
 			var boxPoint:Object=new Object();
 			
-			var dist:Number = box.GetDistanceToPoint(boxPoint, sphere.Position);
+			var dist:Number = box.GetDistanceToPoint(boxPoint, sphere.CurrentState.Position);
 			
 			var depth:Number = sphere.Radius - dist;
 			if (depth > -JConfig.collToll)
@@ -68,23 +68,23 @@ package jiglib.collision {
 				var collPts:Array = new Array();
 				if (dist < -JNumber3D.NUM_TINY)
 				{
-					dir = JNumber3D.sub(JNumber3D.sub(boxPoint.pos, sphere.Position), boxPoint.pos);
+					dir = JNumber3D.sub(JNumber3D.sub(boxPoint.pos, sphere.CurrentState.Position), boxPoint.pos);
 					dir.normalize();
 				}
 				else if (dist > JNumber3D.NUM_TINY)
 				{
-					dir = JNumber3D.sub(sphere.Position, boxPoint.pos);
+					dir = JNumber3D.sub(sphere.CurrentState.Position, boxPoint.pos);
 					dir.normalize();
 				}
 				else
 				{
-					dir = JNumber3D.sub(sphere.Position, box.Position);
+					dir = JNumber3D.sub(sphere.CurrentState.Position, box.CurrentState.Position);
 					dir.normalize();
 				}
 				
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(boxPoint.pos, sphere.Position);
-				cpInfo.R1 = JNumber3D.sub(boxPoint.pos, box.Position);
+				cpInfo.R0 = JNumber3D.sub(boxPoint.pos, sphere.CurrentState.Position);
+				cpInfo.R1 = JNumber3D.sub(boxPoint.pos, box.CurrentState.Position);
 				cpInfo.InitialPenetration = depth;
 				collPts.push(cpInfo);
 				

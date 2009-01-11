@@ -39,9 +39,14 @@ package jiglib.collision {
 			detectionFunctors["BOX"] = new Array();
 			detectionFunctors["BOX"]["BOX"] = new CollDetectBoxBox();
 			detectionFunctors["BOX"]["SPHERE"] = new CollDetectSphereBox();
+			detectionFunctors["BOX"]["PLANE"] = new CollDetectBoxPlane();
 			detectionFunctors["SPHERE"] = new Array();
 			detectionFunctors["SPHERE"]["BOX"] = new CollDetectSphereBox();
 			detectionFunctors["SPHERE"]["SPHERE"] = new CollDetectSphereSphere();
+			detectionFunctors["SPHERE"]["PLANE"] = new CollDetectSpherePlane();
+			detectionFunctors["PLANE"] = new Array();
+			detectionFunctors["PLANE"]["BOX"] = new CollDetectBoxPlane();
+			detectionFunctors["PLANE"]["SPHERE"] = new CollDetectSpherePlane();
 		}
 		
 		public function AddCollisionBody(body:RigidBody):void
@@ -70,12 +75,12 @@ package jiglib.collision {
 			 
 			for (var i:String in collBody)
 			{ 
-				if (body != collBody[i] && detectionFunctors[body.BodySkin.Type][collBody[i].BodySkin.Type] != undefined)
+				if (body != collBody[i] && detectionFunctors[body.Type][collBody[i].Type] != undefined)
 				{
 					info = new CollDetectInfo();
 					info.body0 = body;
 					info.body1 = collBody[i];
-					fu = detectionFunctors[info.body0.BodySkin.Type][info.body1.BodySkin.Type];
+					fu = detectionFunctors[info.body0.Type][info.body1.Type];
 					fu.CollDetect(info, collArr);
 				}
 			}
@@ -98,17 +103,16 @@ package jiglib.collision {
 						continue;
 					}
 					
-					if (detectionFunctors[bodies[i].BodySkin.Type][collBody[j].BodySkin.Type] != undefined)
+					if (detectionFunctors[bodies[i].Type][collBody[j].Type] != undefined)
 					{
 						info = new CollDetectInfo();
 			        	info.body0 = bodies[i];
 						info.body1 = collBody[j];
-						fu = detectionFunctors[info.body0.BodySkin.Type][info.body1.BodySkin.Type];
+						fu = detectionFunctors[info.body0.Type][info.body1.Type];
 					    fu.CollDetect(info, collArr);
 					}
 				}
 			}
-			
 		}
 		 
 		private function findBody(body:RigidBody):Boolean
@@ -122,7 +126,6 @@ package jiglib.collision {
 			}
 			return false;
 		}
-		
 	}
 	
 }

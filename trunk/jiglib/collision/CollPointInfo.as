@@ -24,7 +24,6 @@ distribution.
 */
 
 package jiglib.collision {
-	import org.papervision3d.core.math.Number3D;
 	import jiglib.math.*;
      
 	public class CollPointInfo {
