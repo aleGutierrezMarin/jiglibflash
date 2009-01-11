@@ -26,25 +26,21 @@ distribution.
 package jiglib.geometry {
 
 	import jiglib.math.*;
-	import org.papervision3d.core.proto.MaterialObject3D;
-	import org.papervision3d.materials.utils.MaterialsList;
-	import org.papervision3d.objects.primitives.Sphere;
+	import jiglib.physics.RigidBody;
+	import org.papervision3d.objects.DisplayObject3D;
 	
-	public class JSphere extends JObject3D {
+	public class JSphere extends RigidBody {
 		
 		private var _radius:Number;
 		
-		public function JSphere(material:MaterialObject3D=null, radius:Number=100, segmentsW:int=8, segmentsH:int=6,skin:Boolean=true) {
-			this.Type = "SPHERE";
+		public function JSphere(skin:DisplayObject3D, mov:Boolean = true, radius:Number = 100) {
 			
-			if (skin)
-			{
-		    	this.Skin = new Sphere(material, radius, segmentsW, segmentsH);
-			}
-			
+			super(skin, mov);
 			_radius = radius;
+			_type = "SPHERE";
+			_boundingSphere = _radius;
 			
-			this.BoundingSphere = _radius;
+			this.setMass(1);
 		}
 		 
 		public function get Radius():Number
@@ -58,7 +54,7 @@ package jiglib.geometry {
 			
 			var frac:Number = 0;
 			var r:JNumber3D = seg.Delta;
-			var s:JNumber3D = JNumber3D.sub(seg.Origin, this.Position);
+			var s:JNumber3D = JNumber3D.sub(seg.Origin, CurrentState.Position);
 			
 			var radiusSq:Number = _radius * _radius;
 			var rSq:Number = r.modulo2;
@@ -90,7 +86,6 @@ package jiglib.geometry {
 		override public function GetInertiaProperties(mass:Number):JMatrix3D
 		{
 			var inertiaTensor:JMatrix3D = new JMatrix3D();
-			 
 			var Ixx:Number = 0.4 * mass * _radius * _radius;
 			inertiaTensor.n11 = Ixx;
 			inertiaTensor.n22 = Ixx;
