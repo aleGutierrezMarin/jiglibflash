@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -383,7 +383,7 @@ package jiglib.physics {
 			var ptInfo:CollPointInfo;
 			var approachScale:Number;
 			
-			for(var i=0; i<collision.PointInfo.length; i++)
+			for(var i:int=0; i<collision.PointInfo.length; i++)
 			{
 				ptInfo = collision.PointInfo[i];
 				if(!body0.Getmovable())
