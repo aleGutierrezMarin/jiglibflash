@@ -1,3 +1,0 @@
-#summary v0.15 update
-
-增加了三种类型的碰撞计算，可根据碰撞精度的需求在JConfig中配置solverType为“FAST”，“NORMAL”或者“ACCUMULATED”。
