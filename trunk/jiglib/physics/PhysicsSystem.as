@@ -383,7 +383,7 @@ package jiglib.physics {
 			var ptInfo:CollPointInfo;
 			var approachScale:Number;
 			
-			for(var i:int=0; i<collision.PointInfo.length; i++)
+			for(var i:uint=0; i<collision.PointInfo.length; i++)
 			{
 				ptInfo = collision.PointInfo[i];
 				if(!body0.Getmovable())
