@@ -137,7 +137,7 @@ package jiglib.collision {
 									   
 			var l2:Number;
 			var overlapDepths:Array = new Array();
-			for (var i:int = 0; i < axes.length; i++ )
+			for (var i:uint = 0; i < axes.length; i++ )
 			{
 				overlapDepths[i] = new Object();
 				overlapDepths[i].flag = false;

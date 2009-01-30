@@ -25,6 +25,7 @@ distribution.
 
 package jiglib.collision {
 
+	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 	
@@ -112,6 +113,69 @@ package jiglib.collision {
 					    fu.CollDetect(info, collArr);
 					}
 				}
+			}
+		}
+		
+		public function SegmentIntersect(out:Object, seg:JSegment, ownerBody:RigidBody):Boolean
+		{
+			out.fracOut = JNumber3D.NUM_HUGE;
+			out.posOut = new JNumber3D();
+			out.normalOut = new JNumber3D();
+			
+			var obj:Object = new Object();
+			for (var i:String in collBody)
+			{
+				if (collBody[i] != ownerBody && SegmentBounding(seg, collBody[i]))
+				{
+					if (collBody[i].SegmentIntersect(obj, seg))
+					{
+						if (obj.fracOut < out.fracOut)
+						{
+							out.posOut = obj.posOut;
+							out.normalOut = obj.normalOut;
+							out.fracOut = obj.fracOut;
+							out.bodyOut = collBody[i];
+						}
+					}
+				}
+			}
+			 
+			if (out.fracOut > 1)
+			{
+				return false;
+			}
+			if (out.fracOut < 0)
+			{
+				out.fracOut = 0;
+			}
+			else if (out.fracOut > 1)
+			{
+				out.fracOut = 1;
+			}
+			return true;
+		}
+		 
+		public function SegmentBounding(seg:JSegment,obj:RigidBody):Boolean
+		{
+			var pos:JNumber3D = seg.GetPoint(0.5);
+			var r:Number = seg.Delta.modulo / 2;
+			
+			if (obj.Type != "PLANE")
+			{
+				var num1:Number = JNumber3D.sub(pos, obj.CurrentState.Position).modulo;
+				var num2:Number = r + obj.BoundingSphere;
+				if (num1 <= num2)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return true;
 			}
 		}
 		 

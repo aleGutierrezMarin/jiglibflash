@@ -39,15 +39,20 @@ package jiglib.geometry {
 							             { ind0:5, ind1:3 }, { ind0:4, ind1:2 }, { ind0:6, ind1:0 });
 										 
 		 
-		public function JBox(skin:DisplayObject3D,mov:Boolean = true,width:Number=500, depth:Number=500, height:Number=500) {
+		public function JBox(skin:DisplayObject3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
 			
 			super(skin, mov);
-			_sideLengths = new JNumber3D(width, height, depth);
 			_type = "BOX";
-			_boundingSphere = 0.5 * _sideLengths.modulo;
 			
+			_sideLengths = new JNumber3D(width, height, depth);
+			_boundingSphere = 0.5 * _sideLengths.modulo;
+			initPoint();
+			this.setMass(1);
+		}
+		private function initPoint():void
+		{
 			var halfSide:JNumber3D = GetHalfSideLengths();
-			_points = new Array(8);
+			_points = new Array();
 			_points[0] = new JNumber3D(halfSide.x, -halfSide.y, halfSide.z);
 			_points[1] = new JNumber3D(halfSide.x, halfSide.y, halfSide.z);
 			_points[2] = new JNumber3D(-halfSide.x, -halfSide.y, halfSide.z);
@@ -56,10 +61,17 @@ package jiglib.geometry {
 			_points[5] = new JNumber3D(-halfSide.x, halfSide.y, -halfSide.z);
 			_points[6] = new JNumber3D(halfSide.x, -halfSide.y, -halfSide.z);
 			_points[7] = new JNumber3D(halfSide.x, halfSide.y, -halfSide.z);
-			
-			this.setMass(1);
 		}
 		 
+		public function set SideLengths(size:JNumber3D):void
+		{
+			_sideLengths = size.clone();
+			_boundingSphere = 0.5 * _sideLengths.modulo;
+			initPoint();
+			this.setMass(this.Mass);
+			this.SetActive();
+		}
+		
 		public function get SideLengths():JNumber3D
 		{
 			return _sideLengths;
@@ -184,9 +196,11 @@ package jiglib.geometry {
 			return true;
 		}
 		 
-		public function SegmentIntersect(out:Object,seg:JSegment):Boolean
+		override public function SegmentIntersect(out:Object,seg:JSegment):Boolean
 		{
+			out.fracOut = 0;
 			out.posOut = new JNumber3D();
+			out.normalOut = new JNumber3D();
 			
 			var frac:Number = JNumber3D.NUM_HUGE;
 			var min:Number = -JNumber3D.NUM_HUGE;
@@ -207,7 +221,7 @@ package jiglib.geometry {
 			{
 				e = JNumber3D.dot(CurrentState.Orientation.getCols()[dir], p);
 				f = JNumber3D.dot(CurrentState.Orientation.getCols()[dir], seg.Delta);
-				if (Math.abs(f) > 0)
+				if (Math.abs(f) > JNumber3D.NUM_TINY)
 				{
 					t1 = (e + h.toArray()[dir]) / f;
 					t2 = (e - h.toArray()[dir]) / f;
@@ -252,8 +266,16 @@ package jiglib.geometry {
 			{
 				return false;
 			}
+			out.fracOut = frac;
 			out.posOut = seg.GetPoint(frac);
-			
+			if (JNumber3D.dot(CurrentState.Orientation.getCols()[dir], seg.Delta) < 0)
+			{
+				out.normalOut = JNumber3D.multiply(CurrentState.Orientation.getCols()[dir], -1);
+			}
+			else
+			{
+				out.normalOut = CurrentState.Orientation.getCols()[dir];
+			}
 			return true;
 		}
 		

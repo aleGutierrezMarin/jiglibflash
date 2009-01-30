@@ -36,21 +36,29 @@ package jiglib.geometry {
 		public function JSphere(skin:DisplayObject3D, mov:Boolean = true, radius:Number = 100) {
 			
 			super(skin, mov);
-			_radius = radius;
 			_type = "SPHERE";
+			_radius = radius;
 			_boundingSphere = _radius;
-			
 			this.setMass(1);
 		}
 		 
+		public function set Radius(r:Number):void
+		{
+			_radius = r;
+			_boundingSphere = _radius;
+			this.setMass(this.Mass);
+			this.SetActive();
+		}
 		public function get Radius():Number
 		{
 			return _radius;
 		}
 		 
-		public function SegmentIntersect(out:Object, seg:JSegment):Boolean
+		override public function SegmentIntersect(out:Object, seg:JSegment):Boolean
 		{
+			out.fracOut = 0;
 			out.posOut = new JNumber3D();
+			out.normalOut = new JNumber3D();
 			
 			var frac:Number = 0;
 			var r:JNumber3D = seg.Delta;
@@ -60,7 +68,9 @@ package jiglib.geometry {
 			var rSq:Number = r.modulo2;
 			if (rSq < radiusSq)
 			{
+				out.fracOut = 0;
 				out.posOut = seg.Origin.clone();
+				out.normalOut = JNumber3D.sub(out.posOut, CurrentState.Position);
 				return true;
 			}
 			
@@ -79,7 +89,9 @@ package jiglib.geometry {
 				return false;
 			}
 			frac = Math.max(lambda1, 0);
+			out.fracOut = frac;
 			out.posOut = seg.GetPoint(frac);
+			out.normalOut = JNumber3D.sub(out.posOut, CurrentState.Position);
 			return true;
 		}
 		 

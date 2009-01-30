@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -30,6 +30,8 @@ package jiglib.physics {
 	import jiglib.cof.JConfig;
 	import jiglib.physics.constraint.*;
 	
+	import flash.utils.getTimer;
+	
 	public class PhysicsSystem {
 		
 		private static var _currentPhysicsSystem:PhysicsSystem;
@@ -58,10 +60,11 @@ package jiglib.physics {
 		private var _cachedContacts:Array;
 		private var _collisionSystem:CollisionSystem;
 		
+		
 		public static function getInstance():PhysicsSystem
 	    {
 	    	if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.25 (2009-1-11)");
+				trace("version: JigLibFlash v0.27 (2009-1-30)");
 			    _currentPhysicsSystem = new PhysicsSystem();
 		    }
 		    return _currentPhysicsSystem;
@@ -83,12 +86,17 @@ package jiglib.physics {
 			SetGravity(JNumber3D.multiply(JNumber3D.UP, -10));
 		}
 		 
-		private function GetAllExternalForces():void
+		private function GetAllExternalForces(dt:Number):void
 		{
 			for (var i:String in _bodies)
 			{
-				_bodies[i].AddGravity();
+				_bodies[i].AddExternalForces(dt);
 			}
+		}
+		
+		public function GetCollisionSystem():CollisionSystem
+		{
+			return _collisionSystem;
 		}
 		 
 		public function SetGravity(gravity:JNumber3D):void
@@ -243,7 +251,7 @@ package jiglib.physics {
 				var avR1:JNumber3D = new JNumber3D();
 				var avDepth:Number = 0;
 				
-				for(var i:int=0; i<ptNum; i++)
+				for(var i:uint=0; i<ptNum; i++)
 				{
 					ptInfo=collision.PointInfo[i];
 					avR0 = JNumber3D.add(avR0, ptInfo.R0);
@@ -321,7 +329,7 @@ package jiglib.physics {
 			var approachScale:Number;
 			var ptInfo:CollPointInfo;
 			var tempV:JNumber3D;
-			for(var i:int=0; i<collision.PointInfo.length; i++)
+			for(var i:uint=0; i<collision.PointInfo.length; i++)
 			{
 				ptInfo=collision.PointInfo[i];
 				if(!body0.Getmovable())
@@ -490,7 +498,7 @@ package jiglib.physics {
 			var Vr1:JNumber3D;
 			var ptInfo:CollPointInfo;
 			
-			for (var i:int = 0; i < collision.PointInfo.length; i++)
+			for (var i:uint = 0; i < collision.PointInfo.length; i++)
 			{
 				ptInfo = collision.PointInfo[i];
 				
@@ -583,7 +591,7 @@ package jiglib.physics {
 			var Vr1:JNumber3D;
 			var ptInfo:CollPointInfo;
 			
-			for(var i:int=0; i<collision.PointInfo.length; i++)
+			for(var i:uint=0; i<collision.PointInfo.length; i++)
 			{
 				ptInfo = collision.PointInfo[i];
 				 
@@ -744,7 +752,7 @@ package jiglib.physics {
 			
 			var flag:Boolean;
 			var gotOne:Boolean;
-			for (var step:int = 0; step < iter; step++)
+			for (var step:uint = 0; step < iter; step++)
 			{
 				gotOne = false;
 				for(i in _collisions)
@@ -775,7 +783,7 @@ package jiglib.physics {
 				
 				if(forceInelastic)
 			    {
-			    	for (var j:int = origNumCollisions; j < _collisions.length; j++)
+			    	for (var j:uint = origNumCollisions; j < _collisions.length; j++)
 			    	{
 						_collisions[i].Mat.Restitution = 0;
 					    _collisions[i].Satisfied = false;
@@ -805,11 +813,11 @@ package jiglib.physics {
 			}
 			body.SetActive();
 			_activeBodies.push(body);
-			var orig_num:int=_collisions.length;
+			var orig_num:uint=_collisions.length;
 			_collisionSystem.DetectCollisions(body, _collisions);
 			var other_body:RigidBody;
 			var thisBody_normal:JNumber3D;
-			for (var i:int = orig_num; i < _collisions.length; i++)
+			for (var i:uint = orig_num; i < _collisions.length; i++)
 			{
 				other_body=_collisions[i].ObjInfo.body0;
 				thisBody_normal=_collisions[i].DirToBody;
@@ -896,6 +904,13 @@ package jiglib.physics {
 			for (var i:String in _activeBodies)
 			{
 				_activeBodies[i].UpdatePositionWithAux(dt);
+			}
+		}
+		private function NotifyAllPostPhysics(dt:Number):void
+		{
+			for (var i:String in _bodies)
+			{
+				_bodies[i].PostPhysics(dt);
 			}
 		}
 		private function UpdateAllObject3D():void
@@ -985,7 +1000,7 @@ package jiglib.physics {
 			FindAllActiveBodies();
 			CopyAllCurrentStatesToOld();
 			 
-			GetAllExternalForces();
+			GetAllExternalForces(dt);
 			DetectAllCollisionsFn(dt);
 			HandleAllConstraints(dt, JConfig.numCollisionIterations, false);
 			UpdateAllVelocities(dt);
@@ -997,6 +1012,8 @@ package jiglib.physics {
 			 
 			//LimitAllVelocities();
 			UpdateAllPositions(dt);
+			NotifyAllPostPhysics(dt);
+			
 			UpdateAllObject3D();
 			if (JConfig.solverType == "ACCUMULATED")
 			{

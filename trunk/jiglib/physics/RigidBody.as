@@ -30,6 +30,7 @@ package jiglib.physics
 	
 	import jiglib.math.*;
 	import jiglib.cof.JConfig;
+	import jiglib.geometry.JSegment;
 	import jiglib.physics.constraint.JConstraint;
 	
 	public class RigidBody
@@ -157,6 +158,11 @@ package jiglib.physics
 			}
 	    	_force = JNumber3D.add(_force, JNumber3D.multiply(PhysicsSystem.getInstance().Gravity,_mass));
 			_velChanged = true;
+		}
+		
+		public function AddExternalForces(dt:Number):void
+		{
+			AddGravity();
 		}
 		
 		private function findConstraint(constraint:JConstraint):Boolean
@@ -359,6 +365,10 @@ package jiglib.physics
 			_currRotVelocityAux = JNumber3D.ZERO;
 			SetOrientation(_currState.Orientation);
 		}
+		
+		public function PostPhysics(dt:Number):void
+		{
+		}
 		 
 		public function TryToFreeze(dt:Number):void
 		{
@@ -533,6 +543,10 @@ package jiglib.physics
 			}
 		}
 		
+		public function SegmentIntersect(out:Object, seg:JSegment):Boolean
+		{
+			return false;
+		}
 		public function GetInertiaProperties(mass:Number):JMatrix3D
 		{
 			return new JMatrix3D();

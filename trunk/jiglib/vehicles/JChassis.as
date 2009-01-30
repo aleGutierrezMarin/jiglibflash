@@ -23,49 +23,39 @@ distribution.
 * @link http://code.google.com/p/jiglibflash
 */
 
-package jiglib.geometry {
+package jiglib.vehicles {
 	import jiglib.math.*;
-	
-	public class JSegment {
+	import jiglib.geometry.JBox;
+	import jiglib.physics.PhysicsSystem;
+	import org.papervision3d.objects.DisplayObject3D;
+
+	public class JChassis extends JBox {
 		
-		private var _origin:JNumber3D;
-		private var _delta:JNumber3D;
+		private var _car:JCar;
 		
-		public function JSegment(origin:JNumber3D, delta:JNumber3D) {
-			_origin = origin;
-			_delta = delta;
-		}
-		
-		public function set Origin(ori:JNumber3D):void
-		{
-			_origin = ori;
-		}
-		public function get Origin():JNumber3D
-		{
-			return _origin;
-		}
-		public function set Delta(del:JNumber3D):void
-		{
-			_delta = del;
-		}
-		public function get Delta():JNumber3D
-		{
-			return _delta;
+		public function JChassis(car:JCar, skin:DisplayObject3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
+			super(skin, true, width, depth, height);
+			
+			_car = car;
 		}
 		
-		public function GetPoint(t:Number):JNumber3D
+		public function get Car():JCar
 		{
-			return JNumber3D.add(_origin, JNumber3D.multiply(_delta, t));
-		}
-		public function GetEnd():JNumber3D
-		{
-			return JNumber3D.add(_origin, _delta);
+			return _car;
 		}
 		
-		public function clone():JSegment
+		override public function AddExternalForces(dt:Number):void
 		{
-			return new JSegment(_origin, _delta);
+			this.ClearForces();
+			this.AddGravity();
+			_car.AddExternalForces(dt);
 		}
+		
+		override public function PostPhysics(dt:Number):void
+		{
+			_car.PostPhysics(dt);
+		}
+		
 	}
 	
 }

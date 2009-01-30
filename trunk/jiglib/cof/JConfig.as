@@ -3,7 +3,7 @@ package jiglib.cof {
 	public class JConfig {
 		
 		public static var solverType:String = "ACCUMULATED";//allowable value: FAST,NORMAL,ACCUMULATED
-		public static var detectCollisionsType:String = "DIRECT";//allowable value: DIRECT or STORE
+		public static var detectCollisionsType:String = "STORE";//allowable value: DIRECT or STORE
 		public static var allowedPenetration:Number = 0.01;// How much penetration to allow
 		public static var collToll:Number = 0.05;// the tolerance for collision detection 
 		public static var velThreshold:Number = 0.4;

@@ -58,6 +58,40 @@ package jiglib.geometry {
 			return JNumber3D.dot(_normal, pt) - _distance;
 		}
 		
+		override public function SegmentIntersect(out:Object, seg:JSegment):Boolean
+		{
+			out.fracOut = 0;
+			out.posOut = new JNumber3D();
+			out.normalOut = new JNumber3D();
+			
+			var frac:Number = 0;
+			
+			var t:Number;
+			
+			var denom:Number = JNumber3D.dot(_normal, seg.Delta);
+			if (Math.abs(denom) > JNumber3D.NUM_TINY)
+			{
+				t = -1 * (JNumber3D.dot(_normal, seg.Origin) - _distance) / denom;
+				
+				if (t < 0 || t > 1)
+				{
+					return false;
+				}
+				else
+				{
+					frac = t;
+					out.fracOut = frac;
+					out.posOut = seg.GetPoint(frac);
+					out.normalOut = _normal.clone();
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
 		override public function MoveTo(pos:JNumber3D, orientation:JMatrix3D):void
 		{	
 			pos.copyTo(CurrentState.Position);
