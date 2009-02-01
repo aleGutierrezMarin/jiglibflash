@@ -58,9 +58,6 @@ package jiglib.physics.constraint {
 			{
 				_timescale = JNumber3D.NUM_TINY;
 			}
-			
-			body0.AddConstraint(this);
-			body1.AddConstraint(this);
 		}
 		
 		override public function PreApply(dt:Number):void{

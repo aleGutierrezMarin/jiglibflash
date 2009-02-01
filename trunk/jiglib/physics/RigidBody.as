@@ -69,8 +69,6 @@ package jiglib.physics
 		private var _lastPositionForDeactivation:JNumber3D;
 		private var _lastOrientationForDeactivation:JMatrix3D;
 		
-		private var _constraints:Array;
-		
 		public var Collisions:Array;
 		public var Material:MaterialProperties;
 		
@@ -105,7 +103,6 @@ package jiglib.physics
 			_activity = mov;
 			_movable = mov;
 			 
-			_constraints = new Array();
 			Collisions=new Array();
 			_storedPositionForActivation = new JNumber3D();
 			_bodiesToBeActivatedOnMovement = new Array();
@@ -163,32 +160,6 @@ package jiglib.physics
 		public function AddExternalForces(dt:Number):void
 		{
 			AddGravity();
-		}
-		
-		private function findConstraint(constraint:JConstraint):Boolean
-		{
-			for (var i:String in _constraints)
-			{
-				if (constraint == _constraints[i])
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		public function AddConstraint(constraint:JConstraint):void
-		{
-			if (!findConstraint(constraint))
-			{
-			    _constraints.push(constraint);
-			}
-		}
-		public function RemoveConstraint(constraint:JConstraint):void
-		{
-			if (findConstraint(constraint))
-			{
-			    _constraints.splice(_constraints.indexOf(constraint), 1);
-			}
 		}
 	     
 	    public function AddWorldTorque(t:JNumber3D):void
