@@ -31,6 +31,7 @@ package jiglib.geometry {
 	
 	public class JSphere extends RigidBody {
 		
+		public var name:String;
 		private var _radius:Number;
 		
 		public function JSphere(skin:DisplayObject3D, mov:Boolean = true, radius:Number = 100) {

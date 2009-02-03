@@ -31,6 +31,7 @@ package jiglib.geometry {
 	
 	public class JPlane extends RigidBody{
 		
+		public var name:String;
 		private var _normal:JNumber3D;
 		private var _distance:Number;
 		

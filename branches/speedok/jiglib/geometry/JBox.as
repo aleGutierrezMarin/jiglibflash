@@ -31,6 +31,7 @@ package jiglib.geometry {
 	
 	public class JBox extends RigidBody {
 		
+		public var name:String;
 		private var _sideLengths:JNumber3D;
 		private var _points:Array;
 		private var _edges:Array=new Array({ ind0:0, ind1:1 }, { ind0:3, ind1:1 }, { ind0:2, ind1:3 },
