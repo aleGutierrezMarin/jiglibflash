@@ -699,6 +699,62 @@ package jiglib.physics {
 			return gotOne;
 		}
 		
+		private function ProcessCollisionForShock(collision:CollisionInfo, dt:Number):Boolean
+		{
+			collision.Satisfied = true;
+			var N:JNumber3D = collision.DirToBody;
+			N.x = N.z = 0;
+			N.normalize();
+			 
+			var ptInfo:CollPointInfo;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt;
+			var body0:RigidBody = collision.ObjInfo.body0;
+			var body1:RigidBody = collision.ObjInfo.body1;
+			
+			var normalVel:Number=0;
+			var finalNormalVel:Number;
+			var impulse:Number;
+			var orig:Number;
+			var actualImpulse:JNumber3D;
+			
+			if (!body0.Getmovable() && !body1.Getmovable())
+			{
+				return false;
+			}
+			for (var iteration:int = 0; iteration < 5; iteration++ )
+			{
+				for(var i:int=0; i<collision.PointInfo.length; i++)
+				{
+					ptInfo = collision.PointInfo[i];
+					if (body0.Getmovable())
+					{
+						normalVel = JNumber3D.dot(body0.GetVelocity(ptInfo.R0), N) + JNumber3D.dot(body0.GetVelocityAux(ptInfo.R0), N);
+					}
+					if (body1.Getmovable())
+					{
+						normalVel -= (JNumber3D.dot(body1.GetVelocity(ptInfo.R1), N) + JNumber3D.dot(body1.GetVelocityAux(ptInfo.R1), N));
+					}
+					
+					finalNormalVel = (ptInfo.InitialPenetration - JConfig.allowedPenetration) / timescale;
+					if (finalNormalVel < 0)
+					{
+						continue;
+					}
+					impulse = (finalNormalVel - normalVel) / ptInfo.Denominator;
+					orig = ptInfo.AccumulatedNormalImpulseAux;
+					ptInfo.AccumulatedNormalImpulseAux = Math.max(ptInfo.AccumulatedNormalImpulseAux + impulse, 0);
+					actualImpulse = JNumber3D.multiply(N, ptInfo.AccumulatedNormalImpulseAux - orig);
+					
+					body0.ApplyBodyWorldImpulse(actualImpulse, ptInfo.R0);
+					body1.ApplyBodyWorldImpulse(JNumber3D.multiply(actualImpulse, -1), ptInfo.R1);
+				}
+			}
+			
+			body0.SetConstraintsAndCollisionsUnsatisfied();
+			body1.SetConstraintsAndCollisionsUnsatisfied();
+			return true;
+		}
+		
 		private function UpdateContactCache():void
 		{
 			_cachedContacts=new Array();
@@ -721,6 +777,68 @@ package jiglib.physics {
 					
 					_cachedContacts.push(contact);
 				}
+			}
+		}
+		
+		private function DoShockStep(dt:Number):void
+		{
+			if (Math.abs(_gravity.x) > Math.abs(_gravity.y) && Math.abs(_gravity.x) > Math.abs(_gravity.z))
+			{
+				_bodies.sortOn("PosX",Array.NUMERIC);
+			}
+			else if(Math.abs(_gravity.y) > Math.abs(_gravity.z) && Math.abs(_gravity.y) > Math.abs(_gravity.x))
+			{
+				_bodies.sortOn("PosY",Array.NUMERIC);
+			}
+			else if(Math.abs(_gravity.z) > Math.abs(_gravity.x) && Math.abs(_gravity.z) > Math.abs(_gravity.y))
+			{
+				_bodies.sortOn("PosZ",Array.NUMERIC);
+			}
+			
+			var info:CollisionInfo;
+			var setImmovable:Boolean;
+			var gotOne:Boolean = true;
+			while (gotOne)
+			{
+				gotOne = false;
+				for (var i:String in _bodies)
+				{
+					if (_bodies[i].Getmovable() && _bodies[i].DoShockProcessing)
+					{
+						if (_bodies[i].Collisions.length == 0 || !_bodies[i].IsActive())
+						{
+							_bodies[i].InternalSetImmovable();
+						}
+						else
+						{
+							setImmovable = false;
+							for (var j:String in _bodies[i].Collisions)
+							{
+								info = _bodies[i].Collisions[j];
+								if(((info.ObjInfo.body0 == _bodies[i]) &&
+									((info.ObjInfo.body1 == null) ||
+									(info.ObjInfo.body1.Getmovable()))) ||
+									((info.ObjInfo.body1 == _bodies[i]) &&
+									((info.ObjInfo.body0 == null) ||
+									(info.ObjInfo.body0.Getmovable()))))
+									{
+										PreProcessCollisionFn(info, dt);
+										ProcessCollisionForShock(info, dt);
+										setImmovable = true;
+									}
+							}
+							if (setImmovable)
+							{
+								_bodies[i].InternalSetImmovable();
+								gotOne = true;
+							}
+						}
+					}
+				}
+			}
+			for (i in _bodies)
+			{
+				_bodies[i].InternalRestoreImmovable();
 			}
 		}
 		
@@ -1006,6 +1124,10 @@ package jiglib.physics {
 			UpdateAllVelocities(dt);
 			HandleAllConstraints(dt, JConfig.numContactIterations, true);
 			 
+			if (JConfig.doShockStep)
+			{
+				DoShockStep(dt);
+			}
 			DampAllActiveBodies();
 			TryToFreezeAllObjects(dt);
 			ActivateAllFrozenObjectsLeftHanging();

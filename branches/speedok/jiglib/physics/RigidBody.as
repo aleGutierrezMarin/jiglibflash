@@ -57,6 +57,7 @@ package jiglib.physics
 		private var _force:JNumber3D;
 		private var _torque:JNumber3D;
 		 
+		private var _doShockProcessing:Boolean;
 		private var _velChanged:Boolean;
 		private var _activity:Boolean;
 		private var _movable:Boolean;
@@ -69,9 +70,12 @@ package jiglib.physics
 		private var _lastPositionForDeactivation:JNumber3D;
 		private var _lastOrientationForDeactivation:JMatrix3D;
 		
+		private var currPosX:Number;
+		private var currPosY:Number;
+		private var currPosZ:Number;
+		
 		public var Collisions:Array;
 		public var Material:MaterialProperties;
-		
 		
 		protected var _type:String;
 		protected var _boundingSphere:Number;
@@ -96,18 +100,23 @@ package jiglib.physics
 	    	_force = new JNumber3D();
 	    	_torque = new JNumber3D();
 	    	 
-			_origMovable = mov;
+			_doShockProcessing = true;
 			_velChanged = false;
 			_inactiveTime = 0;
 			 
 			_activity = mov;
 			_movable = mov;
+			_origMovable = mov;
 			 
 			Collisions=new Array();
 			_storedPositionForActivation = new JNumber3D();
 			_bodiesToBeActivatedOnMovement = new Array();
 			_lastPositionForDeactivation = _currState.Position.clone();
 			_lastOrientationForDeactivation = JMatrix3D.clone(_currState.Orientation);
+			
+			currPosX = 0;
+			currPosY = 0;
+			currPosZ = 0;
 			
 			_type = "Object3D";
 			_boundingSphere = 0;
@@ -123,6 +132,10 @@ package jiglib.physics
 		 
 		public function MoveTo(pos:JNumber3D, orientation:JMatrix3D):void
 		{
+			currPosX = pos.x;
+			currPosY = pos.y;
+			currPosZ = pos.z;
+			
 			pos.copyTo(_currState.Position);
 			SetOrientation(orientation);
 			_currState.LinVelocity = JNumber3D.ZERO;
@@ -294,6 +307,9 @@ package jiglib.physics
 			}
 			 
 			_currState.Position = JNumber3D.add(_currState.Position, JNumber3D.multiply(_currState.LinVelocity, dt));
+			currPosX = _currState.Position.x;
+			currPosY = _currState.Position.y;
+			currPosZ = _currState.Position.z;
 			
 			var dir:JNumber3D = _currState.RotVelocity.clone();
 			var ang:Number = dir.modulo;
@@ -317,11 +333,14 @@ package jiglib.physics
 			var ga:int = PhysicsSystem.getInstance().GravityAxis;
 			if (ga != -1)
 			{
-				_currLinVelocityAux.toArray()[(ga + 1) % 3] *= 0;
-				_currLinVelocityAux.toArray()[(ga + 2) % 3] *= 0;
+				_currLinVelocityAux.toArray()[(ga + 1) % 3] *= 0.1;
+				_currLinVelocityAux.toArray()[(ga + 2) % 3] *= 0.1;
 			}
 			
 			_currState.Position = JNumber3D.add(_currState.Position, JNumber3D.multiply(JNumber3D.add(_currState.LinVelocity, _currLinVelocityAux), dt));
+			currPosX = _currState.Position.x;
+			currPosY = _currState.Position.y;
+			currPosZ = _currState.Position.z;
 			
 			var dir:JNumber3D = JNumber3D.add(_currState.RotVelocity, _currRotVelocityAux);
 			var ang:Number = dir.modulo;
@@ -613,6 +632,28 @@ package jiglib.physics
 		public function get WorldInvInertia():JMatrix3D
 		{
 			return _worldInvInertia;
+		}
+		
+		public function get PosX():Number
+		{
+			return currPosX;
+		}
+		public function get PosY():Number
+		{
+			return currPosY;
+		}
+		public function get PosZ():Number
+		{
+			return currPosZ;
+		}
+		
+		public function get DoShockProcessing():Boolean
+		{
+			return _doShockProcessing;
+		}
+		public function set DoShockProcessing(doShock:Boolean):void
+		{
+			_doShockProcessing = doShock;
 		}
 		
 		public function LimitVel():void

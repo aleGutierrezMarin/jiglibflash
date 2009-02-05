@@ -39,6 +39,9 @@ package jiglib.geometry {
 							             { ind0:6, ind1:7 }, { ind0:4, ind1:6 }, { ind0:7, ind1:1 },
 							             { ind0:5, ind1:3 }, { ind0:4, ind1:2 }, { ind0:6, ind1:0 });
 										 
+		private var _face:Array = new Array([6, 7, 1, 0], [5, 4, 2, 3], 
+											[3, 1, 7, 5], [4, 6, 0, 2], 
+											[1, 3, 2, 0], [7, 6, 4, 5]);
 		 
 		public function JBox(skin:DisplayObject3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
 			
@@ -195,6 +198,63 @@ package jiglib.geometry {
 				}
 			}
 			return true;
+		}
+		
+		public function GetSupportVertices(axis:JNumber3D):Array
+		{
+			var vertices:Array = new Array();
+			var d:Array = new Array(3);
+			var H:JNumber3D;
+			var temp:Array = CurrentState.Orientation.getCols();
+			temp[0].normalize();
+			temp[1].normalize();
+			temp[2].normalize();
+			for (var i:uint = 0; i < 3; i++ )
+			{
+				d[i] = JNumber3D.dot(axis, temp[i]);
+				if (Math.abs(d[i]) > 1 - 0.001)
+				{
+					var f:int = (d[i] < 0)?(i * 2) : (i * 2) + 1;
+					for (var j:int = 0; j < 4; j++ )
+					{
+						H = _points[_face[f][j]];
+						vertices[j] = CurrentState.Position.clone();
+						vertices[j] = JNumber3D.add(vertices[j], JNumber3D.multiply(temp[0], H.x));
+						vertices[j] = JNumber3D.add(vertices[j], JNumber3D.multiply(temp[1], H.y));
+						vertices[j] = JNumber3D.add(vertices[j], JNumber3D.multiply(temp[2], H.z));
+					}
+					return vertices;
+				}
+			}
+			
+			for (i = 0; i < 3; i++ )
+			{
+				if (Math.abs(d[i]) < 0.005)
+				{
+					var k:int;
+					var m:int = (i + 1) % 3;
+					var n:int = (i + 2) % 3;
+					
+					H = CurrentState.Position.clone();
+					k = (d[m] > 0)?-1: 1;
+					H = JNumber3D.add(H, JNumber3D.multiply(temp[m], k * _sideLengths.toArray()[m] / 2));
+					k = (d[n] > 0)?-1: 1;
+					H = JNumber3D.add(H, JNumber3D.multiply(temp[n], k * _sideLengths.toArray()[n] / 2));
+					
+					vertices[0] = JNumber3D.add(H, JNumber3D.multiply(temp[i], _sideLengths.toArray()[i] / 2));
+					vertices[1] = JNumber3D.add(H, JNumber3D.multiply(temp[i], -_sideLengths.toArray()[i] / 2));
+					return vertices;
+				}
+			}
+			
+			vertices[0] = CurrentState.Position.clone();
+			k = (d[0] > 0)?-1: 1;
+			vertices[0] = JNumber3D.add(vertices[0], JNumber3D.multiply(temp[0], k * _sideLengths.x / 2));
+			k = (d[1] > 0)?-1: 1;
+			vertices[0] = JNumber3D.add(vertices[0], JNumber3D.multiply(temp[1], k * _sideLengths.y / 2));
+			k = (d[2] > 0)?-1: 1;
+			vertices[0] = JNumber3D.add(vertices[0], JNumber3D.multiply(temp[2], k * _sideLengths.z / 2));
+			return vertices;
 		}
 		 
 		override public function SegmentIntersect(out:Object,seg:JSegment):Boolean

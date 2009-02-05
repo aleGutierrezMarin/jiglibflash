@@ -260,6 +260,18 @@ package jiglib.math {
 		    }
 	    }
 		
+		public static function getNormal(v0:JNumber3D, v1:JNumber3D, v2:JNumber3D):JNumber3D
+		{
+			var E:JNumber3D = v1.clone();
+			E = JNumber3D.sub(E, v0);
+			var F:JNumber3D = v2.clone();
+			F = JNumber3D.sub(F, v1);
+			var N:JNumber3D = JNumber3D.cross(F, E);
+			N.normalize();
+			
+			return N;
+		}
+		
 		static public function get UP():JNumber3D
     	{
     		return new JNumber3D( 0, 1, 0 );
