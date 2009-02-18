@@ -427,12 +427,18 @@ package jiglib.physics
 		 
 		public function SetActive(activityFactor:Number = 1):void
 		{
-			_activity = true;
-			_inactiveTime = (1 - activityFactor) * JConfig.deactivationTime;
+			if (_movable)
+			{
+				_activity = true;
+				_inactiveTime = (1 - activityFactor) * JConfig.deactivationTime;
+			}
 		}
 		public function SetInactive():void
 		{
-			_activity = false;
+			if (_movable)
+			{
+				_activity = false;
+			}
 		}
 		public function GetVelocity(relPos:JNumber3D):JNumber3D
 		{
