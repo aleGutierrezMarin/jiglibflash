@@ -333,8 +333,10 @@ package jiglib.physics
 			var ga:int = PhysicsSystem.getInstance().GravityAxis;
 			if (ga != -1)
 			{
-				_currLinVelocityAux.toArray()[(ga + 1) % 3] *= 0.1;
-				_currLinVelocityAux.toArray()[(ga + 2) % 3] *= 0.1;
+				var arr:Array = _currLinVelocityAux.toArray();
+				arr[(ga + 1) % 3] *= 0.1;
+				arr[(ga + 2) % 3] *= 0.1;
+				_currLinVelocityAux.copyFromArray(arr);
 			}
 			
 			_currState.Position = JNumber3D.add(_currState.Position, JNumber3D.multiply(JNumber3D.add(_currState.LinVelocity, _currLinVelocityAux), dt));
@@ -422,7 +424,7 @@ package jiglib.physics
 		}
 		public function SetMovable(mov:Boolean):void
 		{
-			_movable=mov;
+			_movable = mov;
 		}
 		
 		public function InternalSetImmovable():void
@@ -446,12 +448,18 @@ package jiglib.physics
 		 
 		public function SetActive(activityFactor:Number = 1):void
 		{
-			_activity = true;
-			_inactiveTime = (1 - activityFactor) * JConfig.deactivationTime;
+			if (_movable)
+			{
+				_activity = true;
+				_inactiveTime = (1 - activityFactor) * JConfig.deactivationTime;
+			}
 		}
 		public function SetInactive():void
 		{
-			_activity = false;
+			if (_movable)
+			{
+				_activity = false;
+			}
 		}
 		public function GetVelocity(relPos:JNumber3D):JNumber3D
 		{

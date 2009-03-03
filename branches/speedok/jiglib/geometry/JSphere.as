@@ -72,6 +72,7 @@ package jiglib.geometry {
 				out.fracOut = 0;
 				out.posOut = seg.Origin.clone();
 				out.normalOut = JNumber3D.sub(out.posOut, CurrentState.Position);
+				out.normalOut.normalize();
 				return true;
 			}
 			
@@ -93,6 +94,7 @@ package jiglib.geometry {
 			out.fracOut = frac;
 			out.posOut = seg.GetPoint(frac);
 			out.normalOut = JNumber3D.sub(out.posOut, CurrentState.Position);
+			out.normalOut.normalize();
 			return true;
 		}
 		 

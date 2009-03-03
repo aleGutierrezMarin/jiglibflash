@@ -461,9 +461,6 @@ package jiglib.collision {
 			{
 				contactB = contactA;
 			}
-			//trace(contactA.length + " aaaaaaaaaaaaaa " + box0.ID + "::::" + contactA);
-			//trace(contactB.length + " bbbbbbbbbbbbbb " + box1.ID + "::::" + contactB);
-			//trace("-------------------------------");
 			
 			var cpInfo:CollPointInfo;
 			var collPts:Array = new Array();

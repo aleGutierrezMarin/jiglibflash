@@ -224,7 +224,15 @@ package jiglib.math {
 	    {
 	    	return new Array(this.x, this.y, this.z);
 	    }
-		
+		public function copyFromArray(arr:Array):void
+		{
+			if (arr.length >= 3)
+			{
+				this.x = arr[0];
+				this.y = arr[1];
+				this.z = arr[2];
+			}
+		}
 		public function get modulo2():Number
 	    {
 	    	return this.x*this.x + this.y*this.y + this.z*this.z;
@@ -270,6 +278,19 @@ package jiglib.math {
 			N.normalize();
 			
 			return N;
+		}
+		public static function limiteNumber(num:Number,min:Number,max:Number):Number
+		{
+			var n:Number = num;
+			if (n < min)
+			{
+				n = min;
+			}
+			else if (n > max)
+			{
+				n = max;
+			}
+			return n;
 		}
 		
 		static public function get UP():JNumber3D

@@ -75,7 +75,7 @@ package jiglib.geometry {
 			this.setMass(this.Mass);
 			this.SetActive();
 		}
-		
+		 
 		public function get SideLengths():JNumber3D
 		{
 			return _sideLengths;
@@ -84,7 +84,7 @@ package jiglib.geometry {
 		{
 			return _edges;
 		}
-		
+		 
 		public function GetVolume():Number
 		{
 			return (SideLengths.x * SideLengths.y * SideLengths.z);
@@ -337,6 +337,7 @@ package jiglib.geometry {
 			{
 				out.normalOut = CurrentState.Orientation.getCols()[dir];
 			}
+			out.normalOut.normalize();
 			return true;
 		}
 		

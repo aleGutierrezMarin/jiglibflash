@@ -40,14 +40,22 @@ package jiglib.collision {
 			detectionFunctors["BOX"] = new Array();
 			detectionFunctors["BOX"]["BOX"] = new CollDetectBoxBox();
 			detectionFunctors["BOX"]["SPHERE"] = new CollDetectSphereBox();
+			detectionFunctors["BOX"]["CAPSULE"]=new CollDetectCapsuleBox();
 			detectionFunctors["BOX"]["PLANE"] = new CollDetectBoxPlane();
 			detectionFunctors["SPHERE"] = new Array();
 			detectionFunctors["SPHERE"]["BOX"] = new CollDetectSphereBox();
 			detectionFunctors["SPHERE"]["SPHERE"] = new CollDetectSphereSphere();
+			detectionFunctors["SPHERE"]["CAPSULE"]=new CollDetectSphereCapsule();
 			detectionFunctors["SPHERE"]["PLANE"] = new CollDetectSpherePlane();
 			detectionFunctors["PLANE"] = new Array();
 			detectionFunctors["PLANE"]["BOX"] = new CollDetectBoxPlane();
 			detectionFunctors["PLANE"]["SPHERE"] = new CollDetectSpherePlane();
+			detectionFunctors["PLANE"]["CAPSULE"]=new CollDetectCapsulePlane();
+			detectionFunctors["CAPSULE"] = new Array();
+			detectionFunctors["CAPSULE"]["CAPSULE"] = new CollDetectCapsuleCapsule();
+			detectionFunctors["CAPSULE"]["BOX"] = new CollDetectCapsuleBox();
+			detectionFunctors["CAPSULE"]["SPHERE"] = new CollDetectSphereCapsule();
+			detectionFunctors["CAPSULE"]["PLANE"] = new CollDetectCapsulePlane();
 		}
 		
 		public function AddCollisionBody(body:RigidBody):void
@@ -98,12 +106,12 @@ package jiglib.collision {
 					{
 						continue;
 					}
-					
+					 
 					if (collBody[j].IsActive() && bodies[i].ID > collBody[j].ID)
 					{
 						continue;
 					}
-					
+					 
 					if (detectionFunctors[bodies[i].Type][collBody[j].Type] != undefined)
 					{
 						info = new CollDetectInfo();

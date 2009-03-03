@@ -54,7 +54,7 @@ package jiglib.vehicles {
 			setCar();
 		}
 		 
-		public function setCar(maxSteerAngle:Number = 45, steerRate:Number = 5, driveTorque:Number = 500):void
+		public function setCar(maxSteerAngle:Number = 45, steerRate:Number = 4, driveTorque:Number = 500):void
 		{
 			_maxSteerAngle = maxSteerAngle;
 			_steerRate = steerRate;
@@ -63,8 +63,8 @@ package jiglib.vehicles {
 		 
 		public function SetupWheel(_name:String, pos:JNumber3D, 
 		                           wheelSideFriction:Number = 2, wheelFwdFriction:Number = 2, 
-								   wheelTravel:Number = 0.5, wheelRadius:Number = 10, 
-								   wheelRestingFrac:Number = 0.7, wheelDampingFrac:Number = 0.6, 
+								   wheelTravel:Number = 5, wheelRadius:Number = 10, 
+								   wheelRestingFrac:Number = 0.5, wheelDampingFrac:Number = 0.5, 
 								   wheelNumRays:int = 1):void
 		{
 			var mass:Number = _chassis.Mass;

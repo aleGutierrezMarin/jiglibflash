@@ -127,6 +127,10 @@ package jiglib.vehicles {
 		{
 			return _axisUp;
 		}
+		public function GetActualPos():JNumber3D
+		{
+			return JNumber3D.add(_pos, JNumber3D.multiply(_axisUp, _displacement));
+		}
 		public function GetRadius():Number
 		{
 			return _radius;

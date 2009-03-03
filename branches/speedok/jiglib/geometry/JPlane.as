@@ -84,6 +84,7 @@ package jiglib.geometry {
 					out.fracOut = frac;
 					out.posOut = seg.GetPoint(frac);
 					out.normalOut = _normal.clone();
+					out.normalOut.normalize();
 					return true;
 				}
 			}
