@@ -63,7 +63,7 @@ package jiglib.vehicles {
 		 
 		public function SetupWheel(_name:String, pos:JNumber3D, 
 		                           wheelSideFriction:Number = 2, wheelFwdFriction:Number = 2, 
-								   wheelTravel:Number = 5, wheelRadius:Number = 10, 
+								   wheelTravel:Number = 3, wheelRadius:Number = 10, 
 								   wheelRestingFrac:Number = 0.5, wheelDampingFrac:Number = 0.5, 
 								   wheelNumRays:int = 1):void
 		{
