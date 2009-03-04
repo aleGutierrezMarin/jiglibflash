@@ -16,31 +16,28 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.geometry {
-	import jiglib.math.*;
-	
+	import jiglib.math.*;		
+
 	public class JRay {
-		
-		public var Origin:JNumber3D;
-		public var Dir:JNumber3D;
-		
+
+		public var origin:JNumber3D;
+		public var dir:JNumber3D;
+
 		public function JRay(_origin:JNumber3D, _dir:JNumber3D) {
-			Origin = _origin;
-			Dir = _dir;
+			origin = _origin;
+			dir = _dir;
 		}
-		
-		public function GetOrigin(t:Number):JNumber3D
-		{
-			return JNumber3D.add(Origin, JNumber3D.multiply(Dir, t));
+
+		public function getOrigin(t:Number):JNumber3D {
+			return JNumber3D.add(origin, JNumber3D.multiply(dir, t));
 		}
-		
 	}
-	
 }

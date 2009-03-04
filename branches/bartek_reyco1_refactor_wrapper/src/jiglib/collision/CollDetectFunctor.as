@@ -16,23 +16,21 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
 
 	public class CollDetectFunctor {
-		public var Name:String;
-		public var Type0:String;
-		public var Type1:String;
-		
-		public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+		public var name:String;
+		public var type0:String;
+		public var type1:String;
+
+		public function collDetect(info:CollDetectInfo, collArr:Array):void {
 		}
 	}
-	
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -16,27 +16,28 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.vehicles {
 	import jiglib.collision.CollisionSystem;
 	import jiglib.geometry.JSegment;
-	import jiglib.math.*;
-	import jiglib.physics.RigidBody;
+	import jiglib.math.JMatrix3D;
+	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsSystem;
+	import jiglib.physics.RigidBody;	
 
 	public class JWheel {
-		
+
 		private const noslipVel:Number = 0.5;
 		private const slipVel:Number = 0.5;
 		private const slipFactor:Number = 0.8;
 		private const smallVel:Number = 8;
-		
+
 		private var _car:JCar;
 		private var _pos:JNumber3D;
 		private var _axisUp:JNumber3D;
@@ -48,7 +49,7 @@ package jiglib.vehicles {
 		private var _fwdFriction:Number;
 		private var _damping:Number;
 		private var _numRays:int;
-		
+
 		private var _angVel:Number;
 		private var _steerAngle:Number;
 		private var _torque:Number;
@@ -56,12 +57,12 @@ package jiglib.vehicles {
 		private var _axisAngle:Number;
 		private var _displacement:Number;
 		private var _upSpeed:Number;
-		
+
 		private var _locked:Boolean;
 		private var _lastDisplacement:Number;
 		private var _lastOnFloor:Boolean;
 		private var _angVelForGrip:Number;
-		
+
 		private var worldPos:JNumber3D;
 		private var worldAxis:JNumber3D;
 		private var wheelFwd:JNumber3D;
@@ -76,17 +77,16 @@ package jiglib.vehicles {
 		private var rimVel:JNumber3D;
 		private var worldVel:JNumber3D;
 		private var wheelCentreVel:JNumber3D;
-		
+
 		public function JWheel(car:JCar) {
 			_car = car;
 		}
-		
-		public function Setup(pos:JNumber3D, axisUp:JNumber3D,
-		                      spring:Number=0, travel:Number=0, 
-							  inertia:Number=0, radius:Number=0,
-							  sideFriction:Number=0, fwdFriction:Number=0,
-							  damping:Number=0, numRays:int=0):void
-		{
+
+		public function setup(pos:JNumber3D, axisUp:JNumber3D,
+		                      spring:Number = 0, travel:Number = 0, 
+							  inertia:Number = 0, radius:Number = 0,
+							  sideFriction:Number = 0, fwdFriction:Number = 0,
+							  damping:Number = 0, numRays:int = 0):void {
 			_pos = pos;
 			_axisUp = axisUp;
 			_spring = spring;
@@ -97,71 +97,66 @@ package jiglib.vehicles {
 			_fwdFriction = fwdFriction;
 			_damping = damping;
 			_numRays = numRays;
-			Reset();
+			reset();
 		}
-		
-		public function AddTorque(torque:Number):void
-		{
+
+		public function addTorque(torque:Number):void {
 			_driveTorque += torque;
 		}
-		
-		public function SetLock(lock:Boolean):void
-		{
+
+		public function setLock(lock:Boolean):void {
 			_locked = lock;
 		}
-		
-		public function SetSteerAngle(steer:Number):void
-		{
+
+		public function setSteerAngle(steer:Number):void {
 			_steerAngle = steer;
 		}
-		public function GetSteerAngle():Number
-		{
+
+		public function getSteerAngle():Number {
 			return _steerAngle;
 		}
-		
-		public function GetPos():JNumber3D
-		{
+
+		public function getPos():JNumber3D {
 			return _pos;
 		}
-		public function GetLocalAxisUp():JNumber3D
-		{
+
+		public function getLocalAxisUp():JNumber3D {
 			return _axisUp;
 		}
-		public function GetRadius():Number
-		{
+
+		public function getRadius():Number {
 			return _radius;
 		}
-		public function GetDisplacement():Number
-		{
+
+		public function getDisplacement():Number {
 			return _displacement;
 		}
-		public function GetAxisAngle():Number
-		{
+
+		public function getAxisAngle():Number {
 			return _axisAngle;
 		}
-		public function getRollAngle():Number
-		{
+
+		public function getRollAngle():Number {
 			return 0.1 * _angVel * 180 / Math.PI;
 		}
-		public function GetOnFloor():Boolean
-		{
+
+		public function getOnFloor():Boolean {
 			return _lastOnFloor;
 		}
-		
-		public function AddForcesToCar(dt:Number):Boolean
-		{
+
+		public function addForcesToCar(dt:Number):Boolean {
 			var force:JNumber3D = new JNumber3D();
 			_lastDisplacement = _displacement;
 			_displacement = 0;
 			 
-			var carBody:JChassis = _car.Chassis;
+			var carBody:JChassis = _car.chassis;
 			worldPos = _pos.clone();
-			JMatrix3D.multiplyVector(carBody.CurrentState.Orientation, worldPos);
-			worldPos = JNumber3D.add(carBody.CurrentState.Position, worldPos);
+			JMatrix3D.multiplyVector(carBody.currentState.orientation, worldPos);
+			worldPos = JNumber3D.add(carBody.currentState.position, worldPos);
 			worldAxis = _axisUp.clone();
-			JMatrix3D.multiplyVector(carBody.CurrentState.Orientation, worldAxis);
+			JMatrix3D.multiplyVector(carBody.currentState.orientation, worldAxis);
 			 
-			wheelFwd = carBody.CurrentState.Orientation.getCols()[2].clone();
+			wheelFwd = carBody.currentState.orientation.getCols()[2].clone();
 			JMatrix3D.multiplyVector(JMatrix3D.rotationMatrix(worldAxis.x, worldAxis.y, worldAxis.z, _steerAngle * Math.PI / 180), wheelFwd);
 			wheelUp = worldAxis;
 			wheelLeft = JNumber3D.cross(wheelFwd, wheelUp);
@@ -171,7 +166,7 @@ package jiglib.vehicles {
 			wheelRayEnd = JNumber3D.sub(worldPos, JNumber3D.multiply(worldAxis, _radius));
 			wheelRay = new JSegment(JNumber3D.add(wheelRayEnd, JNumber3D.multiply(worldAxis, rayLen)), JNumber3D.multiply(worldAxis, -rayLen));
 			 
-			var collSystem:CollisionSystem = PhysicsSystem.getInstance().GetCollisionSystem();
+			var collSystem:CollisionSystem = PhysicsSystem.getInstance().getCollisionSystem();
 			 
 			var maxNumRays:int = 10;
 			var numRays:int = Math.min(_numRays, maxNumRays);
@@ -188,52 +183,42 @@ package jiglib.vehicles {
 			var yOffset:Number;
 			var bestIRay:int = 0;
 			var iRay:int = 0;
-			for (iRay = 0; iRay < numRays; iRay++)
-			{
+			for (iRay = 0;iRay < numRays; iRay++) {
 				objArr[iRay] = new Object();
 				distFwd = (deltaFwdStart + iRay * deltaFwd) - _radius;
-				yOffset = _radius * (1 - Math.cos( 90 * (distFwd / _radius) * Math.PI / 180));
+				yOffset = _radius * (1 - Math.cos(90 * (distFwd / _radius) * Math.PI / 180));
 				segments[iRay] = wheelRay.clone();
 				segments[iRay].Origin = JNumber3D.add(segments[iRay].Origin, JNumber3D.add(JNumber3D.multiply(wheelFwd, distFwd), JNumber3D.multiply(wheelUp, yOffset)));
-				if (collSystem.SegmentIntersect(objArr[iRay], segments[iRay], carBody))
-				{
+				if (collSystem.segmentIntersect(objArr[iRay], segments[iRay], carBody)) {
 					_lastOnFloor = true;
-					if (objArr[iRay].fracOut < objArr[bestIRay].fracOut)
-					{
+					if (objArr[iRay].fracOut < objArr[bestIRay].fracOut) {
 						bestIRay = iRay;
 					}
 				}
 			}
 			 
-			if (!_lastOnFloor)
-			{
+			if (!_lastOnFloor) {
 				return false;
 			}
 			
-			var frac:Number=objArr[bestIRay].fracOut;
+			var frac:Number = objArr[bestIRay].fracOut;
 			var groundPos:JNumber3D = objArr[bestIRay].posOut;
 			var otherBody:RigidBody = objArr[bestIRay].bodyOut;
 			
 			var groundNormal:JNumber3D = worldAxis.clone();
-			if (numRays > 1)
-			{
-				for (iRay = 0; iRay < numRays; iRay++)
-				{
-					if (objArr[iRay].fracOut <= 1)
-					{
+			if (numRays > 1) {
+				for (iRay = 0;iRay < numRays; iRay++) {
+					if (objArr[iRay].fracOut <= 1) {
 						groundNormal = JNumber3D.add(groundNormal, JNumber3D.multiply(JNumber3D.sub(worldPos, segments[iRay].GetEnd()), 1 - objArr[iRay].fracOut));
 					}
 				}
 				groundNormal.normalize();
-			}
-			else
-			{
+			} else {
 				groundNormal = objArr[bestIRay].normalOut;
 			}
 			
 			_displacement = rayLen * (1 - frac);
-			if (_displacement < 0)
-			{
+			if (_displacement < 0) {
 				_displacement = 0;
 			}
 			else if (_displacement > _travel) {
@@ -245,8 +230,7 @@ package jiglib.vehicles {
 			
 			var dampingForceMag:Number = _upSpeed * _damping;
 			var totalForceMag:Number = displacementForceMag + dampingForceMag;
-			if (totalForceMag < 0)
-			{
+			if (totalForceMag < 0) {
 				totalForceMag = 0;
 			}
 			var extraForce:JNumber3D = JNumber3D.multiply(worldAxis, totalForceMag);
@@ -258,32 +242,28 @@ package jiglib.vehicles {
 			groundFwd = JNumber3D.cross(groundUp, groundLeft);
 			
 			var tempv:JNumber3D = _pos.clone();
-			JMatrix3D.multiplyVector(carBody.CurrentState.Orientation, tempv);
-			wheelPointVel = JNumber3D.add(carBody.CurrentState.LinVelocity, JNumber3D.cross(tempv, carBody.CurrentState.RotVelocity));
+			JMatrix3D.multiplyVector(carBody.currentState.orientation, tempv);
+			wheelPointVel = JNumber3D.add(carBody.currentState.linVelocity, JNumber3D.cross(tempv, carBody.currentState.rotVelocity));
 			
 			rimVel = JNumber3D.multiply(JNumber3D.cross(JNumber3D.sub(groundPos, worldPos), wheelLeft), _angVel);
 			wheelPointVel = JNumber3D.add(wheelPointVel, rimVel);
 			
-			if (otherBody.Getmovable())
-			{
-				worldVel = JNumber3D.add(otherBody.CurrentState.LinVelocity, JNumber3D.cross(JNumber3D.sub(groundPos, otherBody.CurrentState.Position), otherBody.CurrentState.RotVelocity));
+			if (otherBody.getMovable()) {
+				worldVel = JNumber3D.add(otherBody.currentState.linVelocity, JNumber3D.cross(JNumber3D.sub(groundPos, otherBody.currentState.position), otherBody.currentState.rotVelocity));
 				wheelPointVel = JNumber3D.sub(wheelPointVel, worldVel);
 			}
 			
 			var friction:Number = _sideFriction;
 			var sideVel:Number = JNumber3D.dot(wheelPointVel, groundLeft);
-			if ((sideVel >  slipVel) || (sideVel < -slipVel))
-			{
+			if ((sideVel > slipVel) || (sideVel < -slipVel)) {
 				friction *= slipFactor;
-			}else if ((sideVel >  noslipVel) || (sideVel < -noslipVel)) {
-				friction *= (1 -  (1 - slipFactor) * (Math.abs(sideVel) - noslipVel) / (slipVel - noslipVel));
+			}else if ((sideVel > noslipVel) || (sideVel < -noslipVel)) {
+				friction *= (1 - (1 - slipFactor) * (Math.abs(sideVel) - noslipVel) / (slipVel - noslipVel));
 			}
-			if (sideVel < 0)
-			{
+			if (sideVel < 0) {
 				friction *= -1;
 			}
-			if (Math.abs(sideVel) < smallVel)
-			{
+			if (Math.abs(sideVel) < smallVel) {
 				friction *= Math.abs(sideVel) / smallVel;
 			}
 			
@@ -293,90 +273,73 @@ package jiglib.vehicles {
 			
 			friction = _fwdFriction;
 			var fwdVel:Number = JNumber3D.dot(wheelPointVel, groundFwd);
-			if ( (fwdVel >  slipVel) || (fwdVel < -slipVel) )
-			{
+			if ( (fwdVel > slipVel) || (fwdVel < -slipVel) ) {
 				friction *= slipFactor;
 			}
-			else if ( (fwdVel >  noslipVel) || (fwdVel < -noslipVel) )
-			{
-				friction *= (1 -  (1 - slipFactor) * (Math.abs(fwdVel) - noslipVel) / (slipVel - noslipVel));
+			else if ( (fwdVel > noslipVel) || (fwdVel < -noslipVel) ) {
+				friction *= (1 - (1 - slipFactor) * (Math.abs(fwdVel) - noslipVel) / (slipVel - noslipVel));
 			}
-			if (fwdVel < 0)
-			{
+			if (fwdVel < 0) {
 				friction *= -1;
 			}
-			if (Math.abs(fwdVel) < smallVel)
-			{
+			if (Math.abs(fwdVel) < smallVel) {
 				friction *= (Math.abs(fwdVel) / smallVel);
 			}
 			var fwdForce:Number = -friction * totalForceMag;
 			extraForce = JNumber3D.multiply(groundFwd, fwdForce);
 			force = JNumber3D.add(force, extraForce);
 			
-			wheelCentreVel = JNumber3D.add(carBody.CurrentState.LinVelocity, JNumber3D.cross(tempv, carBody.CurrentState.RotVelocity));
+			wheelCentreVel = JNumber3D.add(carBody.currentState.linVelocity, JNumber3D.cross(tempv, carBody.currentState.rotVelocity));
 			_angVelForGrip = JNumber3D.dot(wheelCentreVel, groundFwd) / _radius;
 			_torque += ( -fwdForce * _radius);
 			
-			carBody.AddWorldForce(force, groundPos);
-			if (otherBody.Getmovable())
-			{
+			carBody.addWorldForce(force, groundPos);
+			if (otherBody.getMovable()) {
 				var maxOtherBodyAcc:Number = 500;
-				var maxOtherBodyForce:Number = maxOtherBodyAcc * otherBody.Mass;
-				if (force.modulo2 > maxOtherBodyForce * maxOtherBodyForce)
-				{
+				var maxOtherBodyForce:Number = maxOtherBodyAcc * otherBody.mass;
+				if (force.modulo2 > maxOtherBodyForce * maxOtherBodyForce) {
 					force = JNumber3D.multiply(force, maxOtherBodyForce / force.modulo);
 				}
-				otherBody.AddWorldForce(JNumber3D.multiply(force, -1), groundPos);
+				otherBody.addWorldForce(JNumber3D.multiply(force, -1), groundPos);
 			}
 			return true;
 		}
-		
-		public function Update(dt:Number):void
-		{
-			if (dt <= 0)
-			{
+
+		public function update(dt:Number):void {
+			if (dt <= 0) {
 				return;
 			}
 			var origAngVel:Number = _angVel;
 			_upSpeed = (_displacement - _lastDisplacement) / Math.max(dt, JNumber3D.NUM_TINY);
 			
-			if (_locked)
-			{
+			if (_locked) {
 				_angVel = 0;
 				_torque = 0;
-			}
-			else
-			{
+			} else {
 				_angVel += (_torque * dt / _inertia);
 				_torque = 0;
 			
 			
-				if (((origAngVel > _angVelForGrip) && (_angVel < _angVelForGrip)) ||
-					((origAngVel < _angVelForGrip) && (_angVel > _angVelForGrip)))
-					{
-						_angVel = _angVelForGrip;
-					}
+				if (((origAngVel > _angVelForGrip) && (_angVel < _angVelForGrip)) || ((origAngVel < _angVelForGrip) && (_angVel > _angVelForGrip))) {
+					_angVel = _angVelForGrip;
+				}
 			 
 				_angVel += _driveTorque * dt / _inertia;
 				_driveTorque = 0;
 			 
-				if(_angVel<-100)
-				{
+				if(_angVel < -100) {
 					_angVel = -100;
 				}
-				else if(_angVel>100)
-				{
+				else if(_angVel > 100) {
 					_angVel = 100;
 				}
 				_angVel *= 0.99;
 				_axisAngle += (_angVel * dt * 180 / Math.PI);
 			}
-			
 		}
+
 		
-		
-		public function Reset():void
-		{
+		public function reset():void {
 			_angVel = 0;
 			_steerAngle = 0;
 			_torque = 0;
@@ -389,7 +352,5 @@ package jiglib.vehicles {
 			_lastOnFloor = false;
 			_angVelForGrip = 0;
 		}
-		
 	}
-	
 }

@@ -16,26 +16,24 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.physics {
 
 	public class MaterialProperties {
-		public var Restitution:Number;
-		public var StaticFriction:Number;
-		public var DynamicFriction:Number;
-		
-		public function MaterialProperties(_restitution:Number = 0.2, _staticFriction:Number = 0.6, _dynamicFriction:Number = 0.6)
-		{
-			Restitution = _restitution;
-			StaticFriction = _staticFriction;
-			DynamicFriction = _dynamicFriction;
+		public var restitution:Number;
+		public var staticFriction:Number;
+		public var dynamicFriction:Number;
+
+		public function MaterialProperties(_restitution:Number = 0.2, _staticFriction:Number = 0.6, _dynamicFriction:Number = 0.6) {
+			restitution = _restitution;
+			staticFriction = _staticFriction;
+			dynamicFriction = _dynamicFriction;
 		}
 	}
-	
 }

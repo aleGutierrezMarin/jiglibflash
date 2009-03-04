@@ -1,14 +1,12 @@
 
 package jiglib.physics {
+	import jiglib.math.*;	
 
-	import jiglib.math.*;
-	
 	public class PhysicsState {
-		
-		public var Position:JNumber3D=new JNumber3D();
-		public var Orientation:JMatrix3D=new JMatrix3D();
-		public var LinVelocity:JNumber3D=new JNumber3D();
-		public var RotVelocity:JNumber3D=new JNumber3D();
+
+		public var position:JNumber3D = new JNumber3D();
+		public var orientation:JMatrix3D = new JMatrix3D();
+		public var linVelocity:JNumber3D = new JNumber3D();
+		public var rotVelocity:JNumber3D = new JNumber3D();
 	}
-	
 }

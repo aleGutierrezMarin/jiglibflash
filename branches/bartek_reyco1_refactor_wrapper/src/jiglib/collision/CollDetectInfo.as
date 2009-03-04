@@ -16,20 +16,18 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
-	
-	import jiglib.physics.RigidBody;
+	import jiglib.physics.RigidBody;	
 
 	public class CollDetectInfo {
 		public var body0:RigidBody;
 		public var body1:RigidBody;
 	}
-	
 }

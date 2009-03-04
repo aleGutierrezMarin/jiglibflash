@@ -16,74 +16,69 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
-
 	import jiglib.cof.JConfig;
-	import jiglib.geometry.*;
-	import jiglib.math.*;
-	import jiglib.physics.RigidBody;
+	import jiglib.geometry.JPlane;
+	import jiglib.geometry.JSphere;
+	import jiglib.math.JNumber3D;
 	import jiglib.physics.MaterialProperties;
-	
+	import jiglib.physics.RigidBody;	
+
 	public class CollDetectSpherePlane extends CollDetectFunctor {
-		
+
 		public function CollDetectSpherePlane() {
-			Name = "SpherePlane";
-			Type0 = "SPHERE";
-			Type1 = "PLANE";
+			name = "SpherePlane";
+			type0 = "SPHERE";
+			type1 = "PLANE";
 		}
-		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="PLANE")
-			{
-				tempBody=info.body0;
-				info.body0=info.body1;
-				info.body1=tempBody;
+			if(info.body0.type == "PLANE") {
+				tempBody = info.body0;
+				info.body0 = info.body1;
+				info.body1 = tempBody;
 			}
 			
 			var sphere:JSphere = info.body0 as JSphere;
 			var plane:JPlane = info.body1 as JPlane;
 			
-			var dist:Number = plane.PointPlaneDistance(sphere.CurrentState.Position);
+			var dist:Number = plane.pointPlaneDistance(sphere.currentState.position);
 			
-			if (dist > sphere.BoundingSphere + JConfig.collToll)
-			{
+			if (dist > sphere.boundingSphere + JConfig.collToll) {
 				return;
 			}
 			
 			var collPts:Array = new Array();
 			var cpInfo:CollPointInfo;
-			var depth:Number=sphere.Radius-dist;
+			var depth:Number = sphere.radius - dist;
 			
-			var worldPos:JNumber3D=JNumber3D.sub(sphere.CurrentState.Position,JNumber3D.multiply(plane.Normal,sphere.Radius));
-			cpInfo=new CollPointInfo();
-			cpInfo.R0=JNumber3D.sub(worldPos,sphere.CurrentState.Position);
-			cpInfo.R1=JNumber3D.sub(worldPos,plane.CurrentState.Position);
-			cpInfo.InitialPenetration=depth;
+			var worldPos:JNumber3D = JNumber3D.sub(sphere.currentState.position, JNumber3D.multiply(plane.normal, sphere.radius));
+			cpInfo = new CollPointInfo();
+			cpInfo.r0 = JNumber3D.sub(worldPos, sphere.currentState.position);
+			cpInfo.r1 = JNumber3D.sub(worldPos, plane.currentState.position);
+			cpInfo.initialPenetration = depth;
 			collPts.push(cpInfo);
 			
-			var collInfo:CollisionInfo=new CollisionInfo();
-			collInfo.ObjInfo=info;
-			collInfo.DirToBody = plane.Normal;
+			var collInfo:CollisionInfo = new CollisionInfo();
+			collInfo.ObjInfo = info;
+			collInfo.DirToBody = plane.normal;
 			collInfo.PointInfo = collPts;
 			var mat:MaterialProperties = new MaterialProperties();
-			mat.Restitution = Math.sqrt(sphere.Material.Restitution * plane.Material.Restitution);
-			mat.StaticFriction = Math.sqrt(sphere.Material.StaticFriction * plane.Material.StaticFriction);
-			mat.DynamicFriction = Math.sqrt(sphere.Material.DynamicFriction * plane.Material.DynamicFriction);
+			mat.restitution = Math.sqrt(sphere.material.restitution * plane.material.restitution);
+			mat.staticFriction = Math.sqrt(sphere.material.staticFriction * plane.material.staticFriction);
+			mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * plane.material.dynamicFriction);
 			collInfo.Mat = mat;
 			collArr.push(collInfo);
-			info.body0.Collisions.push(collInfo);
-			info.body1.Collisions.push(collInfo);
+			info.body0.collisions.push(collInfo);
+			info.body1.collisions.push(collInfo);
 		}
-		
 	}
-	
 }

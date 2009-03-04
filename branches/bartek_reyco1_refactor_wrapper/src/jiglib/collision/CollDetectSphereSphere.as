@@ -16,69 +16,64 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
-
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
-	import jiglib.physics.MaterialProperties;
-	
+	import jiglib.physics.MaterialProperties;	
+
 	public class CollDetectSphereSphere extends CollDetectFunctor {
-		
+
 		public function CollDetectSphereSphere() {
-			Name = "SphereSphere";
-			Type0 = "SPHERE";
-			Type1 = "SPHERE";
+			name = "SphereSphere";
+			type0 = "SPHERE";
+			type1 = "SPHERE";
 		}
-		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var sphere0:JSphere = info.body0 as JSphere;
 			var sphere1:JSphere = info.body1 as JSphere;
 			
-			var delta:JNumber3D = JNumber3D.sub(sphere0.CurrentState.Position, sphere1.CurrentState.Position);
+			var delta:JNumber3D = JNumber3D.sub(sphere0.currentState.position, sphere1.currentState.position);
 			
 			var dist:Number = delta.modulo;
-			var radSum:Number = sphere0.Radius + sphere1.Radius;
+			var radSum:Number = sphere0.radius + sphere1.radius;
 			
-			if (dist < radSum + JConfig.collToll)
-			{
+			if (dist < radSum + JConfig.collToll) {
 				var depth:Number = radSum - dist;
 				delta.normalize();
 				
-				var worldPos:JNumber3D = JNumber3D.add(sphere1.CurrentState.Position, JNumber3D.multiply(delta, sphere1.Radius - 0.5 * depth));
+				var worldPos:JNumber3D = JNumber3D.add(sphere1.currentState.position, JNumber3D.multiply(delta, sphere1.radius - 0.5 * depth));
 				
 				var collPts:Array = new Array();
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(worldPos, sphere0.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(worldPos, sphere1.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(worldPos, sphere0.currentState.position);
+				cpInfo.r1 = JNumber3D.sub(worldPos, sphere1.currentState.position);
+				cpInfo.initialPenetration = depth;
 				collPts.push(cpInfo);
 				
-				var collInfo:CollisionInfo=new CollisionInfo();
-			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = delta;
-			    collInfo.PointInfo = collPts;
+				var collInfo:CollisionInfo = new CollisionInfo();
+				collInfo.ObjInfo = info;
+				collInfo.DirToBody = delta;
+				collInfo.PointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(sphere0.Material.Restitution * sphere1.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(sphere0.Material.StaticFriction * sphere1.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(sphere0.Material.DynamicFriction * sphere1.Material.DynamicFriction);
+				mat.restitution = Math.sqrt(sphere0.material.restitution * sphere1.material.restitution);
+				mat.staticFriction = Math.sqrt(sphere0.material.staticFriction * sphere1.material.staticFriction);
+				mat.dynamicFriction = Math.sqrt(sphere0.material.dynamicFriction * sphere1.material.dynamicFriction);
 				collInfo.Mat = mat;
 				collArr.push(collInfo);
 				
-				info.body0.Collisions.push(collInfo);
-			    info.body1.Collisions.push(collInfo);
+				info.body0.collisions.push(collInfo);
+				info.body1.collisions.push(collInfo);
 			}
 		}
-		
 	}
-	
 }

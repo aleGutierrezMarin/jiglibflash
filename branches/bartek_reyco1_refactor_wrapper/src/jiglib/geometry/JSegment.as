@@ -16,56 +16,52 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.geometry {
-	import jiglib.math.*;
-	
+	import jiglib.math.JNumber3D;				
+
 	public class JSegment {
-		
+
 		private var _origin:JNumber3D;
 		private var _delta:JNumber3D;
-		
+
 		public function JSegment(origin:JNumber3D, delta:JNumber3D) {
 			_origin = origin;
 			_delta = delta;
 		}
-		
-		public function set Origin(ori:JNumber3D):void
-		{
+
+		public function set origin(ori:JNumber3D):void {
 			_origin = ori;
 		}
-		public function get Origin():JNumber3D
-		{
+
+		public function get origin():JNumber3D {
 			return _origin;
 		}
-		public function set Delta(del:JNumber3D):void
-		{
+
+		public function set delta(del:JNumber3D):void {
 			_delta = del;
 		}
-		public function get Delta():JNumber3D
-		{
+
+		public function get delta():JNumber3D {
 			return _delta;
 		}
-		
-		public function GetPoint(t:Number):JNumber3D
-		{
+
+		public function getPoint(t:Number):JNumber3D {
 			return JNumber3D.add(_origin, JNumber3D.multiply(_delta, t));
 		}
-		public function GetEnd():JNumber3D
-		{
+
+		public function getEnd():JNumber3D {
 			return JNumber3D.add(_origin, _delta);
 		}
-		
-		public function clone():JSegment
-		{
+
+		public function clone():JSegment {
 			return new JSegment(_origin, _delta);
 		}
 	}
-	
 }

@@ -1,7 +1,7 @@
 package jiglib.cof {
 
 	public class JConfig {
-		
+
 		public static var solverType:String = "ACCUMULATED";//allowable value: FAST,NORMAL,ACCUMULATED
 		public static var detectCollisionsType:String = "STORE";//allowable value: DIRECT or STORE
 		public static var allowedPenetration:Number = 0.01;// How much penetration to allow
@@ -15,5 +15,4 @@ package jiglib.cof {
 		public static var numCollisionIterations:Number = 4;// number of collision iterations
 		public static var numContactIterations:Number = 8;// number of contact iteratrions
 	}
-	
 }

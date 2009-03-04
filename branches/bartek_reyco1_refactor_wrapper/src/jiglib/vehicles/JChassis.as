@@ -16,46 +16,40 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.vehicles {
-	import jiglib.math.*;
 	import jiglib.geometry.JBox;
-	import jiglib.physics.PhysicsSystem;
-	import org.papervision3d.objects.DisplayObject3D;
+
+	import org.papervision3d.objects.DisplayObject3D;	
 
 	public class JChassis extends JBox {
-		
+
 		private var _car:JCar;
-		
+
 		public function JChassis(car:JCar, skin:DisplayObject3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
 			super(skin, true, width, depth, height);
 			
 			_car = car;
 		}
-		
-		public function get Car():JCar
-		{
+
+		public function get car():JCar {
 			return _car;
 		}
-		
-		override public function AddExternalForces(dt:Number):void
-		{
-			this.ClearForces();
-			this.AddGravity();
-			_car.AddExternalForces(dt);
+
+		override public function addExternalForces(dt:Number):void {
+			this.clearForces();
+			this.addGravity();
+			_car.addExternalForces(dt);
 		}
-		
-		override public function PostPhysics(dt:Number):void
-		{
-			_car.PostPhysics(dt);
+
+		override public function postPhysics(dt:Number):void {
+			_car.postPhysics(dt);
 		}
-		
 	}
-	
 }

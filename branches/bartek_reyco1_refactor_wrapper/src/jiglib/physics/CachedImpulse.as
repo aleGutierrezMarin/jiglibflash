@@ -16,29 +16,26 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.physics {
-	
-	import jiglib.math.*;
+	import jiglib.math.JNumber3D;		
 
 	public class CachedImpulse {
-		
-		public var NormalImpulse:Number;
-		public var NormalImpulseAux:Number;
-		public var FrictionImpulse:JNumber3D;
-		
+
+		public var normalImpulse:Number;
+		public var normalImpulseAux:Number;
+		public var frictionImpulse:JNumber3D;
+
 		public function CachedImpulse(_normalImpulse:Number, _normalImpulseAux:Number, _frictionImpulse:JNumber3D) {
-			this.NormalImpulse = _normalImpulse;
-			this.NormalImpulseAux = _normalImpulseAux;
-			this.FrictionImpulse = _frictionImpulse;
+			this.normalImpulse = _normalImpulse;
+			this.normalImpulseAux = _normalImpulseAux;
+			this.frictionImpulse = _frictionImpulse;
 		}
-		
 	}
-	
 }

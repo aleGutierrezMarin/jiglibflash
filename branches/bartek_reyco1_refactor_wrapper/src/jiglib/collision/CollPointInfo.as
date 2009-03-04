@@ -16,27 +16,27 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
-	import jiglib.math.*;
-     
+	import jiglib.math.*;	
+
 	public class CollPointInfo {
-		public var InitialPenetration:Number;
-		public var R0:JNumber3D;
-		public var R1:JNumber3D;
-		public var Position:JNumber3D;
-		 
-		public var MinSeparationVel:Number = 0;
-		public var Denominator:Number = 0;
-		
-		public var AccumulatedNormalImpulse:Number = 0;
-		public var AccumulatedNormalImpulseAux:Number = 0;
-		public var AccumulatedFrictionImpulse:JNumber3D = new JNumber3D();
+		public var initialPenetration:Number;
+		public var r0:JNumber3D;
+		public var r1:JNumber3D;
+		public var position:JNumber3D;
+
+		public var minSeparationVel:Number = 0;
+		public var denominator:Number = 0;
+
+		public var accumulatedNormalImpulse:Number = 0;
+		public var accumulatedNormalImpulseAux:Number = 0;
+		public var accumulatedFrictionImpulse:JNumber3D = new JNumber3D();
 	}
 }

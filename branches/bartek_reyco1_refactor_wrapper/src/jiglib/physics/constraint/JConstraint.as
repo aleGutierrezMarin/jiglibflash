@@ -16,69 +16,58 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.physics.constraint {
+	import jiglib.physics.PhysicsSystem;		
 
-	import jiglib.physics.PhysicsSystem;
 	public class JConstraint {
-		
+
 		private var _satisfied:Boolean;
 		private var _constraintEnabled:Boolean;
-		
+
 		public function JConstraint() {
-			
 		}
-		
-		public function set Satisfied(s:Boolean):void
-		{
+
+		public function set satisfied(s:Boolean):void {
 			_satisfied = s;
 		}
-		
-		public function get Satisfied():Boolean
-		{
+
+		public function get satisfied():Boolean {
 			return _satisfied;
 		}
-		
-		public function PreApply(dt:Number):void
-		{
+
+		public function preApply(dt:Number):void {
 			_satisfied = false;
 		}
-		
-		public function Apply(dt:Number):Boolean
-		{
+
+		public function apply(dt:Number):Boolean {
 			return false;
 		}
-		
-		public function EnableConstraint():void
-		{
-			if (_constraintEnabled)
-			{
+
+		public function enableConstraint():void {
+			if (_constraintEnabled) {
 				return;
 			}
 			_constraintEnabled = true;
-			PhysicsSystem.getInstance().AddConstraint(this);
+			PhysicsSystem.getInstance().addConstraint(this);
 		}
-		
-		public function DisableConstraint():void
-		{
-			if (!_constraintEnabled)
-			{
+
+		public function disableConstraint():void {
+			if (!_constraintEnabled) {
 				return;
 			}
 			_constraintEnabled = false;
-			PhysicsSystem.getInstance().RemoveConstraint(this);
+			PhysicsSystem.getInstance().removeConstraint(this);
 		}
-		
-		public function get ConstraintEnabled():Boolean
-		{
+
+		public function get constraintEnabled():Boolean {
 			return _constraintEnabled;
 		}
 	}
-	
 }

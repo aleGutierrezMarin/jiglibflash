@@ -16,24 +16,24 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.geometry {
-
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
-	import org.papervision3d.objects.DisplayObject3D;
-	
-	public class JPlane extends RigidBody{
-		
+
+	import org.papervision3d.objects.DisplayObject3D;	
+
+	public class JPlane extends RigidBody {
+
 		private var _normal:JNumber3D;
 		private var _distance:Number;
-		
+
 		public function JPlane(skin:DisplayObject3D) {
 			
 			super(skin, false);
@@ -42,24 +42,20 @@ package jiglib.geometry {
 			_normal = new JNumber3D(0, 0, -1);
 			_distance = 0;
 		}
-		
-		public function get Normal():JNumber3D
-		{
+
+		public function get normal():JNumber3D {
 			return _normal;
 		}
-		
-		public function get Distance():Number
-		{
+
+		public function get distance():Number {
 			return _distance;
 		}
-		 
-		public function PointPlaneDistance(pt:JNumber3D):Number
-		{
+
+		public function pointPlaneDistance(pt:JNumber3D):Number {
 			return JNumber3D.dot(_normal, pt) - _distance;
 		}
-		
-		override public function SegmentIntersect(out:Object, seg:JSegment):Boolean
-		{
+
+		override public function segmentIntersect(out:Object, seg:JSegment):Boolean {
 			out.fracOut = 0;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
@@ -68,42 +64,34 @@ package jiglib.geometry {
 			
 			var t:Number;
 			
-			var denom:Number = JNumber3D.dot(_normal, seg.Delta);
-			if (Math.abs(denom) > JNumber3D.NUM_TINY)
-			{
-				t = -1 * (JNumber3D.dot(_normal, seg.Origin) - _distance) / denom;
+			var denom:Number = JNumber3D.dot(_normal, seg.delta);
+			if (Math.abs(denom) > JNumber3D.NUM_TINY) {
+				t = -1 * (JNumber3D.dot(_normal, seg.origin) - _distance) / denom;
 				
-				if (t < 0 || t > 1)
-				{
+				if (t < 0 || t > 1) {
 					return false;
-				}
-				else
-				{
+				} else {
 					frac = t;
 					out.fracOut = frac;
-					out.posOut = seg.GetPoint(frac);
+					out.posOut = seg.getPoint(frac);
 					out.normalOut = _normal.clone();
 					return true;
 				}
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		}
-		
-		override public function MoveTo(pos:JNumber3D, orientation:JMatrix3D):void
-		{	
-			pos.copyTo(CurrentState.Position);
-			SetOrientation(orientation);
-			CurrentState.LinVelocity = JNumber3D.ZERO;
-			CurrentState.RotVelocity = JNumber3D.ZERO;
-			CopyCurrentStateToOld();
+
+		override public function moveTo(pos:JNumber3D, orientation:JMatrix3D):void {	
+			pos.copyTo(currentState.position);
+			setOrientation(orientation);
+			currentState.linVelocity = JNumber3D.ZERO;
+			currentState.rotVelocity = JNumber3D.ZERO;
+			copyCurrentStateToOld();
 			
 			_normal = new JNumber3D(0, 0, -1);
 			JMatrix3D.multiplyVector(orientation, _normal);
 			_distance = JNumber3D.dot(pos, _normal);
 		}
 	}
-	
 }

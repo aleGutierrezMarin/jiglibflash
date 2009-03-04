@@ -16,95 +16,84 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
-	
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
-	import jiglib.physics.RigidBody;
 	import jiglib.physics.MaterialProperties;
+	import jiglib.physics.RigidBody;	
 
 	public class CollDetectSphereBox extends CollDetectFunctor {
-		
+
 		public function CollDetectSphereBox() {
-			Name = "SphereBox";
-			Type0 = "SPHERE";
-			Type1 = "BOX";
+			name = "SphereBox";
+			type0 = "SPHERE";
+			type1 = "BOX";
 		}
-		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="BOX")
-			{
-				tempBody=info.body0;
-				info.body0=info.body1;
-				info.body1=tempBody;
+			if(info.body0.type == "BOX") {
+				tempBody = info.body0;
+				info.body0 = info.body1;
+				info.body1 = tempBody;
 			}
 			
 			var sphere:JSphere = info.body0 as JSphere;
 			var box:JBox = info.body1 as JBox;
 			
-			if (!sphere.hitTestObject3D(box))
-			{
+			if (!sphere.hitTestObject3D(box)) {
 				return;
 			}
 			
-			var boxPoint:Object=new Object();
+			var boxPoint:Object = new Object();
 			
-			var dist:Number = box.GetDistanceToPoint(boxPoint, sphere.CurrentState.Position);
+			var dist:Number = box.getDistanceToPoint(boxPoint, sphere.currentState.position);
 			
-			var depth:Number = sphere.Radius - dist;
-			if (depth > -JConfig.collToll)
-			{
+			var depth:Number = sphere.radius - dist;
+			if (depth > -JConfig.collToll) {
 				var dir:JNumber3D;
 				var collPts:Array = new Array();
-				if (dist < -JNumber3D.NUM_TINY)
-				{
-					dir = JNumber3D.sub(JNumber3D.sub(boxPoint.pos, sphere.CurrentState.Position), boxPoint.pos);
+				if (dist < -JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(JNumber3D.sub(boxPoint.pos, sphere.currentState.position), boxPoint.pos);
 					dir.normalize();
 				}
-				else if (dist > JNumber3D.NUM_TINY)
-				{
-					dir = JNumber3D.sub(sphere.CurrentState.Position, boxPoint.pos);
+				else if (dist > JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(sphere.currentState.position, boxPoint.pos);
 					dir.normalize();
-				}
-				else
-				{
-					dir = JNumber3D.sub(sphere.CurrentState.Position, box.CurrentState.Position);
+				} else {
+					dir = JNumber3D.sub(sphere.currentState.position, box.currentState.position);
 					dir.normalize();
 				}
 				
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(boxPoint.pos, sphere.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(boxPoint.pos, box.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(boxPoint.pos, sphere.currentState.position);
+				cpInfo.r1 = JNumber3D.sub(boxPoint.pos, box.currentState.position);
+				cpInfo.initialPenetration = depth;
 				collPts.push(cpInfo);
 				
-				var collInfo:CollisionInfo=new CollisionInfo();
-			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = dir;
-			    collInfo.PointInfo = collPts;
+				var collInfo:CollisionInfo = new CollisionInfo();
+				collInfo.ObjInfo = info;
+				collInfo.DirToBody = dir;
+				collInfo.PointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(sphere.Material.Restitution * box.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(sphere.Material.StaticFriction * box.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(sphere.Material.DynamicFriction * box.Material.DynamicFriction);
+				mat.restitution = Math.sqrt(sphere.material.restitution * box.material.restitution);
+				mat.staticFriction = Math.sqrt(sphere.material.staticFriction * box.material.staticFriction);
+				mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * box.material.dynamicFriction);
 				collInfo.Mat = mat;
 				collArr.push(collInfo);
 				
-				info.body0.Collisions.push(collInfo);
-			    info.body1.Collisions.push(collInfo);
+				info.body0.collisions.push(collInfo);
+				info.body1.collisions.push(collInfo);
 			}
 		}
-		
 	}
-	
 }
