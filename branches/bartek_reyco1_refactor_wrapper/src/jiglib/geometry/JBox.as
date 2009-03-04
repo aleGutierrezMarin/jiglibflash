@@ -24,6 +24,7 @@ distribution.
  */
 
 package jiglib.geometry {
+	import jiglib.plugin.ISkin3D;	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 
@@ -36,7 +37,7 @@ package jiglib.geometry {
 		private var _edges:Array = new Array({ ind0:0, ind1:1 }, { ind0:3, ind1:1 }, { ind0:2, ind1:3 }, { ind0:2, ind1:0 }, { ind0:4, ind1:5 }, { ind0:5, ind1:7 }, { ind0:6, ind1:7 }, { ind0:4, ind1:6 }, { ind0:7, ind1:1 }, { ind0:5, ind1:3 }, { ind0:4, ind1:2 }, { ind0:6, ind1:0 });
 
 		
-		public function JBox(skin:DisplayObject3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
+		public function JBox(skin:ISkin3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
 			
 			super(skin, mov);
 			_type = "BOX";

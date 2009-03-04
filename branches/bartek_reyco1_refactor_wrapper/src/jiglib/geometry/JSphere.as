@@ -24,6 +24,7 @@ distribution.
  */
 
 package jiglib.geometry {
+	import jiglib.plugin.ISkin3D;	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 
@@ -33,7 +34,7 @@ package jiglib.geometry {
 
 		private var _radius:Number;
 
-		public function JSphere(skin:DisplayObject3D, mov:Boolean = true, radius:Number = 100) {
+		public function JSphere(skin:ISkin3D, mov:Boolean = true, radius:Number = 100) {
 			
 			super(skin, mov);
 			_type = "SPHERE";

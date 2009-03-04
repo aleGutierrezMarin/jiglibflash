@@ -24,14 +24,13 @@ distribution.
  */
 
 package jiglib.collision {
-	import jiglib.math.*;
-	import jiglib.physics.MaterialProperties;	
-
+	import jiglib.math.JNumber3D;
+	import jiglib.physics.MaterialProperties;	
 	public class CollisionInfo {
-		public var Mat:MaterialProperties = new MaterialProperties();
-		public var ObjInfo:CollDetectInfo;
-		public var DirToBody:JNumber3D;
-		public var PointInfo:Array;
-		public var Satisfied:Boolean;
+		public var mat:MaterialProperties = new MaterialProperties();
+		public var objInfo:CollDetectInfo;
+		public var dirToBody:JNumber3D;
+		public var pointInfo:Array;
+		public var satisfied:Boolean;
 	}
 }

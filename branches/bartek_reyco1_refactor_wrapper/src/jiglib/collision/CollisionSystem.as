@@ -69,7 +69,7 @@ package jiglib.collision {
 			var fu:CollDetectFunctor;
 			 
 			for (var i:String in collBody) { 
-				if (body != collBody[i] && detectionFunctors[body.type][collBody[i].Type] != undefined) {
+				if (body != collBody[i] && detectionFunctors[body.type][collBody[i].type] != undefined) {
 					info = new CollDetectInfo();
 					info.body0 = body;
 					info.body1 = collBody[i];
@@ -88,11 +88,11 @@ package jiglib.collision {
 						continue;
 					}
 					
-					if (collBody[j].IsActive() && bodies[i].ID > collBody[j].ID) {
+					if (collBody[j].isActive() && bodies[i].id > collBody[j].id) {
 						continue;
 					}
 					
-					if (detectionFunctors[bodies[i].Type][collBody[j].Type] != undefined) {
+					if (detectionFunctors[bodies[i].type][collBody[j].type] != undefined) {
 						info = new CollDetectInfo();
 						info.body0 = bodies[i];
 						info.body1 = collBody[j];

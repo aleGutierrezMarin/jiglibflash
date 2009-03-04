@@ -24,6 +24,7 @@ distribution.
  */
 
 package jiglib.vehicles {
+	import jiglib.plugin.ISkin3D;	
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsSystem;
 
@@ -46,7 +47,7 @@ package jiglib.vehicles {
 		private var _wheels:Array;
 		private var _steerWheels:Array;
 
-		public function JCar(skin:DisplayObject3D):void {
+		public function JCar(skin:ISkin3D):void {
 			_chassis = new JChassis(this, skin);
 			_wheels = new Array();
 			_steerWheels = new Array();

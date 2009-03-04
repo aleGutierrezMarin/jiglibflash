@@ -80,15 +80,15 @@ package jiglib.collision {
 				collPts.push(cpInfo);
 				
 				var collInfo:CollisionInfo = new CollisionInfo();
-				collInfo.ObjInfo = info;
-				collInfo.DirToBody = dir;
-				collInfo.PointInfo = collPts;
+				collInfo.objInfo = info;
+				collInfo.dirToBody = dir;
+				collInfo.pointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
 				mat.restitution = Math.sqrt(sphere.material.restitution * box.material.restitution);
 				mat.staticFriction = Math.sqrt(sphere.material.staticFriction * box.material.staticFriction);
 				mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * box.material.dynamicFriction);
-				collInfo.Mat = mat;
+				collInfo.mat = mat;
 				collArr.push(collInfo);
 				
 				info.body0.collisions.push(collInfo);
