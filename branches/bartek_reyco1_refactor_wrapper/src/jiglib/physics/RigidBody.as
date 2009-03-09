@@ -24,21 +24,20 @@ distribution.
  */
 
 package jiglib.physics {
+	import jiglib.plugin.PhysicsBody;	
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.JMatrix3D;
 	import jiglib.math.JNumber3D;
-	import jiglib.plugin.ISkin3D;
-	
-	import org.papervision3d.objects.DisplayObject3D;		
+	import jiglib.plugin.ISkin3D;	
 
-	public class RigidBody {
+	public class RigidBody implements PhysicsBody {
 		private static var idCounter:int = 0;
 
 		private var _id:int;
 		private var _skin:ISkin3D;
 
-		private var _currState:PhysicsState;
+		protected var _currState:PhysicsState;
 		private var _oldState:PhysicsState;
 		private var _storeState:PhysicsState;
 		private var _invOrientation:JMatrix3D;
@@ -68,17 +67,17 @@ package jiglib.physics {
 		private var _lastOrientationForDeactivation:JMatrix3D;
 
 		public var collisions:Array;
-		public var material:MaterialProperties;
+		private var _material:MaterialProperties;
 
 		
 		protected var _type:String;
 		protected var _boundingSphere:Number;
 
-		public function RigidBody(skin:ISkin3D, mov:Boolean = true) {
+		public function RigidBody(skin:ISkin3D) {
 			_id = idCounter++;
 			 
 			_skin = skin;
-			material = new MaterialProperties();
+			_material = new MaterialProperties();
 			 
 			_bodyInertia = JMatrix3D.IDENTITY;
 			_bodyInvInertia = JMatrix3D.inverse(_bodyInertia);
@@ -93,12 +92,14 @@ package jiglib.physics {
 			_force = new JNumber3D();
 			_torque = new JNumber3D();
 	    	 
-			_origMovable = mov;
+			// Can this be 'true' by default? 
+			// This was set when the 'mov' paremeter from constructor was removed [bartekd]
+			_origMovable = true;
 			_velChanged = false;
 			_inactiveTime = 0;
 			 
-			_activity = mov;
-			_movable = mov;
+			_activity = true;
+			_movable = true;
 			 
 			collisions = new Array();
 			_storedPositionForActivation = new JNumber3D();
@@ -117,9 +118,38 @@ package jiglib.physics {
 			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.orientation, _bodyInvInertia), _invOrientation);
 		}
 
-		public function moveTo(pos:JNumber3D, orientation:JMatrix3D):void {
+		public function get x():Number { 
+			return _currState.position.x; 
+		}
+		public function get y():Number { 
+			return _currState.position.y; 
+		}
+		public function get z():Number { 
+			return _currState.position.z; 
+		}
+
+		public function set x(px:Number):void { 
+			_currState.position.x = px; 
+			updateState();
+		}
+
+		public function set y(py:Number):void { 
+			_currState.position.y = py; 
+			updateState();
+		}
+
+		public function set z(pz:Number):void { 
+			_currState.position.z = pz; 
+			updateState();
+		}
+
+		public function moveTo(pos:JNumber3D):void {
 			pos.copyTo(_currState.position);
-			setOrientation(orientation);
+			setOrientation(_currState.orientation);
+			updateState();
+		}
+
+		protected function updateState():void {
 			_currState.linVelocity = JNumber3D.ZERO;
 			_currState.rotVelocity = JNumber3D.ZERO;
 			copyCurrentStateToOld();
@@ -142,7 +172,7 @@ package jiglib.physics {
 		}
 
 		public function addGravity():void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_force = JNumber3D.add(_force, JNumber3D.multiply(PhysicsSystem.getInstance().gravity, _mass));
@@ -154,7 +184,7 @@ package jiglib.physics {
 		}
 
 		public function addWorldTorque(t:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_torque = JNumber3D.add(_torque, t);
@@ -163,7 +193,7 @@ package jiglib.physics {
 		}
 
 		public function addWorldForce(f:JNumber3D, p:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_force = JNumber3D.add(_force, f);
@@ -173,7 +203,7 @@ package jiglib.physics {
 		}
 
 		public function addBodyForce(f:JNumber3D, p:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			JMatrix3D.multiplyVector(_currState.orientation, f);
@@ -182,7 +212,7 @@ package jiglib.physics {
 		}
 
 		public function addBodyTorque(t:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			JMatrix3D.multiplyVector(_currState.orientation, t);
@@ -195,7 +225,7 @@ package jiglib.physics {
 		}
 
 		public function applyWorldImpulse(impulse:JNumber3D, pos:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_currState.linVelocity = JNumber3D.add(_currState.linVelocity, JNumber3D.multiply(impulse, _invMass));
@@ -208,7 +238,7 @@ package jiglib.physics {
 		}
 
 		public function applyWorldImpulseAux(impulse:JNumber3D, pos:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_currLinVelocityAux = JNumber3D.add(_currLinVelocityAux, JNumber3D.multiply(impulse, _invMass));
@@ -221,7 +251,7 @@ package jiglib.physics {
 		}
 
 		public function applyBodyWorldImpulse(impulse:JNumber3D, delta:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_currState.linVelocity = JNumber3D.add(_currState.linVelocity, JNumber3D.multiply(impulse, _invMass));
@@ -234,7 +264,7 @@ package jiglib.physics {
 		}
 
 		public function applyBodyWorldImpulseAux(impulse:JNumber3D, delta:JNumber3D):void {
-			if(!getMovable()) {
+			if(!movable) {
 				return;
 			}
 			_currLinVelocityAux = JNumber3D.add(_currLinVelocityAux, JNumber3D.multiply(impulse, _invMass));
@@ -247,7 +277,7 @@ package jiglib.physics {
 		}
 
 		public function updateVelocity(dt:Number):void {
-			if (!getMovable() || !isActive()) {
+			if (!movable || !isActive()) {
 				return;
 			}
 			_currState.linVelocity = JNumber3D.add(_currState.linVelocity, JNumber3D.multiply(_force, _invMass * dt));
@@ -261,7 +291,7 @@ package jiglib.physics {
 		}
 
 		public function updatePosition(dt:Number):void {
-			if (!getMovable() || !isActive()) {
+			if (!movable || !isActive()) {
 				return;
 			}
 			 
@@ -279,7 +309,7 @@ package jiglib.physics {
 		}
 
 		public function updatePositionWithAux(dt:Number):void {
-			if (!getMovable() || !isActive()) {
+			if (!movable || !isActive()) {
 				_currLinVelocityAux = JNumber3D.ZERO;
 				_currRotVelocityAux = JNumber3D.ZERO;
 				return;
@@ -309,7 +339,7 @@ package jiglib.physics {
 		}
 
 		public function tryToFreeze(dt:Number):void {
-			if (!getMovable() || !isActive()) {
+			if (!movable || !isActive()) {
 				return;
 			}
 			if (JNumber3D.sub(_currState.position, _lastPositionForDeactivation).modulo > JConfig.posThreshold) {
@@ -353,12 +383,20 @@ package jiglib.physics {
 		public function isActive():Boolean {
 			return _activity;
 		}
-
+		
 		public function getMovable():Boolean {
 			return _movable;
 		}
 
 		public function setMovable(mov:Boolean):void {
+			_movable = mov;
+		}
+
+		public function get movable():Boolean {
+			return _movable;
+		}
+
+		public function set movable(mov:Boolean):void {
 			_movable = mov;
 		}
 
@@ -512,7 +550,7 @@ package jiglib.physics {
 			return _type;
 		}
 
-		public function get bodySkin():ISkin3D {
+		public function get skin():ISkin3D {
 			return _skin;
 		}
 
@@ -583,54 +621,16 @@ package jiglib.physics {
 		}
 
 		public function getTransform():JMatrix3D {
-//			var tr:JMatrix3D = new JMatrix3D();
-//			tr.n11 = _skin.transform.n11; 
-//			tr.n12 = _skin.transform.n12; 
-//			tr.n13 = _skin.transform.n13; 
-//			tr.n14 = _skin.transform.n14;
-//			tr.n21 = _skin.transform.n21; 
-//			tr.n22 = _skin.transform.n22; 
-//			tr.n23 = _skin.transform.n23; 
-//			tr.n24 = _skin.transform.n24;
-//			tr.n31 = _skin.transform.n31; 
-//			tr.n32 = _skin.transform.n32; 
-//			tr.n33 = _skin.transform.n33; 
-//			tr.n34 = _skin.transform.n34;
-//			tr.n41 = _skin.transform.n41; 
-//			tr.n42 = _skin.transform.n42; 
-//			tr.n43 = _skin.transform.n43; 
-//			tr.n44 = _skin.transform.n44;
-//			 
-//			return tr;
-
 			return _skin.transform;
 		}
 
 		public function updateObject3D():void {
-//			var p:Number3D = new Number3D(_currState.position.x, _currState.position.y, _currState.position.z);
-//			var o:Matrix3D = new Matrix3D();
-//			o.n11 = _currState.orientation.n11; 
-//			o.n12 = _currState.orientation.n12; 
-//			o.n13 = _currState.orientation.n13; 
-//			o.n14 = _currState.orientation.n14;
-//			o.n21 = _currState.orientation.n21; 
-//			o.n22 = _currState.orientation.n22; 
-//			o.n23 = _currState.orientation.n23; 
-//			o.n24 = _currState.orientation.n24;
-//			o.n31 = _currState.orientation.n31; 
-//			o.n32 = _currState.orientation.n32; 
-//			o.n33 = _currState.orientation.n33; 
-//			o.n34 = _currState.orientation.n34;
-//			o.n41 = _currState.orientation.n41; 
-//			o.n42 = _currState.orientation.n42; 
-//			o.n43 = _currState.orientation.n43; 
-//			o.n44 = _currState.orientation.n44;
-//			
-//			_skin.transform = Matrix3D.multiply(Matrix3D.translationMatrix(p.x, p.y, p.z), o);
-			
 			var m:JMatrix3D = JMatrix3D.multiply(JMatrix3D.translationMatrix(_currState.position.x, _currState.position.y, _currState.position.z), _currState.orientation);
 			_skin.transform = m;
-			
+		}
+		
+		public function get material():MaterialProperties {
+			return _material;
 		}
 	}
 }

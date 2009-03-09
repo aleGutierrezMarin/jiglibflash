@@ -25,14 +25,15 @@ distribution.
 
 package jiglib.vehicles {
 	import jiglib.geometry.JBox;
-	import jiglib.plugin.ISkin3D;		
+	import jiglib.plugin.ISkin3D;
+	import jiglib.plugin.PhysicsBody;	
 
-	public class JChassis extends JBox {
+	public class JChassis extends JBox implements PhysicsBody {
 
 		private var _car:JCar;
 
 		public function JChassis(car:JCar, skin:ISkin3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
-			super(skin, true, width, depth, height);
+			super(skin, width, depth, height);
 			
 			_car = car;
 		}

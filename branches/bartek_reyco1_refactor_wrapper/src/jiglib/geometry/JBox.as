@@ -24,22 +24,21 @@ distribution.
  */
 
 package jiglib.geometry {
-	import jiglib.plugin.ISkin3D;	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
+	import jiglib.plugin.ISkin3D;
+	import jiglib.plugin.PhysicsBody;		
 
-	import org.papervision3d.objects.DisplayObject3D;	
-
-	public class JBox extends RigidBody {
+	public class JBox extends RigidBody implements PhysicsBody {
 
 		private var _sideLengths:JNumber3D;
 		private var _points:Array;
 		private var _edges:Array = new Array({ ind0:0, ind1:1 }, { ind0:3, ind1:1 }, { ind0:2, ind1:3 }, { ind0:2, ind1:0 }, { ind0:4, ind1:5 }, { ind0:5, ind1:7 }, { ind0:6, ind1:7 }, { ind0:4, ind1:6 }, { ind0:7, ind1:1 }, { ind0:5, ind1:3 }, { ind0:4, ind1:2 }, { ind0:6, ind1:0 });
 
 		
-		public function JBox(skin:ISkin3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
+		public function JBox(skin:ISkin3D, width:Number, depth:Number, height:Number) {
 			
-			super(skin, mov);
+			super(skin);
 			_type = "BOX";
 			
 			_sideLengths = new JNumber3D(width, height, depth);

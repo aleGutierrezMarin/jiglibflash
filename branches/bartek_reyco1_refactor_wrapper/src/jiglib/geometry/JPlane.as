@@ -25,17 +25,19 @@ distribution.
 
 package jiglib.geometry {
 	import jiglib.math.*;
+	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
-	import jiglib.plugin.ISkin3D;		
+	import jiglib.plugin.ISkin3D;
+	import jiglib.plugin.PhysicsBody;	
 
-	public class JPlane extends RigidBody {
+	public class JPlane extends RigidBody implements PhysicsBody {
 
 		private var _normal:JNumber3D;
 		private var _distance:Number;
 
 		public function JPlane(skin:ISkin3D) {
 			
-			super(skin, false);
+			super(skin);
 			_type = "PLANE";
 			
 			_normal = new JNumber3D(0, 0, -1);
@@ -80,17 +82,12 @@ package jiglib.geometry {
 				return false;
 			}
 		}
-
-		override public function moveTo(pos:JNumber3D, orientation:JMatrix3D):void {	
-			pos.copyTo(currentState.position);
-			setOrientation(orientation);
-			currentState.linVelocity = JNumber3D.ZERO;
-			currentState.rotVelocity = JNumber3D.ZERO;
-			copyCurrentStateToOld();
-			
+		
+		override protected function updateState():void {	
+			super.updateState();
 			_normal = new JNumber3D(0, 0, -1);
-			JMatrix3D.multiplyVector(orientation, _normal);
-			_distance = JNumber3D.dot(pos, _normal);
+			JMatrix3D.multiplyVector(_currState.orientation, _normal);
+			_distance = JNumber3D.dot(_currState.position, _normal);
 		}
 	}
 }

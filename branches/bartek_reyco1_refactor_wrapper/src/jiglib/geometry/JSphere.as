@@ -24,19 +24,18 @@ distribution.
  */
 
 package jiglib.geometry {
-	import jiglib.plugin.ISkin3D;	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
+	import jiglib.plugin.ISkin3D;
+	import jiglib.plugin.PhysicsBody;		
 
-	import org.papervision3d.objects.DisplayObject3D;	
-
-	public class JSphere extends RigidBody {
+	public class JSphere extends RigidBody implements PhysicsBody {
 
 		private var _radius:Number;
 
-		public function JSphere(skin:ISkin3D, mov:Boolean = true, radius:Number = 100) {
+		public function JSphere(skin:ISkin3D, radius:Number) {
 			
-			super(skin, mov);
+			super(skin);
 			_type = "SPHERE";
 			_radius = radius;
 			_boundingSphere = _radius;
