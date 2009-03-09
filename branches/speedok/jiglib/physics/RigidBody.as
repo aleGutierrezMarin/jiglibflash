@@ -25,20 +25,21 @@ distribution.
 
 package jiglib.physics
 {
-	import org.papervision3d.core.math.*;
-	import org.papervision3d.objects.DisplayObject3D;
+	//import org.papervision3d.core.math.*;
+	//import org.papervision3d.objects.DisplayObject3D;
 	
 	import jiglib.math.*;
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.JSegment;
 	import jiglib.physics.constraint.JConstraint;
+	import jiglib.plugin.ISkin3D;
 	
 	public class RigidBody
 	{
 		private static var idCounter:int = 0;
 		
 		private var _id:int;
-		private var _skin:DisplayObject3D;
+		private var _skin:ISkin3D;
 		 
 		private var _currState:PhysicsState;
 		private var _oldState:PhysicsState;
@@ -80,7 +81,7 @@ package jiglib.physics
 		protected var _type:String;
 		protected var _boundingSphere:Number;
 	     
-	    public function RigidBody(skin:DisplayObject3D, mov:Boolean = true)
+	    public function RigidBody(skin:ISkin3D, mov:Boolean = true)
 	    {
 			_id = idCounter++;
 			 
@@ -609,7 +610,7 @@ package jiglib.physics
 			return _type;
 		}
 		 
-		public function get BodySkin():DisplayObject3D
+		public function get BodySkin():ISkin3D
 		{
 			return _skin;
 		}
@@ -721,25 +722,28 @@ package jiglib.physics
 		 
 		public function getTransform():JMatrix3D
 		{
-			var tr:JMatrix3D=new JMatrix3D();
-			tr.n11=_skin.transform.n11; tr.n12=_skin.transform.n12; tr.n13=_skin.transform.n13; tr.n14=_skin.transform.n14;
-			tr.n21=_skin.transform.n21; tr.n22=_skin.transform.n22; tr.n23=_skin.transform.n23; tr.n24=_skin.transform.n24;
-			tr.n31=_skin.transform.n31; tr.n32=_skin.transform.n32; tr.n33=_skin.transform.n33; tr.n34=_skin.transform.n34;
-			tr.n41=_skin.transform.n41; tr.n42=_skin.transform.n42; tr.n43=_skin.transform.n43; tr.n44=_skin.transform.n44;
+			//var tr:JMatrix3D=new JMatrix3D();
+			//tr.n11=_skin.transform.n11; tr.n12=_skin.transform.n12; tr.n13=_skin.transform.n13; tr.n14=_skin.transform.n14;
+			//tr.n21=_skin.transform.n21; tr.n22=_skin.transform.n22; tr.n23=_skin.transform.n23; tr.n24=_skin.transform.n24;
+			//tr.n31=_skin.transform.n31; tr.n32=_skin.transform.n32; tr.n33=_skin.transform.n33; tr.n34=_skin.transform.n34;
+			//tr.n41=_skin.transform.n41; tr.n42=_skin.transform.n42; tr.n43=_skin.transform.n43; tr.n44=_skin.transform.n44;
 			 
-			return tr;
+			return _skin.transform;
 		}
 		
 		public function updateObject3D():void
 	    {
-			var p:Number3D=new Number3D(_currState.Position.x,_currState.Position.y,_currState.Position.z);
+			/*var p:Number3D=new Number3D(_currState.Position.x,_currState.Position.y,_currState.Position.z);
 			var o:Matrix3D=new Matrix3D();
 			o.n11=_currState.Orientation.n11; o.n12=_currState.Orientation.n12; o.n13=_currState.Orientation.n13; o.n14=_currState.Orientation.n14;
 			o.n21=_currState.Orientation.n21; o.n22=_currState.Orientation.n22; o.n23=_currState.Orientation.n23; o.n24=_currState.Orientation.n24;
 			o.n31=_currState.Orientation.n31; o.n32=_currState.Orientation.n32; o.n33=_currState.Orientation.n33; o.n34=_currState.Orientation.n34;
 			o.n41=_currState.Orientation.n41; o.n42=_currState.Orientation.n42; o.n43=_currState.Orientation.n43; o.n44=_currState.Orientation.n44;
 			
-			_skin.transform=Matrix3D.multiply(Matrix3D.translationMatrix(p.x, p.y, p.z), o);
+			_skin.transform = Matrix3D.multiply(Matrix3D.translationMatrix(p.x, p.y, p.z), o);
+			*/
+			var m:JMatrix3D = JMatrix3D.multiply(JMatrix3D.translationMatrix(_currState.Position.x, _currState.Position.y, _currState.Position.z), _currState.Orientation);
+			_skin.transform = m;
 	    }
 	}
 }

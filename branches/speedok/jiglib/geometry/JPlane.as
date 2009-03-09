@@ -25,9 +25,9 @@ distribution.
 
 package jiglib.geometry {
 
+	import jiglib.plugin.ISkin3D;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
-	import org.papervision3d.objects.DisplayObject3D;
 	
 	public class JPlane extends RigidBody{
 		
@@ -35,7 +35,7 @@ package jiglib.geometry {
 		private var _normal:JNumber3D;
 		private var _distance:Number;
 		
-		public function JPlane(skin:DisplayObject3D) {
+		public function JPlane(skin:ISkin3D) {
 			
 			super(skin, false);
 			_type = "PLANE";

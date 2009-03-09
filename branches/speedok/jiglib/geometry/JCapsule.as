@@ -25,17 +25,17 @@ distribution.
 
 package jiglib.geometry{
 
+	import jiglib.plugin.ISkin3D;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
-	import org.papervision3d.objects.DisplayObject3D;
 	
 	public class JCapsule extends RigidBody {
 		
 		private var _length:Number;
 		private var _radius:Number;
 		
-		public function JCapsule(skin:DisplayObject3D, mov:Boolean = true, radius:Number = 100, length:Number = 100) {
+		public function JCapsule(skin:ISkin3D, mov:Boolean = true, radius:Number = 100, length:Number = 100) {
 			super(skin, mov);
 			_type = "CAPSULE";
 			_radius = radius;

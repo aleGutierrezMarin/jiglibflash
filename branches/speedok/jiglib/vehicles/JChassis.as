@@ -24,16 +24,14 @@ distribution.
 */
 
 package jiglib.vehicles {
-	import jiglib.math.*;
 	import jiglib.geometry.JBox;
-	import jiglib.physics.PhysicsSystem;
-	import org.papervision3d.objects.DisplayObject3D;
+	import jiglib.plugin.ISkin3D;
 
 	public class JChassis extends JBox {
 		
 		private var _car:JCar;
 		
-		public function JChassis(car:JCar, skin:DisplayObject3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
+		public function JChassis(car:JCar, skin:ISkin3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
 			super(skin, true, width, depth, height);
 			
 			_car = car;

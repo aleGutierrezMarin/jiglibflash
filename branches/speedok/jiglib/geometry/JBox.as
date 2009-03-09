@@ -25,9 +25,9 @@ distribution.
 
 package jiglib.geometry {
 
+	import jiglib.plugin.ISkin3D;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
-	import org.papervision3d.objects.DisplayObject3D;
 	
 	public class JBox extends RigidBody {
 		
@@ -43,7 +43,7 @@ package jiglib.geometry {
 											[3, 1, 7, 5], [4, 6, 0, 2], 
 											[1, 3, 2, 0], [7, 6, 4, 5]);
 		 
-		public function JBox(skin:DisplayObject3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
+		public function JBox(skin:ISkin3D, mov:Boolean = true, width:Number = 500, depth:Number = 500, height:Number = 500) {
 			
 			super(skin, mov);
 			_type = "BOX";
