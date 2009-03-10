@@ -10,30 +10,30 @@ package jiglib.plugin.away3d {
 	 */
 	public class Away3dMesh implements ISkin3D {
 		
-		private var mesh:Mesh;
+		private var _mesh:Mesh;
 
 		public function Away3dMesh(do3d:Mesh) {
-			this.mesh = do3d;
+			this._mesh = do3d;
 		}
 
 		public function get transform():JMatrix3D {
 			var tr:JMatrix3D = new JMatrix3D();
-			tr.n11 = mesh.transform.sxx; 
-			tr.n12 = mesh.transform.sxy; 
-			tr.n13 = mesh.transform.sxz; 
-			tr.n14 = mesh.transform.tx;
-			tr.n21 = mesh.transform.syx; 
-			tr.n22 = mesh.transform.syy; 
-			tr.n23 = mesh.transform.syz; 
-			tr.n24 = mesh.transform.ty;
-			tr.n31 = mesh.transform.szx; 
-			tr.n32 = mesh.transform.szy; 
-			tr.n33 = mesh.transform.szz; 
-			tr.n34 = mesh.transform.tz;
-			tr.n41 = mesh.transform.swx; 
-			tr.n42 = mesh.transform.swy; 
-			tr.n43 = mesh.transform.swz; 
-			tr.n44 = mesh.transform.tw;
+			tr.n11 = _mesh.transform.sxx; 
+			tr.n12 = _mesh.transform.sxy; 
+			tr.n13 = _mesh.transform.sxz; 
+			tr.n14 = _mesh.transform.tx;
+			tr.n21 = _mesh.transform.syx; 
+			tr.n22 = _mesh.transform.syy; 
+			tr.n23 = _mesh.transform.syz; 
+			tr.n24 = _mesh.transform.ty;
+			tr.n31 = _mesh.transform.szx; 
+			tr.n32 = _mesh.transform.szy; 
+			tr.n33 = _mesh.transform.szz; 
+			tr.n34 = _mesh.transform.tz;
+			tr.n41 = _mesh.transform.swx; 
+			tr.n42 = _mesh.transform.swy; 
+			tr.n43 = _mesh.transform.swz; 
+			tr.n44 = _mesh.transform.tw;
 			 
 			return tr;
 		}
@@ -56,7 +56,11 @@ package jiglib.plugin.away3d {
 			tr.swy = m.n42; 
 			tr.swz = m.n43; 
 			tr.tw = m.n44;
-			mesh.transform = tr;
+			_mesh.transform = tr;
+		}
+		
+		public function get mesh():Mesh {
+			return _mesh;
 		}
 	}
 }

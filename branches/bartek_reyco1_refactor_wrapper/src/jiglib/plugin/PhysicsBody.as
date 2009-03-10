@@ -2,9 +2,8 @@ package jiglib.plugin {
 	import jiglib.physics.MaterialProperties;	
 	
 	/**
-	 * Don't use I in the name of this one, 
-	 * we do not want to remind people that 
-	 * they are dealing with an interface.
+	 * PhysicsBody is the interface through which the users can access properties and methods
+	 * of a body inside the JigLib physics system. 
 	 * 
 	 * @author bartekd
 	 */
