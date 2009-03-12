@@ -69,7 +69,6 @@ package jiglib.physics {
 		public var collisions:Array;
 		private var _material:MaterialProperties;
 
-		
 		protected var _type:String;
 		protected var _boundingSphere:Number;
 
@@ -109,6 +108,30 @@ package jiglib.physics {
 			
 			_type = "Object3D";
 			_boundingSphere = 0;
+		}
+
+		public function get rotationX():Number {
+			return 0; // TODO: implement
+		}
+
+		public function get rotationY():Number {
+			return 0; // TODO: implement
+		}
+
+		public function get rotationZ():Number {
+			return 0; // TODO: implement
+		}
+
+		public function set rotationX(px:Number):void {
+			// TODO: implement
+		}
+
+		public function set rotationY(py:Number):void {
+			// TODO: implement
+		}
+
+		public function set rotationZ(pz:Number):void {
+			// TODO: implement
 		}
 
 		public function setOrientation(orient:JMatrix3D):void {
@@ -383,7 +406,7 @@ package jiglib.physics {
 		public function isActive():Boolean {
 			return _activity;
 		}
-		
+
 		public function getMovable():Boolean {
 			return _movable;
 		}
@@ -628,7 +651,7 @@ package jiglib.physics {
 			var m:JMatrix3D = JMatrix3D.multiply(JMatrix3D.translationMatrix(_currState.position.x, _currState.position.y, _currState.position.z), _currState.orientation);
 			_skin.transform = m;
 		}
-		
+
 		public function get material():MaterialProperties {
 			return _material;
 		}

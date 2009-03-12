@@ -36,7 +36,7 @@ package bartek {
 			view.y = stage.stageHeight / 2;
 			addChild(view);
 			
-			physics = new Away3DPhysics(view, 5);
+			physics = new Away3DPhysics(view, 10);
 
 			for (var i:int = 0; i < 40; i++) {
 				var sphere:PhysicsBody = physics.createSphere({radius:30, segmentsW:6, segmentsH:6});

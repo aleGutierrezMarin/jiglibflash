@@ -19,8 +19,8 @@ package jiglib.plugin {
 			initTime = getTimer();
 		}
 		
-		public function addBody(body:RigidBody):void {
-			PhysicsSystem.getInstance().addBody(body);
+		public function addBody(body:PhysicsBody):void {
+			PhysicsSystem.getInstance().addBody(body as RigidBody);
 		}
 		
 		public function step():void {
