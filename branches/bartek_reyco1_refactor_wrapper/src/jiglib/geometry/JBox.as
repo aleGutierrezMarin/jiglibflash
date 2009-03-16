@@ -26,10 +26,9 @@ distribution.
 package jiglib.geometry {
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
-	import jiglib.plugin.ISkin3D;
-	import jiglib.plugin.PhysicsBody;		
+	import jiglib.plugin.ISkin3D;	
 
-	public class JBox extends RigidBody implements PhysicsBody {
+	public class JBox extends RigidBody {
 
 		private var _sideLengths:JNumber3D;
 		private var _points:Array;

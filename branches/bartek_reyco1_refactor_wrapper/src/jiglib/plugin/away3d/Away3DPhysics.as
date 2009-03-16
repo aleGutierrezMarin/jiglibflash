@@ -9,8 +9,8 @@ package jiglib.plugin.away3d {
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
 	import jiglib.math.JMatrix3D;
-	import jiglib.plugin.AbstractPhysics;
-	import jiglib.plugin.PhysicsBody;	
+	import jiglib.physics.RigidBody;
+	import jiglib.plugin.AbstractPhysics;	
 
 	/**
 	 * @author bartekd
@@ -24,7 +24,7 @@ package jiglib.plugin.away3d {
 			super(speed);
 		}
 		
-		public function getMesh(body:PhysicsBody):Mesh {
+		public function getMesh(body:RigidBody):Mesh {
 			return Away3dMesh(body.skin).mesh;
 		}
 		
@@ -33,7 +33,7 @@ package jiglib.plugin.away3d {
 		 *  Example of an initObject: {radius:100, segmentsW:8, segmentsH:6}
 		 *  Refer to Away3D docs for more info.
 		 */
-		public function createSphere(initObject:Object):PhysicsBody {
+		public function createSphere(initObject:Object):RigidBody {
 			var r:Number = initObject["radius"];
 			var sphere:Sphere = new Sphere(initObject);
 			view.scene.addChild(sphere);
@@ -45,7 +45,7 @@ package jiglib.plugin.away3d {
 		/**
 		 *  {width:100, height:100, depth:100}
 		 */
-		public function createCube(initObject:Object):PhysicsBody {
+		public function createCube(initObject:Object):RigidBody {
 			var w:Number = initObject["width"];			var d:Number = initObject["depth"];			var h:Number = initObject["height"];
 			var cube:Cube = new Cube(initObject);
 			view.scene.addChild(cube);
@@ -57,7 +57,7 @@ package jiglib.plugin.away3d {
 		/**
 		 * {width:100, height:100}
 		 */
-		public function createGround(initObject:Object, level:Number):PhysicsBody {
+		public function createGround(initObject:Object, level:Number):RigidBody {
 			var ground:Plane = new Plane(initObject);
 			// Away3D plane
 			ground.rotationX = -90;

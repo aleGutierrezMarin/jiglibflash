@@ -27,10 +27,9 @@ package jiglib.geometry {
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
-	import jiglib.plugin.ISkin3D;
-	import jiglib.plugin.PhysicsBody;	
+	import jiglib.plugin.ISkin3D;	
 
-	public class JPlane extends RigidBody implements PhysicsBody {
+	public class JPlane extends RigidBody {
 
 		private var _normal:JNumber3D;
 		private var _distance:Number;

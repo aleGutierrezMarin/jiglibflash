@@ -1,5 +1,4 @@
 package jiglib.plugin.papervision3d {
-	import jiglib.plugin.PhysicsBody;	
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
@@ -27,11 +26,11 @@ package jiglib.plugin.papervision3d {
 			this.scene = scene;
 		}
 		
-		public function getMesh(body:PhysicsBody):DisplayObject3D {
+		public function getMesh(body:RigidBody):DisplayObject3D {
 			return Pv3dMesh(body.skin).mesh;
 		}
 
-		public function createSphere(material:MaterialObject3D, radius:Number=100, segmentsW:int=8, segmentsH:int = 6):PhysicsBody {
+		public function createSphere(material:MaterialObject3D, radius:Number=100, segmentsW:int=8, segmentsH:int = 6):RigidBody {
 			var sphere:Sphere = new Sphere(material, radius, segmentsW, segmentsH);
 			scene.addChild(sphere);
 			var jsphere:JSphere = new JSphere(new Pv3dMesh(sphere), radius);
@@ -39,7 +38,7 @@ package jiglib.plugin.papervision3d {
 			return jsphere;
 		}
 		
-		public function createCube(materials:MaterialsList, width:Number=500, depth:Number=500, height:Number=500, segmentsS:int=1, segmentsT:int=1, segmentsH:int=1, insideFaces:int=0, excludeFaces:int=0):PhysicsBody {
+		public function createCube(materials:MaterialsList, width:Number=500, depth:Number=500, height:Number=500, segmentsS:int=1, segmentsT:int=1, segmentsH:int=1, insideFaces:int=0, excludeFaces:int=0):RigidBody {
 			var cube:Cube = new Cube(materials, width, depth, height, segmentsS, segmentsT, segmentsH, insideFaces, excludeFaces);
 			scene.addChild(cube);
 			var jbox:JBox = new JBox(new Pv3dMesh(cube), width, depth, height);
@@ -47,7 +46,7 @@ package jiglib.plugin.papervision3d {
 			return jbox;
 		}
 		
-		public function createGround(material:MaterialObject3D, size:Number, level:Number):PhysicsBody {
+		public function createGround(material:MaterialObject3D, size:Number, level:Number):RigidBody {
 			var ground:Plane = new Plane(material, size, size);
 			scene.addChild(ground);
 			var jGround:JPlane = new JPlane(new Pv3dMesh(ground));

@@ -25,10 +25,9 @@ distribution.
 
 package jiglib.vehicles {
 	import jiglib.geometry.JBox;
-	import jiglib.plugin.ISkin3D;
-	import jiglib.plugin.PhysicsBody;	
+	import jiglib.plugin.ISkin3D;	
 
-	public class JChassis extends JBox implements PhysicsBody {
+	public class JChassis extends JBox {
 
 		private var _car:JCar;
 

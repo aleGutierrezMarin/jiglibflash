@@ -24,14 +24,13 @@ distribution.
  */
 
 package jiglib.physics {
-	import jiglib.plugin.PhysicsBody;	
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.JMatrix3D;
 	import jiglib.math.JNumber3D;
-	import jiglib.plugin.ISkin3D;	
+	import jiglib.plugin.ISkin3D;		
 
-	public class RigidBody implements PhysicsBody {
+	public class RigidBody {
 		private static var idCounter:int = 0;
 
 		private var _id:int;

@@ -2,7 +2,7 @@ package jiglib.plugin {
 	import jiglib.physics.PhysicsSystem;
 	import jiglib.physics.RigidBody;
 	
-	import flash.utils.getTimer;		
+	import flash.utils.getTimer;	
 
 	/**
 	 * @author bartekd
@@ -19,7 +19,7 @@ package jiglib.plugin {
 			initTime = getTimer();
 		}
 		
-		public function addBody(body:PhysicsBody):void {
+		public function addBody(body:RigidBody):void {
 			PhysicsSystem.getInstance().addBody(body as RigidBody);
 		}
 		
