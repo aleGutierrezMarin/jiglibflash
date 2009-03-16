@@ -43,7 +43,7 @@ package jiglib.geometry {
 			_sideLengths = new JNumber3D(width, height, depth);
 			_boundingSphere = 0.5 * _sideLengths.modulo;
 			initPoint();
-			this.setMass(1);
+			this.mass =1;
 		}
 
 		private function initPoint():void {
@@ -63,7 +63,7 @@ package jiglib.geometry {
 			_sideLengths = size.clone();
 			_boundingSphere = 0.5 * _sideLengths.modulo;
 			initPoint();
-			this.setMass(this.mass);
+//			this.setMass(this.mass);
 			this.setActive();
 		}
 

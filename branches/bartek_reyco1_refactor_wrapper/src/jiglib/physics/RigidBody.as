@@ -387,10 +387,9 @@ package jiglib.physics {
 			}
 		}
 
-		public function setMass(m:Number):void {
+		public function set mass(m:Number):void {
 			_mass = m;
 			_invMass = 1 / m;
-			
 			setInertia(getInertiaProperties(m));
 		}
 
@@ -653,6 +652,30 @@ package jiglib.physics {
 
 		public function get material():MaterialProperties {
 			return _material;
+		}
+		
+		public function get restitution():Number {
+			return _material.restitution;
+		}
+		
+		public function set restitution(restitution:Number):void {
+			_material.restitution = restitution;
+		}
+		
+		public function get staticFriction():Number {
+			return _material.staticFriction;
+		}
+		
+		public function set staticFriction(staticFriction:Number):void {
+			_material.staticFriction = staticFriction;
+		}
+		
+		public function get dynamicFriction():Number {
+			return _material.dynamicFriction;
+		}
+		
+		public function set dynamicFriction(dynamicFriction:Number):void {
+			_material.dynamicFriction = dynamicFriction;
 		}
 	}
 }
