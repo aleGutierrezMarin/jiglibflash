@@ -26,15 +26,39 @@ distribution.
 package jiglib.physics {
 
 	public class MaterialProperties {
-		public var Restitution:Number;
-		public var StaticFriction:Number;
-		public var DynamicFriction:Number;
+
+		private var _restitution:Number;
+		private var _staticFriction:Number;
+		private var _dynamicFriction:Number;
 		
-		public function MaterialProperties(_restitution:Number = 0.2, _staticFriction:Number = 0.6, _dynamicFriction:Number = 0.6)
-		{
-			Restitution = _restitution;
-			StaticFriction = _staticFriction;
-			DynamicFriction = _dynamicFriction;
+		public function MaterialProperties(_restitution:Number = 0.2, _staticFriction:Number = 0.6, _dynamicFriction:Number = 0.6) {
+			this._restitution = _restitution;
+			this._staticFriction = _staticFriction;
+			this._dynamicFriction = _dynamicFriction;
+		}
+		
+		public function get restitution():Number {
+			return _restitution;
+		}
+		
+		public function set restitution(restitution:Number):void {
+			_restitution = restitution;
+		}
+		
+		public function get staticFriction():Number {
+			return _staticFriction;
+		}
+		
+		public function set staticFriction(staticFriction:Number):void {
+			_staticFriction = staticFriction;
+		}
+		
+		public function get dynamicFriction():Number {
+			return _dynamicFriction;
+		}
+		
+		public function set dynamicFriction(dynamicFriction:Number):void {
+			_dynamicFriction = dynamicFriction;
 		}
 	}
 	

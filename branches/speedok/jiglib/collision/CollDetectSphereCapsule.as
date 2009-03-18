@@ -34,16 +34,14 @@ package jiglib.collision {
 	public class CollDetectSphereCapsule extends CollDetectFunctor {
 		
 		public function CollDetectSphereCapsule() {
-			Name = "SphereCapsule";
-			Type0 = "SPHERE";
-			Type1 = "CAPSULE";
+			this.name = "SphereCapsule";
+			this.type0 = "SPHERE";
+			this.type1 = "CAPSULE";
 		}
 		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="CAPSULE")
-			{
+			if(info.body0.type=="CAPSULE") {
 				tempBody=info.body0;
 				info.body0=info.body1;
 				info.body1=tempBody;
@@ -52,58 +50,57 @@ package jiglib.collision {
 			var sphere:JSphere = info.body0 as JSphere;
 			var capsule:JCapsule = info.body1 as JCapsule;
 			
-			if (!sphere.hitTestObject3D(capsule))
-			{
+			if (!sphere.hitTestObject3D(capsule)) {
 				return;
 			}
 			
-			var seg:JSegment = new JSegment(capsule.getBottomPos(), JNumber3D.multiply(capsule.CurrentState.Orientation.getCols()[1], capsule.Length));
-			var radSum:Number = sphere.Radius + capsule.Radius;
+			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], capsule.length));
+			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], capsule.length));
+			var radSum:Number = sphere.radius + capsule.radius;
 			
-			var obj:Object = new Object();
-			var distSq:Number = JSegment.PointSegmentDistanceSq(obj, sphere.CurrentState.Position, seg);
+			var oldObj:Object = new Object();
+			var oldDistSq:Number = oldSeg.pointSegmentDistanceSq(oldObj, sphere.oldState.position);
+			var newObj:Object = new Object();
+			var newDistSq:Number = newSeg.pointSegmentDistanceSq(newObj, sphere.currentState.position);
 			
-			if (distSq < Math.pow(radSum + JConfig.collToll, 2))
-			{
-				var segPos:JNumber3D = seg.GetPoint(obj.t);
-				var delta:JNumber3D = JNumber3D.sub(sphere.CurrentState.Position, segPos);
+			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2)) {
+				var segPos:JNumber3D = oldSeg.getPoint(oldObj.t);
+				var delta:JNumber3D = JNumber3D.sub(sphere.oldState.position, segPos);
 				
-				var dist:Number = Math.sqrt(distSq);
+				var dist:Number = Math.sqrt(oldDistSq);
 				var depth:Number = radSum - dist;
 				
-				if (dist > JNumber3D.NUM_TINY)
-				{
+				if (dist > JNumber3D.NUM_TINY) {
 					delta = JNumber3D.divide(delta, dist);
 				}
-				else
-				{
+				else {
 					delta = JNumber3D.UP;
 					JMatrix3D.multiplyVector(JMatrix3D.rotationMatrix(0, 0, 1, 360 * Math.random()), delta);
 				}
 				
-				var worldPos:JNumber3D = JNumber3D.add(segPos, JNumber3D.multiply(delta, capsule.Radius - 0.5 * depth));
+				var worldPos:JNumber3D = JNumber3D.add(segPos, JNumber3D.multiply(delta, capsule.radius - 0.5 * depth));
 				 
 				var collPts:Array = new Array();
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(worldPos, sphere.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(worldPos, capsule.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(worldPos, sphere.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(worldPos, capsule.oldState.position);
+				cpInfo.initialPenetration = depth;
 				collPts.push(cpInfo);
 				 
 				var collInfo:CollisionInfo=new CollisionInfo();
-			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = delta;
-			    collInfo.PointInfo = collPts;
+			    collInfo.objInfo=info;
+			    collInfo.dirToBody = delta;
+			    collInfo.pointInfo = collPts;
 				 
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(sphere.Material.Restitution * capsule.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(sphere.Material.StaticFriction * capsule.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(sphere.Material.DynamicFriction * capsule.Material.DynamicFriction);
-				collInfo.Mat = mat;
+				mat.restitution = Math.sqrt(sphere.material.restitution * capsule.material.restitution);
+				mat.staticFriction = Math.sqrt(sphere.material.staticFriction * capsule.material.staticFriction);
+				mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * capsule.material.dynamicFriction);
+				collInfo.mat = mat;
 				collArr.push(collInfo);
 				 
-				info.body0.Collisions.push(collInfo);
-			    info.body1.Collisions.push(collInfo);
+				info.body0.collisions.push(collInfo);
+			    info.body1.collisions.push(collInfo);
 			}
 		}
 	}

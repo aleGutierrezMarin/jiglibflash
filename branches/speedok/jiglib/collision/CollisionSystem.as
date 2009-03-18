@@ -16,15 +16,14 @@ appreciated but is not required.
 misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
-*/
+ */
 
 /**
-* @author Muzer(muzerly@gmail.com)
-* @link http://code.google.com/p/jiglibflash
-*/
+ * @author Muzer(muzerly@gmail.com)
+ * @link http://code.google.com/p/jiglibflash
+ */
 
 package jiglib.collision {
-
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
@@ -58,87 +57,69 @@ package jiglib.collision {
 			detectionFunctors["CAPSULE"]["PLANE"] = new CollDetectCapsulePlane();
 		}
 		
-		public function AddCollisionBody(body:RigidBody):void
-		{
-			if (!findBody(body))
-			{
+		public function addCollisionBody(body:RigidBody):void {
+			if (!findBody(body)) {
 				collBody.push(body);
 			}
 		}
-		public function RemoveCollisionBody(body:RigidBody):void
-		{
-			if (findBody(body))
-			{
+		public function removeCollisionBody(body:RigidBody):void {
+			if (findBody(body)) {
 				collBody.splice(collBody.indexOf(body), 1);
 			}
 		}
 		
-		public function DetectCollisions(body:RigidBody, collArr:Array):void
-		{
-			if (!body.IsActive())
-			{
+		public function detectCollisions(body:RigidBody, collArr:Array):void {
+			if (!body.isActive()) {
 				return;
 			}
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
 			 
-			for (var i:String in collBody)
-			{ 
-				if (body != collBody[i] && detectionFunctors[body.Type][collBody[i].Type] != undefined)
-				{
+			for (var i:String in collBody) { 
+				if (body != collBody[i] && detectionFunctors[body.type][collBody[i].type] != undefined) {
 					info = new CollDetectInfo();
 					info.body0 = body;
 					info.body1 = collBody[i];
-					fu = detectionFunctors[info.body0.Type][info.body1.Type];
-					fu.CollDetect(info, collArr);
+					fu = detectionFunctors[info.body0.type][info.body1.type];
+					fu.collDetect(info, collArr);
 				}
 			}
 		}
-		public function DetectAllCollisions(bodies:Array, collArr:Array):void
-		{
+		
+		public function detectAllCollisions(bodies:Array, collArr:Array):void {
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
-			for (var i:String in bodies)
-			{
-				for (var j:String in collBody)
-				{
-					if (bodies[i] == collBody[j])
-					{
+			for (var i:String in bodies) {
+				for (var j:String in collBody) {
+					if (bodies[i] == collBody[j]) {
 						continue;
 					}
-					 
-					if (collBody[j].IsActive() && bodies[i].ID > collBody[j].ID)
-					{
+					
+					if (collBody[j].isActive() && bodies[i].id > collBody[j].id) {
 						continue;
 					}
-					 
-					if (detectionFunctors[bodies[i].Type][collBody[j].Type] != undefined)
-					{
+					
+					if (detectionFunctors[bodies[i].type][collBody[j].type] != undefined) {
 						info = new CollDetectInfo();
-			        	info.body0 = bodies[i];
+						info.body0 = bodies[i];
 						info.body1 = collBody[j];
-						fu = detectionFunctors[info.body0.Type][info.body1.Type];
-					    fu.CollDetect(info, collArr);
+						fu = detectionFunctors[info.body0.type][info.body1.type];
+						fu.collDetect(info, collArr);
 					}
 				}
 			}
 		}
 		
-		public function SegmentIntersect(out:Object, seg:JSegment, ownerBody:RigidBody):Boolean
-		{
+		public function segmentIntersect(out:Object, seg:JSegment, ownerBody:RigidBody):Boolean {
 			out.fracOut = JNumber3D.NUM_HUGE;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
 			
 			var obj:Object = new Object();
-			for (var i:String in collBody)
-			{
-				if (collBody[i] != ownerBody && SegmentBounding(seg, collBody[i]))
-				{
-					if (collBody[i].SegmentIntersect(obj, seg))
-					{
-						if (obj.fracOut < out.fracOut)
-						{
+			for (var i:String in collBody) {
+				if (collBody[i] != ownerBody && segmentBounding(seg, collBody[i])) {
+					if (collBody[i].segmentIntersect(obj, seg, collBody[i].currentState)) {
+						if (obj.fracOut < out.fracOut) {
 							out.posOut = obj.posOut;
 							out.normalOut = obj.normalOut;
 							out.fracOut = obj.fracOut;
@@ -148,51 +129,38 @@ package jiglib.collision {
 				}
 			}
 			 
-			if (out.fracOut > 1)
-			{
+			if (out.fracOut > 1) {
 				return false;
 			}
-			if (out.fracOut < 0)
-			{
+			if (out.fracOut < 0) {
 				out.fracOut = 0;
 			}
-			else if (out.fracOut > 1)
-			{
+			else if (out.fracOut > 1) {
 				out.fracOut = 1;
 			}
 			return true;
 		}
-		 
-		public function SegmentBounding(seg:JSegment,obj:RigidBody):Boolean
-		{
-			var pos:JNumber3D = seg.GetPoint(0.5);
-			var r:Number = seg.Delta.modulo / 2;
+		
+		public function segmentBounding(seg:JSegment,obj:RigidBody):Boolean {
+			var pos:JNumber3D = seg.getPoint(0.5);
+			var r:Number = seg.delta.modulo / 2;
 			
-			if (obj.Type != "PLANE")
-			{
-				var num1:Number = JNumber3D.sub(pos, obj.CurrentState.Position).modulo;
-				var num2:Number = r + obj.BoundingSphere;
-				if (num1 <= num2)
-				{
+			if (obj.type != "PLANE") {
+				var num1:Number = JNumber3D.sub(pos, obj.currentState.position).modulo;
+				var num2:Number = r + obj.boundingSphere;
+				if (num1 <= num2) {
 					return true;
-				}
-				else
-				{
+				} else {
 					return false;
 				}
-			}
-			else
-			{
+			} else {
 				return true;
 			}
 		}
 		 
-		private function findBody(body:RigidBody):Boolean
-		{
-			for (var i:String in collBody)
-			{
-				if (body == collBody[i])
-				{
+		private function findBody(body:RigidBody):Boolean {
+			for (var i:String in collBody) {
+				if (body == collBody[i]) {
 					return true;
 				}
 			}

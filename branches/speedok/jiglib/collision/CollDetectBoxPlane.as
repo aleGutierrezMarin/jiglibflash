@@ -34,16 +34,14 @@ package jiglib.collision {
 	public class CollDetectBoxPlane extends CollDetectFunctor {
 		
 		public function CollDetectBoxPlane() {
-			Name = "BoxPlane";
-			Type0 = "BOX";
-			Type1 = "PLANE";
+			this.name = "BoxPlane";
+			this.type0 = "BOX";
+			this.type1 = "PLANE";
 		}
 		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="PLANE")
-			{
+			if(info.body0.type=="PLANE") {
 				tempBody=info.body0;
 				info.body0=info.body1;
 				info.body1=tempBody;
@@ -52,45 +50,46 @@ package jiglib.collision {
 			var box:JBox = info.body0 as JBox;
 			var plane:JPlane = info.body1 as JPlane;
 			
-			var centreDist:Number = plane.PointPlaneDistance(box.CurrentState.Position);
-			if (centreDist > box.BoundingSphere + JConfig.collToll)
-			{
+			var centreDist:Number = plane.pointPlaneDistance(box.currentState.position);
+			if (centreDist > box.boundingSphere + JConfig.collToll) {
 				return;
 			}
 			
-			var newPts:Array=box.GetCornerPoints();
+			var newPts:Array = box.getCornerPoints(box.currentState);
+			var oldPts:Array = box.getCornerPoints(box.oldState);
 			var collPts:Array = new Array();
 			var cpInfo:CollPointInfo;
-			var pt:JNumber3D;
-			var depth:Number;
-			for(var i:String in newPts)
-			{
-				pt=newPts[i];
-				depth=-1*plane.PointPlaneDistance(pt);
-				if(depth>-JConfig.collToll)
-				{
+			var newPt:JNumber3D;
+			var oldPt:JNumber3D;
+			var newDepth:Number;
+			var oldDepth:Number;
+			for(var i:String in newPts) {
+				newPt = newPts[i];
+				oldPt = oldPts[i];
+				newDepth = -1 * plane.pointPlaneDistance(newPt);
+				oldDepth = -1 * plane.pointPlaneDistance(oldPt);
+				if (Math.max(newDepth, oldDepth) > -JConfig.collToll) {
 					cpInfo=new CollPointInfo();
-					cpInfo.R0 = JNumber3D.sub(pt, box.CurrentState.Position);
-					cpInfo.R1 = JNumber3D.sub(pt, plane.CurrentState.Position);
-					cpInfo.InitialPenetration = depth;
+					cpInfo.r0 = JNumber3D.sub(oldPt, box.oldState.position);
+					cpInfo.r1 = JNumber3D.sub(oldPt, plane.oldState.position);
+					cpInfo.initialPenetration = oldDepth;
 					collPts.push(cpInfo);
 				}
 			}
-			if(collPts.length>0)
-			{
+			if(collPts.length>0) {
 				var collInfo:CollisionInfo=new CollisionInfo();
-			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = plane.Normal;
-			    collInfo.PointInfo = collPts;
+			    collInfo.objInfo=info;
+			    collInfo.dirToBody = plane.normal;
+			    collInfo.pointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(box.Material.Restitution * plane.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(box.Material.StaticFriction * plane.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(box.Material.DynamicFriction * plane.Material.DynamicFriction);
-				collInfo.Mat = mat;
+				mat.restitution = Math.sqrt(box.material.restitution * plane.material.restitution);
+				mat.staticFriction = Math.sqrt(box.material.staticFriction * plane.material.staticFriction);
+				mat.dynamicFriction = Math.sqrt(box.material.dynamicFriction * plane.material.dynamicFriction);
+				collInfo.mat = mat;
 				collArr.push(collInfo);
-				info.body0.Collisions.push(collInfo);
-			    info.body1.Collisions.push(collInfo);
+				info.body0.collisions.push(collInfo);
+			    info.body1.collisions.push(collInfo);
 			}
 		}
 	}

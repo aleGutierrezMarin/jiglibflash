@@ -24,43 +24,38 @@ distribution.
 */
 
 package jiglib.geometry {
-
-	import jiglib.plugin.ISkin3D;
 	import jiglib.math.*;
+	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
+	import jiglib.plugin.ISkin3D;
 	
-	public class JPlane extends RigidBody{
+	public class JPlane extends RigidBody {
 		
-		public var name:String;
 		private var _normal:JNumber3D;
 		private var _distance:Number;
 		
 		public function JPlane(skin:ISkin3D) {
 			
-			super(skin, false);
+			super(skin);
 			_type = "PLANE";
-			
+			this.movable = false;
 			_normal = new JNumber3D(0, 0, -1);
 			_distance = 0;
 		}
 		
-		public function get Normal():JNumber3D
-		{
+		public function get normal():JNumber3D {
 			return _normal;
 		}
 		
-		public function get Distance():Number
-		{
+		public function get distance():Number {
 			return _distance;
 		}
 		 
-		public function PointPlaneDistance(pt:JNumber3D):Number
-		{
+		public function pointPlaneDistance(pt:JNumber3D):Number {
 			return JNumber3D.dot(_normal, pt) - _distance;
 		}
 		
-		override public function SegmentIntersect(out:Object, seg:JSegment):Boolean
-		{
+		override public function segmentIntersect(out:Object, seg:JSegment,state:PhysicsState):Boolean {
 			out.fracOut = 0;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
@@ -69,43 +64,30 @@ package jiglib.geometry {
 			
 			var t:Number;
 			
-			var denom:Number = JNumber3D.dot(_normal, seg.Delta);
-			if (Math.abs(denom) > JNumber3D.NUM_TINY)
-			{
-				t = -1 * (JNumber3D.dot(_normal, seg.Origin) - _distance) / denom;
+			var denom:Number = JNumber3D.dot(_normal, seg.delta);
+			if (Math.abs(denom) > JNumber3D.NUM_TINY) {
+				t = -1 * (JNumber3D.dot(_normal, seg.origin) - _distance) / denom;
 				
-				if (t < 0 || t > 1)
-				{
+				if (t < 0 || t > 1) {
 					return false;
-				}
-				else
-				{
+				} else {
 					frac = t;
 					out.fracOut = frac;
-					out.posOut = seg.GetPoint(frac);
+					out.posOut = seg.getPoint(frac);
 					out.normalOut = _normal.clone();
 					out.normalOut.normalize();
 					return true;
 				}
-			}
-			else
-			{
+			} else {
 				return false;
 			}
 		}
 		
-		override public function MoveTo(pos:JNumber3D, orientation:JMatrix3D):void
-		{	
-			pos.copyTo(CurrentState.Position);
-			SetOrientation(orientation);
-			CurrentState.LinVelocity = JNumber3D.ZERO;
-			CurrentState.RotVelocity = JNumber3D.ZERO;
-			CopyCurrentStateToOld();
-			
+		override protected function updateState():void {	
+			super.updateState();
 			_normal = new JNumber3D(0, 0, -1);
-			JMatrix3D.multiplyVector(orientation, _normal);
-			_distance = JNumber3D.dot(pos, _normal);
+			JMatrix3D.multiplyVector(_currState.orientation, _normal);
+			_distance = JNumber3D.dot(_currState.position, _normal);
 		}
 	}
-	
 }

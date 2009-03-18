@@ -25,79 +25,72 @@ distribution.
 
 package jiglib.geometry{
 
+	import jiglib.math.*;
 	import jiglib.plugin.ISkin3D;
 	import jiglib.geometry.JSegment;
-	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
+	import jiglib.physics.PhysicsState;
 	
 	public class JCapsule extends RigidBody {
 		
 		private var _length:Number;
 		private var _radius:Number;
 		
-		public function JCapsule(skin:ISkin3D, mov:Boolean = true, radius:Number = 100, length:Number = 100) {
-			super(skin, mov);
+		public function JCapsule(skin:ISkin3D, radius:Number = 100, length:Number = 100) {
+			super(skin);
 			_type = "CAPSULE";
 			_radius = radius;
 			_length = length;
 			_boundingSphere = getBoundingSphere(radius, length);
-			this.setMass(1);
+			this.mass = 1;
 		}
 		 
-		public function set Radius(r:Number):void
-		{
+		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = getBoundingSphere(_radius, _length);
-			this.setMass(this.Mass);
-			this.SetActive();
+			this.mass = this.mass;
+			this.setActive();
 		}
-		public function get Radius():Number
-		{
+		public function get radius():Number {
 			return _radius;
 		}
 		 
-		public function set Length(l:Number):void
-		{
+		public function set length(l:Number):void {
 			_length = l;
 			_boundingSphere = getBoundingSphere(_radius, _length);
-			this.setMass(this.Mass);
-			this.SetActive();
+			this.mass = this.mass;
+			this.setActive();
 		}
-		public function get Length():Number
-		{
+		public function get length():Number {
 			return _length;
 		}
 		 
-		public function getBottomPos():JNumber3D
-		{
-			var temp:JNumber3D = CurrentState.Orientation.getCols()[1];
+		public function getBottomPos(state:PhysicsState):JNumber3D {
+			var temp:JNumber3D = state.orientation.getCols()[1];
 			temp.normalize();
-			return JNumber3D.add(CurrentState.Position, JNumber3D.multiply(temp, -_length / 2));
+			return JNumber3D.add(state.position, JNumber3D.multiply(temp, -_length / 2));
 		}
 		 
-		public function getEndPos():JNumber3D
-		{
-			var temp:JNumber3D = CurrentState.Orientation.getCols()[1];
+		public function getEndPos(state:PhysicsState):JNumber3D {
+			var temp:JNumber3D = state.orientation.getCols()[1];
 			temp.normalize();
-			return JNumber3D.add(CurrentState.Position, JNumber3D.multiply(temp, _length / 2));
+			return JNumber3D.add(state.position, JNumber3D.multiply(temp, _length / 2));
 		}
 		 
-		override public function SegmentIntersect(out:Object, seg:JSegment):Boolean
-		{
+		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
 			out.fracOut = 0;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
 			
-			var Ks:JNumber3D = seg.Delta;
+			var Ks:JNumber3D = seg.delta;
 			var kss:Number = JNumber3D.dot(Ks, Ks);
 			var radiusSq:Number = _radius * _radius;
 			
-			var cylinderAxis:JSegment = new JSegment(getBottomPos(), CurrentState.Orientation.getCols()[1]);
-			var Ke:JNumber3D = cylinderAxis.Delta;
-			var Kg:JNumber3D = JNumber3D.sub(cylinderAxis.Origin, seg.Origin);
+			var cylinderAxis:JSegment = new JSegment(getBottomPos(state), state.orientation.getCols()[1]);
+			var Ke:JNumber3D = cylinderAxis.delta;
+			var Kg:JNumber3D = JNumber3D.sub(cylinderAxis.origin, seg.origin);
 			var kee:Number = JNumber3D.dot(Ke, Ke);
-			if (Math.abs(kee) < JNumber3D.NUM_TINY)
-			{
+			if (Math.abs(kee) < JNumber3D.NUM_TINY) {
 				return false;
 			}
 			
@@ -107,44 +100,39 @@ package jiglib.geometry{
 			var kgg:Number = JNumber3D.dot(Kg, Kg);
 			
 			var distSq:Number = JNumber3D.sub(Kg, JNumber3D.divide(JNumber3D.multiply(Ke, keg), kee)).modulo2;
-			if (distSq < radiusSq)
-			{
+			if (distSq < radiusSq) {
 				out.fracOut = 0;
-				out.posOut = seg.Origin.clone();
-				out.normalOut = JNumber3D.sub(out.posOut, getBottomPos());
-				out.normalOut = JNumber3D.sub(out.normalOut, JNumber3D.multiply(CurrentState.Orientation.getCols()[1], JNumber3D.dot(out.normalOut, CurrentState.Orientation.getCols()[1])));
+				out.posOut = seg.origin.clone();
+				out.normalOut = JNumber3D.sub(out.posOut, getBottomPos(state));
+				out.normalOut = JNumber3D.sub(out.normalOut, JNumber3D.multiply(state.orientation.getCols()[1], JNumber3D.dot(out.normalOut, state.orientation.getCols()[1])));
 				out.normalOut.normalize();
 				return true;
 			}
 			
 			var a:Number = kee * kss - (kes * kes);
-			if (Math.abs(a) < JNumber3D.NUM_TINY)
-			{
+			if (Math.abs(a) < JNumber3D.NUM_TINY) {
 				return false;
 			}
 			var b:Number = 2 * (keg * kes - kee * kgs);
 			var c:Number = kee * (kgg - radiusSq) - (keg * keg);
 			var blah:Number = (b * b) - 4 * a * c;
-			if (blah < 0)
-			{
+			if (blah < 0) {
 				return false;
 			}
 			var t:Number = ( -b - Math.sqrt(blah)) / (2 * a);
-			if (t < 0 || t > 1)
-			{
+			if (t < 0 || t > 1) {
 				return false;
 			}
 			out.fracOut = t;
-			out.posOut = seg.GetPoint(t);
-			out.normalOut = JNumber3D.sub(out.posOut, getBottomPos());
-			out.normalOut = JNumber3D.sub(out.normalOut, JNumber3D.multiply(CurrentState.Orientation.getCols()[1], JNumber3D.dot(out.normalOut, CurrentState.Orientation.getCols()[1])));
+			out.posOut = seg.getPoint(t);
+			out.normalOut = JNumber3D.sub(out.posOut, getBottomPos(state));
+			out.normalOut = JNumber3D.sub(out.normalOut, JNumber3D.multiply(state.orientation.getCols()[1], JNumber3D.dot(out.normalOut, state.orientation.getCols()[1])));
 			out.normalOut.normalize();
 			return true;
 		}
 		 
-		override public function GetInertiaProperties(mass:Number):JMatrix3D
-		{
-			var cylinderMass:Number = mass * Math.PI * _radius * _radius * _length / GetVolume();
+		override public function getInertiaProperties(mass:Number):JMatrix3D {
+			var cylinderMass:Number = mass * Math.PI * _radius * _radius * _length / getVolume();
 			var Ixx:Number = 0.25 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
 			var Iyy:Number = 0.5 * cylinderMass * _radius * _radius;
 			var Izz:Number = Ixx;
@@ -162,13 +150,11 @@ package jiglib.geometry{
 			return inertiaTensor;
 		}
 		
-		private function getBoundingSphere(r:Number, l:Number):Number
-		{
+		private function getBoundingSphere(r:Number, l:Number):Number {
 			return Math.sqrt(Math.pow(l / 2, 2) + r * r) + r;
 		}
 		
-		private function GetVolume():Number
-		{
+		private function getVolume():Number {
 			return (4 / 3) * Math.PI * _radius * _radius * _radius + _length * Math.PI * _radius * _radius;
 		}
 	}

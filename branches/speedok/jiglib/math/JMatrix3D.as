@@ -909,8 +909,8 @@ public class JMatrix3D
 	    	this.n34 = a.n34 - b.n34;
 	    }
 		
-		public static function sub( a:JMatrix3D, b:JMatrix3D ):JMatrix3D
-    	{
+		public static function sub( a:JMatrix3D, b:JMatrix3D ):JMatrix3D 
+		{
     		var m:JMatrix3D = new JMatrix3D();
     		
     		m.calculateSub( a, b );
@@ -918,8 +918,8 @@ public class JMatrix3D
     		return m;
     	}
 		
-		public static function Transpose( m:JMatrix3D ):JMatrix3D
-    	{
+		public static function transpose( m:JMatrix3D ):JMatrix3D 
+		{
     		var tr:JMatrix3D = new JMatrix3D();
          
 		    tr.n11 = m.n11;

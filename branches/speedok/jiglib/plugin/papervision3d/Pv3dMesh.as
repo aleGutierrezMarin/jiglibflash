@@ -1,4 +1,5 @@
-package jiglib.plugin {
+package jiglib.plugin.papervision3d {
+	import jiglib.plugin.ISkin3D;
 	import jiglib.math.JMatrix3D;
 	
 	import org.papervision3d.core.math.Matrix3D;
@@ -7,7 +8,7 @@ package jiglib.plugin {
 	/**
 	 * @author bartekd
 	 */
-	public class Pv3dMesh implements ISkin3D {
+	public class Pv3dMesh implements ISkin3D{
 		
 		private var do3d:DisplayObject3D;
 
@@ -58,8 +59,7 @@ package jiglib.plugin {
 			do3d.transform = tr;
 		}
 		
-		public function get Mesh():DisplayObject3D
-		{
+		public function get mesh():DisplayObject3D {
 			return do3d;
 		}
 	}

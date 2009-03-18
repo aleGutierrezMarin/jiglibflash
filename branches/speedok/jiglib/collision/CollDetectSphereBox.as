@@ -34,16 +34,14 @@ package jiglib.collision {
 	public class CollDetectSphereBox extends CollDetectFunctor {
 		
 		public function CollDetectSphereBox() {
-			Name = "SphereBox";
-			Type0 = "SPHERE";
-			Type1 = "BOX";
+			this.name = "SphereBox";
+			this.type0 = "SPHERE";
+			this.type1 = "BOX";
 		}
 		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="BOX")
-			{
+			if(info.body0.type=="BOX") {
 				tempBody=info.body0;
 				info.body0=info.body1;
 				info.body1=tempBody;
@@ -52,59 +50,58 @@ package jiglib.collision {
 			var sphere:JSphere = info.body0 as JSphere;
 			var box:JBox = info.body1 as JBox;
 			
-			if (!sphere.hitTestObject3D(box))
-			{
+			if (!sphere.hitTestObject3D(box)) {
 				return;
 			}
+			var spherePos:JNumber3D = sphere.oldState.position;
+			var boxPos:JNumber3D = box.oldState.position;
 			
-			var boxPoint:Object=new Object();
+			var oldBoxPoint:Object=new Object();
+			var newBoxPoint:Object=new Object();
 			
-			var dist:Number = box.GetDistanceToPoint(boxPoint, sphere.CurrentState.Position);
+			var oldDist:Number = box.getDistanceToPoint(box.oldState, oldBoxPoint, sphere.oldState.position);
+			var newDist:Number = box.getDistanceToPoint(box.currentState, newBoxPoint, sphere.currentState.position);
 			
-			var depth:Number = sphere.Radius - dist;
-			if (depth > -JConfig.collToll)
-			{
+			var oldDepth:Number = sphere.radius - oldDist;
+			var newDepth:Number = sphere.radius - newDist;
+			if (Math.max(oldDepth, newDepth) > -JConfig.collToll) {
 				var dir:JNumber3D;
 				var collPts:Array = new Array();
-				if (dist < -JNumber3D.NUM_TINY)
-				{
-					dir = JNumber3D.sub(JNumber3D.sub(boxPoint.pos, sphere.CurrentState.Position), boxPoint.pos);
+				if (oldDist < -JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(JNumber3D.sub(oldBoxPoint.pos, sphere.oldState.position), oldBoxPoint.pos);
 					dir.normalize();
 				}
-				else if (dist > JNumber3D.NUM_TINY)
-				{
-					dir = JNumber3D.sub(sphere.CurrentState.Position, boxPoint.pos);
+				else if (oldDist > JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(sphere.oldState.position, oldBoxPoint.pos);
 					dir.normalize();
 				}
-				else
-				{
-					dir = JNumber3D.sub(sphere.CurrentState.Position, box.CurrentState.Position);
+				else {
+					dir = JNumber3D.sub(sphere.oldState.position, box.oldState.position);
 					dir.normalize();
 				}
 				
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(boxPoint.pos, sphere.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(boxPoint.pos, box.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(oldBoxPoint.pos, sphere.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(oldBoxPoint.pos, box.oldState.position);
+				cpInfo.initialPenetration = oldDepth;
 				collPts.push(cpInfo);
 				
 				var collInfo:CollisionInfo=new CollisionInfo();
-			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = dir;
-			    collInfo.PointInfo = collPts;
+			    collInfo.objInfo=info;
+			    collInfo.dirToBody = dir;
+			    collInfo.pointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(sphere.Material.Restitution * box.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(sphere.Material.StaticFriction * box.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(sphere.Material.DynamicFriction * box.Material.DynamicFriction);
-				collInfo.Mat = mat;
+				mat.restitution = Math.sqrt(sphere.material.restitution * box.material.restitution);
+				mat.staticFriction = Math.sqrt(sphere.material.staticFriction * box.material.staticFriction);
+				mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * box.material.dynamicFriction);
+				collInfo.mat = mat;
 				collArr.push(collInfo);
 				
-				info.body0.Collisions.push(collInfo);
-			    info.body1.Collisions.push(collInfo);
+				info.body0.collisions.push(collInfo);
+			    info.body1.collisions.push(collInfo);
 			}
 		}
-		
 	}
 	
 }

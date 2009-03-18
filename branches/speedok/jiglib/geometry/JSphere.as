@@ -24,54 +24,50 @@ distribution.
 */
 
 package jiglib.geometry {
-
-	import jiglib.plugin.ISkin3D;
 	import jiglib.math.*;
+	import jiglib.plugin.ISkin3D;
 	import jiglib.physics.RigidBody;
+	import jiglib.physics.PhysicsState;
 	
 	public class JSphere extends RigidBody {
 		
 		public var name:String;
 		private var _radius:Number;
 		
-		public function JSphere(skin:ISkin3D, mov:Boolean = true, radius:Number = 100) {
+		public function JSphere(skin:ISkin3D, radius:Number) {
 			
-			super(skin, mov);
+			super(skin);
 			_type = "SPHERE";
 			_radius = radius;
 			_boundingSphere = _radius;
-			this.setMass(1);
+			this.mass = 1;
 		}
 		 
-		public function set Radius(r:Number):void
-		{
+		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = _radius;
-			this.setMass(this.Mass);
-			this.SetActive();
+			this.mass = this.mass;
+			this.setActive();
 		}
-		public function get Radius():Number
-		{
+		public function get radius():Number {
 			return _radius;
 		}
 		 
-		override public function SegmentIntersect(out:Object, seg:JSegment):Boolean
-		{
+		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
 			out.fracOut = 0;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
 			
 			var frac:Number = 0;
-			var r:JNumber3D = seg.Delta;
-			var s:JNumber3D = JNumber3D.sub(seg.Origin, CurrentState.Position);
+			var r:JNumber3D = seg.delta;
+			var s:JNumber3D = JNumber3D.sub(seg.origin, state.position);
 			
 			var radiusSq:Number = _radius * _radius;
 			var rSq:Number = r.modulo2;
-			if (rSq < radiusSq)
-			{
+			if (rSq < radiusSq) {
 				out.fracOut = 0;
-				out.posOut = seg.Origin.clone();
-				out.normalOut = JNumber3D.sub(out.posOut, CurrentState.Position);
+				out.posOut = seg.origin.clone();
+				out.normalOut = JNumber3D.sub(out.posOut, state.position);
 				out.normalOut.normalize();
 				return true;
 			}
@@ -79,27 +75,24 @@ package jiglib.geometry {
 			var sDotr:Number = JNumber3D.dot(s, r);
 			var sSq:Number = s.modulo2;
 			var sigma:Number = sDotr * sDotr - rSq * (sSq - radiusSq);
-			if (sigma < 0)
-			{
+			if (sigma < 0) {
 				return false;
 			}
 			var sigmaSqrt:Number = Math.sqrt(sigma);
 			var lambda1:Number = ( -sDotr - sigmaSqrt) / rSq;
 			var lambda2:Number = ( -sDotr + sigmaSqrt) / rSq;
-			if (lambda1 > 1 || lambda2 < 0)
-			{
+			if (lambda1 > 1 || lambda2 < 0) {
 				return false;
 			}
 			frac = Math.max(lambda1, 0);
 			out.fracOut = frac;
-			out.posOut = seg.GetPoint(frac);
-			out.normalOut = JNumber3D.sub(out.posOut, CurrentState.Position);
+			out.posOut = seg.getPoint(frac);
+			out.normalOut = JNumber3D.sub(out.posOut, state.position);
 			out.normalOut.normalize();
 			return true;
 		}
 		 
-		override public function GetInertiaProperties(mass:Number):JMatrix3D
-		{
+		override public function getInertiaProperties(mass:Number):JMatrix3D {
 			var inertiaTensor:JMatrix3D = new JMatrix3D();
 			var Ixx:Number = 0.4 * mass * _radius * _radius;
 			inertiaTensor.n11 = Ixx;
@@ -109,5 +102,4 @@ package jiglib.geometry {
 			return inertiaTensor;
 		}
 	}
-	
 }

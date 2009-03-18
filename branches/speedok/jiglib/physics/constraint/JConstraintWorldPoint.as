@@ -45,65 +45,57 @@ package jiglib.physics.constraint {
 			_worldPosition = worldPosition;
 		}
 		
-		public function set WorldPosition(pos:JNumber3D):void
-		{
+		public function set worldPosition(pos:JNumber3D):void {
 			_worldPosition = pos;
 		}
-		public function get WorldPosition():JNumber3D
-		{
+		
+		public function get worldPosition():JNumber3D {
 			return _worldPosition;
 		}
 		
-		override public function Apply(dt:Number):Boolean {
-			this.Satisfied = true;
+		override public function apply(dt:Number):Boolean {
+			this.satisfied = true;
 			
 			var worldPos:JNumber3D = _pointOnBody.clone();
-			JMatrix3D.multiplyVector(_body.CurrentState.Orientation, worldPos);
-			worldPos = JNumber3D.add(worldPos, _body.CurrentState.Position);
-			var R:JNumber3D = JNumber3D.sub(worldPos, _body.CurrentState.Position);
-			var currentVel:JNumber3D = JNumber3D.add(_body.CurrentState.LinVelocity, JNumber3D.cross(R, _body.CurrentState.RotVelocity));
+			JMatrix3D.multiplyVector(_body.currentState.orientation, worldPos);
+			worldPos = JNumber3D.add(worldPos, _body.currentState.position);
+			var R:JNumber3D = JNumber3D.sub(worldPos, _body.currentState.position);
+			var currentVel:JNumber3D = JNumber3D.add(_body.currentState.linVelocity, JNumber3D.cross(R, _body.currentState.rotVelocity));
 			
 			var desiredVel:JNumber3D;
 			var deviationDir:JNumber3D;
 			var deviation:JNumber3D = JNumber3D.sub(worldPos, _worldPosition);
 			var deviationDistance:Number = deviation.modulo;
-			if (deviationDistance > allowedDeviation)
-			{
+			if (deviationDistance > allowedDeviation) {
 				deviationDir = JNumber3D.divide(deviation, deviationDistance);
 				desiredVel = JNumber3D.multiply(deviationDir, (allowedDeviation - deviationDistance) / (timescale * dt));
-			}
-			else
-			{
+			} else {
 				desiredVel = JNumber3D.ZERO;
 			}
 			
 			var N:JNumber3D = JNumber3D.sub(currentVel, desiredVel);
 			var normalVel:Number = N.modulo;
-			if (normalVel < minVelForProcessing)
-			{
+			if (normalVel < minVelForProcessing) {
 				return false;
 			}
 			N = JNumber3D.divide(N, normalVel);
 			
 			var tempV:JNumber3D = JNumber3D.cross(N, R);
-			JMatrix3D.multiplyVector(_body.WorldInvInertia, tempV);
-			var denominator:Number = _body.InvMass + JNumber3D.dot(N, JNumber3D.cross(R, tempV));
+			JMatrix3D.multiplyVector(_body.worldInvInertia, tempV);
+			var denominator:Number = _body.invMass + JNumber3D.dot(N, JNumber3D.cross(R, tempV));
 			
-			if (denominator < JNumber3D.NUM_TINY)
-			{
+			if (denominator < JNumber3D.NUM_TINY) {
 				return false;
 			}
 			
 			var normalImpulse:Number = -normalVel / denominator;
 			
-			_body.ApplyWorldImpulse(JNumber3D.multiply(N, normalImpulse), worldPos);
+			_body.applyWorldImpulse(JNumber3D.multiply(N, normalImpulse), worldPos);
 			
-			_body.SetConstraintsAndCollisionsUnsatisfied();
-			this.Satisfied = true;
+			_body.setConstraintsAndCollisionsUnsatisfied();
+			this.satisfied = true;
 			
 			return true;
 		}
-		
 	}
-	
 }

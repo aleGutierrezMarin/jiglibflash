@@ -35,19 +35,17 @@ package jiglib.collision {
 	public class CollDetectCapsulePlane extends CollDetectFunctor {
 		
 		public function CollDetectCapsulePlane() {
-			Name = "CapsulePlane";
-			Type0 = "CAPSULE";
-			Type1 = "PLANE";
+			this.name = "CapsulePlane";
+			this.type0 = "CAPSULE";
+			this.type1 = "PLANE";
 		}
 		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="PLANE")
-			{
-				tempBody=info.body0;
-				info.body0=info.body1;
-				info.body1=tempBody;
+			if (info.body0.type == "PLANE") {
+				tempBody = info.body0;
+				info.body0 = info.body1;
+				info.body1 = tempBody;
 			}
 			
 			var capsule:JCapsule = info.body0 as JCapsule;
@@ -56,51 +54,51 @@ package jiglib.collision {
 			var collPts:Array = new Array();
 			var cpInfo:CollPointInfo;
 			
-			var temPos:JNumber3D;
-			temPos = capsule.getBottomPos();
-			var dist:Number = plane.PointPlaneDistance(temPos);
+			var oldPos:JNumber3D = capsule.getBottomPos(capsule.oldState);
+			var oldDist:Number = plane.pointPlaneDistance(oldPos);
+			var newPos:JNumber3D = capsule.getBottomPos(capsule.currentState);
+			var newDist:Number = plane.pointPlaneDistance(newPos);
 			
-			if (dist < capsule.Radius + JConfig.collToll)
-			{
-				var depth:Number = capsule.Radius - dist;
-				var worldPos:JNumber3D = JNumber3D.sub(temPos, JNumber3D.multiply(plane.Normal, capsule.Radius));
+			if (Math.min(oldDist, newDist) < capsule.radius + JConfig.collToll) {
+				var oldDepth:Number = capsule.radius - oldDist;
+				var worldPos:JNumber3D = JNumber3D.sub(oldPos, JNumber3D.multiply(plane.normal, capsule.radius));
 				
 				cpInfo=new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(worldPos, capsule.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(worldPos, plane.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(worldPos, capsule.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(worldPos, plane.oldState.position);
+				cpInfo.initialPenetration = oldDepth;
 				collPts.push(cpInfo);
 			}
 			
-			temPos = capsule.getEndPos();
-			dist = plane.PointPlaneDistance(temPos);
-			if (dist < capsule.Radius + JConfig.collToll)
-			{
-				depth = capsule.Radius - dist;
-				worldPos = JNumber3D.sub(temPos, JNumber3D.multiply(plane.Normal, capsule.Radius));
+			oldPos = capsule.getEndPos(capsule.oldState);
+			newPos = capsule.getEndPos(capsule.currentState);
+			oldDist = plane.pointPlaneDistance(oldPos);
+			newDist = plane.pointPlaneDistance(newPos);
+			if (Math.min(oldDist, newDist) < capsule.radius + JConfig.collToll) {
+				oldDepth = capsule.radius - oldDist;
+				worldPos = JNumber3D.sub(oldPos, JNumber3D.multiply(plane.normal, capsule.radius));
 				
 				cpInfo=new CollPointInfo();
-				cpInfo.R0 = JNumber3D.sub(worldPos, capsule.CurrentState.Position);
-				cpInfo.R1 = JNumber3D.sub(worldPos, plane.CurrentState.Position);
-				cpInfo.InitialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(worldPos, capsule.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(worldPos, plane.oldState.position);
+				cpInfo.initialPenetration = oldDepth;
 				collPts.push(cpInfo);
 			}
 			
-			if (collPts.length > 0)
-			{
+			if (collPts.length > 0) {
 				var collInfo:CollisionInfo=new CollisionInfo();
-			    collInfo.ObjInfo=info;
-			    collInfo.DirToBody = plane.Normal;
-			    collInfo.PointInfo = collPts;
+			    collInfo.objInfo=info;
+			    collInfo.dirToBody = plane.normal;
+			    collInfo.pointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.Restitution = Math.sqrt(capsule.Material.Restitution * plane.Material.Restitution);
-				mat.StaticFriction = Math.sqrt(capsule.Material.StaticFriction * plane.Material.StaticFriction);
-				mat.DynamicFriction = Math.sqrt(capsule.Material.DynamicFriction * plane.Material.DynamicFriction);
-				collInfo.Mat = mat;
+				mat.restitution = Math.sqrt(capsule.material.restitution * plane.material.restitution);
+				mat.staticFriction = Math.sqrt(capsule.material.staticFriction * plane.material.staticFriction);
+				mat.dynamicFriction = Math.sqrt(capsule.material.dynamicFriction * plane.material.dynamicFriction);
+				collInfo.mat = mat;
 				collArr.push(collInfo);
-				info.body0.Collisions.push(collInfo);
-			    info.body1.Collisions.push(collInfo);
+				info.body0.collisions.push(collInfo);
+			    info.body1.collisions.push(collInfo);
 			}
 		}
 	}

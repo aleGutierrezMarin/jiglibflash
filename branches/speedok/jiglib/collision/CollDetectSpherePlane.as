@@ -34,16 +34,14 @@ package jiglib.collision {
 	public class CollDetectSpherePlane extends CollDetectFunctor {
 		
 		public function CollDetectSpherePlane() {
-			Name = "SpherePlane";
-			Type0 = "SPHERE";
-			Type1 = "PLANE";
+			this.name = "SpherePlane";
+			this.type0 = "SPHERE";
+			this.type1 = "PLANE";
 		}
 		
-		override public function CollDetect(info:CollDetectInfo, collArr:Array):void
-		{
+		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.Type=="PLANE")
-			{
+			if(info.body0.type=="PLANE") {
 				tempBody=info.body0;
 				info.body0=info.body1;
 				info.body1=tempBody;
@@ -52,36 +50,36 @@ package jiglib.collision {
 			var sphere:JSphere = info.body0 as JSphere;
 			var plane:JPlane = info.body1 as JPlane;
 			
-			var dist:Number = plane.PointPlaneDistance(sphere.CurrentState.Position);
+			var oldDist:Number = plane.pointPlaneDistance(sphere.oldState.position);
+			var newDist:Number = plane.pointPlaneDistance(sphere.currentState.position);
 			
-			if (dist > sphere.BoundingSphere + JConfig.collToll)
-			{
+			if (Math.min(newDist, oldDist) > sphere.boundingSphere + JConfig.collToll) {
 				return;
 			}
 			
 			var collPts:Array = new Array();
 			var cpInfo:CollPointInfo;
-			var depth:Number=sphere.Radius-dist;
+			var depth:Number = sphere.radius - oldDist;
 			
-			var worldPos:JNumber3D=JNumber3D.sub(sphere.CurrentState.Position,JNumber3D.multiply(plane.Normal,sphere.Radius));
+			var worldPos:JNumber3D=JNumber3D.sub(sphere.oldState.position,JNumber3D.multiply(plane.normal,sphere.radius));
 			cpInfo=new CollPointInfo();
-			cpInfo.R0=JNumber3D.sub(worldPos,sphere.CurrentState.Position);
-			cpInfo.R1=JNumber3D.sub(worldPos,plane.CurrentState.Position);
-			cpInfo.InitialPenetration=depth;
+			cpInfo.r0=JNumber3D.sub(worldPos,sphere.oldState.position);
+			cpInfo.r1=JNumber3D.sub(worldPos,plane.oldState.position);
+			cpInfo.initialPenetration=depth;
 			collPts.push(cpInfo);
 			
 			var collInfo:CollisionInfo=new CollisionInfo();
-			collInfo.ObjInfo=info;
-			collInfo.DirToBody = plane.Normal;
-			collInfo.PointInfo = collPts;
+			collInfo.objInfo=info;
+			collInfo.dirToBody = plane.normal;
+			collInfo.pointInfo = collPts;
 			var mat:MaterialProperties = new MaterialProperties();
-			mat.Restitution = Math.sqrt(sphere.Material.Restitution * plane.Material.Restitution);
-			mat.StaticFriction = Math.sqrt(sphere.Material.StaticFriction * plane.Material.StaticFriction);
-			mat.DynamicFriction = Math.sqrt(sphere.Material.DynamicFriction * plane.Material.DynamicFriction);
-			collInfo.Mat = mat;
+			mat.restitution = Math.sqrt(sphere.material.restitution * plane.material.restitution);
+			mat.staticFriction = Math.sqrt(sphere.material.staticFriction * plane.material.staticFriction);
+			mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * plane.material.dynamicFriction);
+			collInfo.mat = mat;
 			collArr.push(collInfo);
-			info.body0.Collisions.push(collInfo);
-			info.body1.Collisions.push(collInfo);
+			info.body0.collisions.push(collInfo);
+			info.body1.collisions.push(collInfo);
 		}
 		
 	}

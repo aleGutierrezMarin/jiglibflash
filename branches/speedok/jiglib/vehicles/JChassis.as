@@ -32,28 +32,23 @@ package jiglib.vehicles {
 		private var _car:JCar;
 		
 		public function JChassis(car:JCar, skin:ISkin3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
-			super(skin, true, width, depth, height);
+			super(skin, width, depth, height);
 			
 			_car = car;
 		}
 		
-		public function get Car():JCar
-		{
+		public function get car():JCar {
 			return _car;
 		}
 		
-		override public function AddExternalForces(dt:Number):void
-		{
-			this.ClearForces();
-			this.AddGravity();
-			_car.AddExternalForces(dt);
+		override public function addExternalForces(dt:Number):void {
+			this.clearForces();
+			this.addGravity();
+			_car.addExternalForces(dt);
 		}
 		
-		override public function PostPhysics(dt:Number):void
-		{
-			_car.PostPhysics(dt);
+		override public function postPhysics(dt:Number):void {
+			_car.postPhysics(dt);
 		}
-		
 	}
-	
 }
