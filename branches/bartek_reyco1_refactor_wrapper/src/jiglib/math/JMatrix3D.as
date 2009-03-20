@@ -456,9 +456,6 @@ package jiglib.math {
 			return inv;
 		}
 
-		
-		
-		
 		public function get det():Number {
 			return	(this.n11 * this.n22 - this.n21 * this.n12) * this.n33 - (this.n11 * this.n32 - this.n31 * this.n12) * this.n23 + (this.n21 * this.n32 - this.n31 * this.n22) * this.n13;
 		}

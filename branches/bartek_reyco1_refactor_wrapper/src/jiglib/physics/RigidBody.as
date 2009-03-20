@@ -70,6 +70,8 @@ package jiglib.physics {
 
 		protected var _type:String;
 		protected var _boundingSphere:Number;
+		
+		private var _rotationX:Number = 0;		private var _rotationY:Number = 0;		private var _rotationZ:Number = 0;
 
 		public function RigidBody(skin:ISkin3D) {
 			_id = idCounter++;
@@ -110,27 +112,45 @@ package jiglib.physics {
 		}
 
 		public function get rotationX():Number {
-			return 0; // TODO: implement
+			return _rotationX;
 		}
 
 		public function get rotationY():Number {
-			return 0; // TODO: implement
+			return _rotationY;
 		}
 
 		public function get rotationZ():Number {
-			return 0; // TODO: implement
+			return _rotationZ;
 		}
 
+		/**
+		 * px - angle in Radians
+		 */
 		public function set rotationX(px:Number):void {
-			// TODO: implement
+			_rotationX = px;
+			setOrientation(createRotationMatrix());
 		}
 
+		/**
+		 * py - angle in Radians
+		 */
 		public function set rotationY(py:Number):void {
-			// TODO: implement
+			_rotationY = py;
+			setOrientation(createRotationMatrix());
 		}
 
+		/**
+		 * pz - angle in Radians
+		 */
 		public function set rotationZ(pz:Number):void {
-			// TODO: implement
+			_rotationZ = pz;
+			setOrientation(createRotationMatrix());
+		}
+		
+		private function createRotationMatrix():JMatrix3D {
+			var rx:JMatrix3D = JMatrix3D.rotationX(_rotationX);			var ry:JMatrix3D = JMatrix3D.rotationY(_rotationY);			var rz:JMatrix3D = JMatrix3D.rotationZ(_rotationZ);
+			var um:JMatrix3D = JMatrix3D.multiply(rx, ry);			um = JMatrix3D.multiply(um, rz);
+			return um;
 		}
 
 		public function setOrientation(orient:JMatrix3D):void {

@@ -15,9 +15,20 @@ package bartek {
 	import flash.display.StageScaleMode;
 	import flash.events.Event;	
 
-	/**	 * @author bartekd	 */	[SWF(width='900', height='700', backgroundColor='#404040', frameRate='50')]	public class FallingBalls extends BasicView {		private var physics:Papervision3DPhysics;		public function FallingBalls() {			stage.quality = StageQuality.LOW;			stage.scaleMode = StageScaleMode.NO_SCALE;			stage.align = StageAlign.TOP_LEFT;			stage.showDefaultContextMenu = false;			stage.stageFocusRect = false;			super(800, 600, true, false, CameraType.TARGET);						physics = new Papervision3DPhysics(scene, 10);						for (var i:int = 0; i < 40; i++) {				var sphere:RigidBody = physics.createSphere(new WireframeMaterial(0xffffff), 30, 6, 6);				sphere.x = 100 - Math.random() * 200;				sphere.y = 700 + Math.random() * 3000;				sphere.z = 200 - Math.random() * 100;				// sphere.rotationX, Y & Z coming soon!				sphere.material.restitution = 2; 
+	/**	 * @author bartekd	 */	[SWF(width='900', height='700', backgroundColor='#404040', frameRate='50')]	public class FallingBalls extends BasicView {		private var physics:Papervision3DPhysics;		public function FallingBalls() {			stage.quality = StageQuality.LOW;			stage.scaleMode = StageScaleMode.NO_SCALE;			stage.align = StageAlign.TOP_LEFT;			stage.showDefaultContextMenu = false;			stage.stageFocusRect = false;			super(800, 600, true, false, CameraType.TARGET);						physics = new Papervision3DPhysics(scene, 10);						for (var i:int = 0; i < 10; i++) {//				var sphere:RigidBody = physics.createSphere(new WireframeMaterial(0xffffff), 30, 6, 6);//				sphere.x = 100 - Math.random() * 200;//				sphere.y = 700 + Math.random() * 3000;//				sphere.z = 200 - Math.random() * 100;				// sphere.rotationX, Y & Z coming soon!//				sphere.material.restitution = 2; 
 				
-				// This is how to access the engine specific mesh/do3d				physics.getMesh(sphere).material = new WireframeMaterial(0xffffff);			}
+				// This is how to access the engine specific mesh/do3d//				physics.getMesh(sphere).material = new WireframeMaterial(0xffffff);
+
+				var ml:MaterialsList = new MaterialsList();
+				ml.addMaterial(new WireframeMaterial(0xffffff), "all");
+				
+				var cube:RigidBody = physics.createCube(ml, 60, 60, 60);
+				cube.x = 100 - Math.random() * 200;
+				cube.y = 700 + Math.random() * 3000;
+				cube.z = 200 - Math.random() * 100;
+				cube.rotationY = Math.PI / 4;				cube.rotationZ = Math.PI / 4;
+				cube.material.restitution = 2; 
+				physics.getMesh(cube).material = new WireframeMaterial(0xffffff);			}
 			
 			// Here's how to create a sphere without the shortcut method:
 			var manualSphere:Sphere = new Sphere(new WireframeMaterial(0xff0000), 30, 6, 6);
