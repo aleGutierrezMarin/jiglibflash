@@ -34,11 +34,11 @@ package jiglib.geometry {
 		public var name:String;
 		private var _radius:Number;
 		
-		public function JSphere(skin:ISkin3D, radius:Number) {
+		public function JSphere(skin:ISkin3D, r:Number) {
 			
 			super(skin);
 			_type = "SPHERE";
-			_radius = radius;
+			_radius = r;
 			_boundingSphere = _radius;
 			this.mass = 1;
 		}
@@ -46,8 +46,8 @@ package jiglib.geometry {
 		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = _radius;
-			this.mass = this.mass;
-			this.setActive();
+			setInertia(getInertiaProperties(mass));
+			setActive();
 		}
 		public function get radius():Number {
 			return _radius;
@@ -92,9 +92,9 @@ package jiglib.geometry {
 			return true;
 		}
 		 
-		override public function getInertiaProperties(mass:Number):JMatrix3D {
+		override public function getInertiaProperties(m:Number):JMatrix3D {
 			var inertiaTensor:JMatrix3D = new JMatrix3D();
-			var Ixx:Number = 0.4 * mass * _radius * _radius;
+			var Ixx:Number = 0.4 * m * _radius * _radius;
 			inertiaTensor.n11 = Ixx;
 			inertiaTensor.n22 = Ixx;
 			inertiaTensor.n33 = Ixx;

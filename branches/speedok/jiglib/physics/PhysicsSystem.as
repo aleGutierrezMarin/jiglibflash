@@ -656,13 +656,13 @@ package jiglib.physics {
 		
 		private function doShockStep(dt:Number):void {
 			if (Math.abs(_gravity.x) > Math.abs(_gravity.y) && Math.abs(_gravity.x) > Math.abs(_gravity.z)) {
-				_bodies.sortOn("posX",Array.NUMERIC);
+				_bodies.sortOn("x",Array.NUMERIC);
 			}
 			else if(Math.abs(_gravity.y) > Math.abs(_gravity.z) && Math.abs(_gravity.y) > Math.abs(_gravity.x)) {
-				_bodies.sortOn("posY",Array.NUMERIC);
+				_bodies.sortOn("y",Array.NUMERIC);
 			}
 			else if(Math.abs(_gravity.z) > Math.abs(_gravity.x) && Math.abs(_gravity.z) > Math.abs(_gravity.y)) {
-				_bodies.sortOn("posZ",Array.NUMERIC);
+				_bodies.sortOn("z",Array.NUMERIC);
 			}
 			
 			var info:CollisionInfo;
@@ -920,7 +920,7 @@ package jiglib.physics {
 			//limitAllVelocities();
 			updateAllPositions(dt);
 			notifyAllPostPhysics(dt);
-			
+			 
 			updateAllObject3D();
 			if (JConfig.solverType == "ACCUMULATED") {
 				updateContactCache();
@@ -932,5 +932,4 @@ package jiglib.physics {
 			_doingIntegration = false;
 		}
 	}
-	
 }

@@ -36,20 +36,20 @@ package jiglib.geometry{
 		private var _length:Number;
 		private var _radius:Number;
 		
-		public function JCapsule(skin:ISkin3D, radius:Number = 100, length:Number = 100) {
+		public function JCapsule(skin:ISkin3D, r:Number, l:Number) {
 			super(skin);
 			_type = "CAPSULE";
-			_radius = radius;
-			_length = length;
-			_boundingSphere = getBoundingSphere(radius, length);
-			this.mass = 1;
+			_radius = r;
+			_length = l;
+			_boundingSphere = getBoundingSphere(r, l);
+			mass = 1;
 		}
 		 
 		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = getBoundingSphere(_radius, _length);
-			this.mass = this.mass;
-			this.setActive();
+			setInertia(getInertiaProperties(mass));
+			setActive();
 		}
 		public function get radius():Number {
 			return _radius;
@@ -58,8 +58,8 @@ package jiglib.geometry{
 		public function set length(l:Number):void {
 			_length = l;
 			_boundingSphere = getBoundingSphere(_radius, _length);
-			this.mass = this.mass;
-			this.setActive();
+			setInertia(getInertiaProperties(mass));
+			setActive();
 		}
 		public function get length():Number {
 			return _length;
@@ -131,13 +131,13 @@ package jiglib.geometry{
 			return true;
 		}
 		 
-		override public function getInertiaProperties(mass:Number):JMatrix3D {
-			var cylinderMass:Number = mass * Math.PI * _radius * _radius * _length / getVolume();
+		override public function getInertiaProperties(m:Number):JMatrix3D {
+			var cylinderMass:Number = m * Math.PI * _radius * _radius * _length / getVolume();
 			var Ixx:Number = 0.25 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
 			var Iyy:Number = 0.5 * cylinderMass * _radius * _radius;
 			var Izz:Number = Ixx;
 			 
-			var endMass:Number = mass - cylinderMass;
+			var endMass:Number = m - cylinderMass;
 			Ixx += (0.4 * endMass * _radius * _radius + endMass * Math.pow(0.5 * _length, 2));
 			Iyy += (0.2 * endMass * _radius * _radius);
 			Izz += (0.4 * endMass * _radius * _radius + endMass * Math.pow(0.5 * _length, 2));

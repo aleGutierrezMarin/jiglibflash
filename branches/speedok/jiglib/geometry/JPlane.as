@@ -38,9 +38,9 @@ package jiglib.geometry {
 			
 			super(skin);
 			_type = "PLANE";
-			this.movable = false;
 			_normal = new JNumber3D(0, 0, -1);
 			_distance = 0;
+			this.movable = false;
 		}
 		
 		public function get normal():JNumber3D {

@@ -51,7 +51,7 @@ package jiglib.geometry {
 			_sideLengths = new JNumber3D(width, height, depth);
 			_boundingSphere = 0.5 * _sideLengths.modulo;
 			initPoint();
-			this.mass = 1;
+			mass = 1;
 		}
 		
 		private function initPoint():void {
@@ -71,8 +71,8 @@ package jiglib.geometry {
 			_sideLengths = size.clone();
 			_boundingSphere = 0.5 * _sideLengths.modulo;
 			initPoint();
-			this.mass = this.mass;
-			this.setActive();
+			setInertia(getInertiaProperties(mass));
+			setActive();
 		}
 		 
 		public function get sideLengths():JNumber3D {
@@ -84,11 +84,11 @@ package jiglib.geometry {
 		}
 		 
 		public function getVolume():Number {
-			return (sideLengths.x * sideLengths.y * sideLengths.z);
+			return (_sideLengths.x * _sideLengths.y * _sideLengths.z);
 		}
 		
 		public function getSurfaceArea():Number {
-			return 2 * (sideLengths.x * sideLengths.y + sideLengths.x * sideLengths.z + sideLengths.y * sideLengths.z);
+			return 2 * (_sideLengths.x * _sideLengths.y + _sideLengths.x * _sideLengths.z + _sideLengths.y * _sideLengths.z);
 		}
 		
 		public function getHalfSideLengths():JNumber3D {
@@ -97,9 +97,9 @@ package jiglib.geometry {
 		
 		public function getSpan(axis:JNumber3D):Object {
 			var obj:Object = new Object();
-			var s:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[0])) * (0.5 * sideLengths.x);
-			var u:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[1])) * (0.5 * sideLengths.y);
-			var d:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[2])) * (0.5 * sideLengths.z);
+			var s:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[0])) * (0.5 * _sideLengths.x);
+			var u:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[1])) * (0.5 * _sideLengths.y);
+			var d:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[2])) * (0.5 * _sideLengths.z);
 			var r:Number = s + u + d;
 			var p:Number = JNumber3D.dot(currentState.position, axis);
 			obj.min = p - r;
@@ -169,7 +169,7 @@ package jiglib.geometry {
 		
 		public function pointIntersect(pos:JNumber3D):Boolean {
 			var p:JNumber3D=JNumber3D.sub(pos,currentState.position);
-			var h:JNumber3D = JNumber3D.multiply(sideLengths, 0.5);
+			var h:JNumber3D = JNumber3D.multiply(_sideLengths, 0.5);
 			var dirVec:JNumber3D;
 			for(var dir:int;dir<3;dir++) {
 				dirVec = currentState.orientation.getCols()[dir].clone();
@@ -244,7 +244,7 @@ package jiglib.geometry {
 			var dirMax:Number = 0;
 			var dir:Number = 0;
 			var p:JNumber3D = JNumber3D.sub(state.position, seg.origin);
-			var h:JNumber3D = JNumber3D.multiply(sideLengths, 0.5);
+			var h:JNumber3D = JNumber3D.multiply(_sideLengths, 0.5);
 			
 			var tempV:JNumber3D;
 			var e:Number;
@@ -301,11 +301,11 @@ package jiglib.geometry {
 			return true;
 		}
 		
-		override public function getInertiaProperties(mass:Number):JMatrix3D {
+		override public function getInertiaProperties(m:Number):JMatrix3D {
 			var inertiaTensor:JMatrix3D = new JMatrix3D();
-			inertiaTensor.n11 = (mass / 12) * (sideLengths.y * sideLengths.y + sideLengths.z * sideLengths.z);
-			inertiaTensor.n22 = (mass / 12) * (sideLengths.x * sideLengths.x + sideLengths.z * sideLengths.z);
-			inertiaTensor.n33 = (mass / 12) * (sideLengths.x * sideLengths.x + sideLengths.y * sideLengths.y);
+			inertiaTensor.n11 = (m / 12) * (_sideLengths.y * _sideLengths.y + _sideLengths.z * _sideLengths.z);
+			inertiaTensor.n22 = (m / 12) * (_sideLengths.x * _sideLengths.x + _sideLengths.z * _sideLengths.z);
+			inertiaTensor.n33 = (m / 12) * (_sideLengths.x * _sideLengths.x + _sideLengths.y * _sideLengths.y);
 			return inertiaTensor;
 		}
 	}

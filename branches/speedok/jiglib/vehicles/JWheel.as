@@ -244,7 +244,7 @@ package jiglib.vehicles {
 			rimVel = JNumber3D.multiply(JNumber3D.cross(JNumber3D.sub(groundPos, worldPos), wheelLeft), _angVel);
 			wheelPointVel = JNumber3D.add(wheelPointVel, rimVel);
 			
-			if (otherBody.getmovable()) {
+			if (otherBody.movable) {
 				worldVel = JNumber3D.add(otherBody.currentState.linVelocity, JNumber3D.cross(JNumber3D.sub(groundPos, otherBody.currentState.position), otherBody.currentState.rotVelocity));
 				wheelPointVel = JNumber3D.sub(wheelPointVel, worldVel);
 			}
@@ -289,7 +289,7 @@ package jiglib.vehicles {
 			_torque += ( -fwdForce * _radius);
 			
 			carBody.addWorldForce(force, groundPos);
-			if (otherBody.getmovable()) {
+			if (otherBody.movable) {
 				var maxOtherBodyAcc:Number = 500;
 				var maxOtherBodyForce:Number = maxOtherBodyAcc * otherBody.mass;
 				if (force.modulo2 > maxOtherBodyForce * maxOtherBodyForce) {
