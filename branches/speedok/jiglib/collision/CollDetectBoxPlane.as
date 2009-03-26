@@ -84,8 +84,7 @@ package jiglib.collision {
 				
 				var mat:MaterialProperties = new MaterialProperties();
 				mat.restitution = Math.sqrt(box.material.restitution * plane.material.restitution);
-				mat.staticFriction = Math.sqrt(box.material.staticFriction * plane.material.staticFriction);
-				mat.dynamicFriction = Math.sqrt(box.material.dynamicFriction * plane.material.dynamicFriction);
+				mat.friction = Math.sqrt(box.material.friction * plane.material.friction);
 				collInfo.mat = mat;
 				collArr.push(collInfo);
 				info.body0.collisions.push(collInfo);

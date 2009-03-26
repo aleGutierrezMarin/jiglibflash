@@ -54,7 +54,6 @@ package jiglib.physics {
 		private var _force:JNumber3D;
 		private var _torque:JNumber3D;
 		 
-		private var _doShockProcessing:Boolean;
 		private var _velChanged:Boolean;
 		private var _activity:Boolean;
 		private var _movable:Boolean;
@@ -96,7 +95,6 @@ package jiglib.physics {
 	    	_force = new JNumber3D();
 	    	_torque = new JNumber3D();
 	    	 
-			_doShockProcessing = true;
 			_velChanged = false;
 			_inactiveTime = 0;
 			 
@@ -188,7 +186,7 @@ package jiglib.physics {
 			_currState.position.y = py; 
 			updateState();
 		}
-
+		
 		public function set z(pz:Number):void { 
 			_currState.position.z = pz; 
 			updateState();
@@ -241,6 +239,14 @@ package jiglib.physics {
 			_velChanged = true;
 			setActive();
 	    }
+		
+		public function addBodyTorque(t:JNumber3D):void {
+			if(!_movable) {
+				return;
+			}
+			JMatrix3D.multiplyVector(_currState.orientation, t);
+			addWorldTorque(t);
+		}
 	     
 	    public function addWorldForce(f:JNumber3D, p:JNumber3D):void {
 			if(!_movable) {
@@ -259,14 +265,6 @@ package jiglib.physics {
 			JMatrix3D.multiplyVector(_currState.orientation, f);
 			JMatrix3D.multiplyVector(_currState.orientation, p);
 			addWorldForce(f, JNumber3D.add(_currState.position, p));
-		}
-		 
-		public function addBodyTorque(t:JNumber3D):void {
-			if(!_movable) {
-				return;
-			}
-			JMatrix3D.multiplyVector(_currState.orientation, t);
-			addWorldTorque(t);
 		}
 		 
 		public function clearForces():void {
@@ -630,13 +628,6 @@ package jiglib.physics {
 			return _worldInvInertia;
 		}
 		
-		public function get doShockProcessing():Boolean {
-			return _doShockProcessing;
-		}
-		public function set doShockProcessing(doShock:Boolean):void {
-			_doShockProcessing = doShock;
-		}
-		
 		public function limitVel():void {
 			_currState.linVelocity.x = JNumber3D.limiteNumber(_currState.linVelocity.x, -100, 100);
 			_currState.linVelocity.y = JNumber3D.limiteNumber(_currState.linVelocity.y, -100, 100);
@@ -679,20 +670,12 @@ package jiglib.physics {
 			_material.restitution = restitution;
 		}
 		
-		public function get staticFriction():Number {
-			return _material.staticFriction;
+		public function get friction():Number {
+			return _material.friction;
 		}
 		
-		public function set staticFriction(staticFriction:Number):void {
-			_material.staticFriction = staticFriction;
-		}
-		
-		public function get dynamicFriction():Number {
-			return _material.dynamicFriction;
-		}
-		
-		public function set dynamicFriction(dynamicFriction:Number):void {
-			_material.dynamicFriction = dynamicFriction;
+		public function set friction(friction:Number):void {
+			_material.friction = friction;
 		}
 	}
 }
