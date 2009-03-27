@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Document describing how the rearchitected API works.
 #labels Phase-Deploy,Phase-Implementation
 
 == Introduction ==
@@ -65,4 +65,3 @@ Every object in the physics world is of type RigidBody exactly the same way as e
 The properties are as follows: `x`, `y`, `z`, `rotationX`, `rotationY` and `rotationZ`. Using this properties will update both the object in the 3d world and its representation in the physics world.
 
 IMPORTANT. Using those properties directly on the physics-enabled mesh will have no effect.
-
