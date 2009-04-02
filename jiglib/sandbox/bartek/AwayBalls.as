@@ -1,4 +1,4 @@
-package bartek {
+﻿package bartek {
 	import away3d.containers.View3D;
 	import away3d.materials.WireframeMaterial;
 	
@@ -36,7 +36,7 @@ package bartek {
 			view.y = stage.stageHeight / 2;
 			addChild(view);
 			
-			physics = new Away3DPhysics(view, 10);
+			physics = new Away3DPhysics(view, 1);
 
 			for (var i:int = 0; i < 40; i++) {
 				var sphere:RigidBody = physics.createSphere({radius:30, segmentsW:6, segmentsH:6});
