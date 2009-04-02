@@ -21,7 +21,7 @@ package jiglib.plugin.papervision3d {
 
 		private var scene:Scene3D;
 
-		public function Papervision3DPhysics(scene:Scene3D, speed:Number = 5) {
+		public function Papervision3DPhysics(scene:Scene3D, speed:Number = 1) {
 			super(speed);
 			this.scene = scene;
 		}

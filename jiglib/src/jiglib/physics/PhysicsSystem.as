@@ -19,7 +19,7 @@ distribution.
  */
 
 /**
- * @author Muzer(muzerly@gmail.com)
+ * @author Muzer(muzerly@gmail.com), speedok(speedok@gmail.com)
  * @link http://code.google.com/p/jiglibflash
  */
 
@@ -63,7 +63,7 @@ package jiglib.physics {
 		
 		public static function getInstance():PhysicsSystem {
 			if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.28 (2009-2-1)");
+				trace("version: JigLibFlash v0.3 (2009-4-2)");
 				_currentPhysicsSystem = new PhysicsSystem();
 			}
 			return _currentPhysicsSystem;

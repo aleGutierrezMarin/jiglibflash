@@ -19,7 +19,7 @@ package jiglib.plugin.away3d {
 		
 		private var view:View3D;
 
-		public function Away3DPhysics(view:View3D, speed:Number = 5) {
+		public function Away3DPhysics(view:View3D, speed:Number = 1) {
 			this.view = view;
 			super(speed);
 		}
