@@ -14,7 +14,7 @@ package jiglib.plugin {
 		private var speed:Number;
 		private var deltaTime:Number = 0;
 		
-		public function AbstractPhysics(speed:Number = 5) {
+		public function AbstractPhysics(speed:Number = 1) {
 			this.speed = speed;
 			initTime = getTimer();
 		}
@@ -27,7 +27,10 @@ package jiglib.plugin {
 			stepTime = getTimer();
 	        deltaTime = ((stepTime - initTime) / 1000) * speed;
 	        initTime = stepTime;
-	        PhysicsSystem.getInstance().integrate(deltaTime);
+	        //PhysicsSystem.getInstance().integrate(deltaTime);
+	        //trace(deltaTime);
+	        // TODO: fix the timestep for now use a fixed timestep
+	        PhysicsSystem.getInstance().integrate(1*speed);
 		}
 	}
 }
