@@ -24,7 +24,7 @@ distribution.
  */
 
 package jiglib.collision {
-	import jiglib.math.*;	
+	import jiglib.math.*;
 
 	public class CollPointInfo {
 		public var initialPenetration:Number;

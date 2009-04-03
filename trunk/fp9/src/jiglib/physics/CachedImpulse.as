@@ -24,18 +24,21 @@ distribution.
  */
 
 package jiglib.physics {
-	import jiglib.math.JNumber3D;		
+	
+	import jiglib.math.JNumber3D;
 
 	public class CachedImpulse {
-
+		
 		public var normalImpulse:Number;
 		public var normalImpulseAux:Number;
 		public var frictionImpulse:JNumber3D;
-
+		
 		public function CachedImpulse(_normalImpulse:Number, _normalImpulseAux:Number, _frictionImpulse:JNumber3D) {
 			this.normalImpulse = _normalImpulse;
 			this.normalImpulseAux = _normalImpulseAux;
 			this.frictionImpulse = _frictionImpulse;
 		}
+		
 	}
+	
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -25,48 +25,50 @@ distribution.
 
 package jiglib.geometry {
 	import jiglib.math.*;
+	import jiglib.plugin.ISkin3D;
 	import jiglib.physics.RigidBody;
-	import jiglib.plugin.ISkin3D;	
-
+	import jiglib.physics.PhysicsState;
+	
 	public class JSphere extends RigidBody {
-
+		
+		public var name:String;
 		private var _radius:Number;
-
-		public function JSphere(skin:ISkin3D, radius:Number) {
+		
+		public function JSphere(skin:ISkin3D, r:Number) {
 			
 			super(skin);
 			_type = "SPHERE";
-			_radius = radius;
+			_radius = r;
 			_boundingSphere = _radius;
 			this.mass = 1;
 		}
-
+		 
 		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = _radius;
-//			this.setMass(this.mass);
-			this.setActive();
+			setInertia(getInertiaProperties(mass));
+			setActive();
 		}
-
 		public function get radius():Number {
 			return _radius;
 		}
-
-		override public function segmentIntersect(out:Object, seg:JSegment):Boolean {
+		 
+		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
 			out.fracOut = 0;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
 			
 			var frac:Number = 0;
 			var r:JNumber3D = seg.delta;
-			var s:JNumber3D = JNumber3D.sub(seg.origin, currentState.position);
+			var s:JNumber3D = JNumber3D.sub(seg.origin, state.position);
 			
 			var radiusSq:Number = _radius * _radius;
 			var rSq:Number = r.modulo2;
 			if (rSq < radiusSq) {
 				out.fracOut = 0;
 				out.posOut = seg.origin.clone();
-				out.normalOut = JNumber3D.sub(out.posOut, currentState.position);
+				out.normalOut = JNumber3D.sub(out.posOut, state.position);
+				out.normalOut.normalize();
 				return true;
 			}
 			
@@ -85,13 +87,14 @@ package jiglib.geometry {
 			frac = Math.max(lambda1, 0);
 			out.fracOut = frac;
 			out.posOut = seg.getPoint(frac);
-			out.normalOut = JNumber3D.sub(out.posOut, currentState.position);
+			out.normalOut = JNumber3D.sub(out.posOut, state.position);
+			out.normalOut.normalize();
 			return true;
 		}
-
-		override public function getInertiaProperties(mass:Number):JMatrix3D {
+		 
+		override public function getInertiaProperties(m:Number):JMatrix3D {
 			var inertiaTensor:JMatrix3D = new JMatrix3D();
-			var Ixx:Number = 0.4 * mass * _radius * _radius;
+			var Ixx:Number = 0.4 * m * _radius * _radius;
 			inertiaTensor.n11 = Ixx;
 			inertiaTensor.n22 = Ixx;
 			inertiaTensor.n33 = Ixx;

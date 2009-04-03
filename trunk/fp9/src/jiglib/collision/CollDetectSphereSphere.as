@@ -24,56 +24,66 @@ distribution.
  */
 
 package jiglib.collision {
+
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
-	import jiglib.physics.MaterialProperties;	
-
+	import jiglib.physics.MaterialProperties;
+	
 	public class CollDetectSphereSphere extends CollDetectFunctor {
-
+		
 		public function CollDetectSphereSphere() {
-			name = "SphereSphere";
-			type0 = "SPHERE";
-			type1 = "SPHERE";
+			this.name = "SphereSphere";
+			this.type0 = "SPHERE";
+			this.type1 = "SPHERE";
 		}
-
+		
 		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var sphere0:JSphere = info.body0 as JSphere;
 			var sphere1:JSphere = info.body1 as JSphere;
 			
-			var delta:JNumber3D = JNumber3D.sub(sphere0.currentState.position, sphere1.currentState.position);
+			var oldDelta:JNumber3D=JNumber3D.sub(sphere0.oldState.position, sphere1.oldState.position);
+			var newDelta:JNumber3D = JNumber3D.sub(sphere0.currentState.position, sphere1.currentState.position);
 			
-			var dist:Number = delta.modulo;
+			var oldDistSq:Number = oldDelta.modulo2;
+			var newDistSq:Number = newDelta.modulo2;
 			var radSum:Number = sphere0.radius + sphere1.radius;
 			
-			if (dist < radSum + JConfig.collToll) {
-				var depth:Number = radSum - dist;
-				delta.normalize();
+			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2)) {
+				var oldDist:Number = Math.sqrt(oldDistSq);
+				var depth:Number = radSum - oldDist;
+				if (oldDist > JNumber3D.NUM_TINY) {
+					oldDelta = JNumber3D.divide(oldDelta, oldDist);
+				} else {
+					oldDelta = JNumber3D.UP;
+					JMatrix3D.multiplyVector(JMatrix3D.rotationMatrix(0, 0, 1, 360 * Math.random()), oldDelta);
+				}
 				
-				var worldPos:JNumber3D = JNumber3D.add(sphere1.currentState.position, JNumber3D.multiply(delta, sphere1.radius - 0.5 * depth));
+				var worldPos:JNumber3D = JNumber3D.add(sphere1.oldState.position, JNumber3D.multiply(oldDelta, sphere1.radius - 0.5 * depth));
 				
 				var collPts:Array = new Array();
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.r0 = JNumber3D.sub(worldPos, sphere0.currentState.position);
-				cpInfo.r1 = JNumber3D.sub(worldPos, sphere1.currentState.position);
+				cpInfo.r0 = JNumber3D.sub(worldPos, sphere0.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(worldPos, sphere1.oldState.position);
 				cpInfo.initialPenetration = depth;
 				collPts.push(cpInfo);
 				
-				var collInfo:CollisionInfo = new CollisionInfo();
-				collInfo.objInfo = info;
-				collInfo.dirToBody = delta;
-				collInfo.pointInfo = collPts;
+				var collInfo:CollisionInfo=new CollisionInfo();
+			    collInfo.objInfo=info;
+			    collInfo.dirToBody = oldDelta;
+			    collInfo.pointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
 				mat.restitution = Math.sqrt(sphere0.material.restitution * sphere1.material.restitution);
-				mat.staticFriction = Math.sqrt(sphere0.material.staticFriction * sphere1.material.staticFriction);
-				mat.dynamicFriction = Math.sqrt(sphere0.material.dynamicFriction * sphere1.material.dynamicFriction);
+				mat.friction = Math.sqrt(sphere0.material.friction * sphere1.material.friction);
 				collInfo.mat = mat;
 				collArr.push(collInfo);
 				
 				info.body0.collisions.push(collInfo);
-				info.body1.collisions.push(collInfo);
+			    info.body1.collisions.push(collInfo);
 			}
 		}
+		
 	}
+	
 }
