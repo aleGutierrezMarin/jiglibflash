@@ -24,18 +24,18 @@ distribution.
  */
 
 package jiglib.geometry {
-	import jiglib.math.*;		
-
+	import jiglib.math.*;
+	
 	public class JRay {
-
+		
 		public var origin:JNumber3D;
 		public var dir:JNumber3D;
-
+		
 		public function JRay(_origin:JNumber3D, _dir:JNumber3D) {
 			origin = _origin;
 			dir = _dir;
 		}
-
+		
 		public function getOrigin(t:Number):JNumber3D {
 			return JNumber3D.add(origin, JNumber3D.multiply(dir, t));
 		}

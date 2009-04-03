@@ -24,26 +24,27 @@ distribution.
  */
 
 package jiglib.collision {
+	
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
+	import jiglib.physics.RigidBody;
 	import jiglib.physics.MaterialProperties;
-	import jiglib.physics.RigidBody;	
 
 	public class CollDetectSphereBox extends CollDetectFunctor {
-
+		
 		public function CollDetectSphereBox() {
-			name = "SphereBox";
-			type0 = "SPHERE";
-			type1 = "BOX";
+			this.name = "SphereBox";
+			this.type0 = "SPHERE";
+			this.type1 = "BOX";
 		}
-
+		
 		override public function collDetect(info:CollDetectInfo, collArr:Array):void {
 			var tempBody:RigidBody;
-			if(info.body0.type == "BOX") {
-				tempBody = info.body0;
-				info.body0 = info.body1;
-				info.body1 = tempBody;
+			if(info.body0.type=="BOX") {
+				tempBody=info.body0;
+				info.body0=info.body1;
+				info.body1=tempBody;
 			}
 			
 			var sphere:JSphere = info.body0 as JSphere;
@@ -52,48 +53,54 @@ package jiglib.collision {
 			if (!sphere.hitTestObject3D(box)) {
 				return;
 			}
+			var spherePos:JNumber3D = sphere.oldState.position;
+			var boxPos:JNumber3D = box.oldState.position;
 			
-			var boxPoint:Object = new Object();
+			var oldBoxPoint:Object=new Object();
+			var newBoxPoint:Object=new Object();
 			
-			var dist:Number = box.getDistanceToPoint(boxPoint, sphere.currentState.position);
+			var oldDist:Number = box.getDistanceToPoint(box.oldState, oldBoxPoint, sphere.oldState.position);
+			var newDist:Number = box.getDistanceToPoint(box.currentState, newBoxPoint, sphere.currentState.position);
 			
-			var depth:Number = sphere.radius - dist;
-			if (depth > -JConfig.collToll) {
+			var oldDepth:Number = sphere.radius - oldDist;
+			var newDepth:Number = sphere.radius - newDist;
+			if (Math.max(oldDepth, newDepth) > -JConfig.collToll) {
 				var dir:JNumber3D;
 				var collPts:Array = new Array();
-				if (dist < -JNumber3D.NUM_TINY) {
-					dir = JNumber3D.sub(JNumber3D.sub(boxPoint.pos, sphere.currentState.position), boxPoint.pos);
+				if (oldDist < -JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(JNumber3D.sub(oldBoxPoint.pos, sphere.oldState.position), oldBoxPoint.pos);
 					dir.normalize();
 				}
-				else if (dist > JNumber3D.NUM_TINY) {
-					dir = JNumber3D.sub(sphere.currentState.position, boxPoint.pos);
+				else if (oldDist > JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(sphere.oldState.position, oldBoxPoint.pos);
 					dir.normalize();
-				} else {
-					dir = JNumber3D.sub(sphere.currentState.position, box.currentState.position);
+				}
+				else {
+					dir = JNumber3D.sub(sphere.oldState.position, box.oldState.position);
 					dir.normalize();
 				}
 				
 				var cpInfo:CollPointInfo = new CollPointInfo();
-				cpInfo.r0 = JNumber3D.sub(boxPoint.pos, sphere.currentState.position);
-				cpInfo.r1 = JNumber3D.sub(boxPoint.pos, box.currentState.position);
-				cpInfo.initialPenetration = depth;
+				cpInfo.r0 = JNumber3D.sub(oldBoxPoint.pos, sphere.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(oldBoxPoint.pos, box.oldState.position);
+				cpInfo.initialPenetration = oldDepth;
 				collPts.push(cpInfo);
 				
-				var collInfo:CollisionInfo = new CollisionInfo();
-				collInfo.objInfo = info;
-				collInfo.dirToBody = dir;
-				collInfo.pointInfo = collPts;
+				var collInfo:CollisionInfo=new CollisionInfo();
+			    collInfo.objInfo=info;
+			    collInfo.dirToBody = dir;
+			    collInfo.pointInfo = collPts;
 				
 				var mat:MaterialProperties = new MaterialProperties();
 				mat.restitution = Math.sqrt(sphere.material.restitution * box.material.restitution);
-				mat.staticFriction = Math.sqrt(sphere.material.staticFriction * box.material.staticFriction);
-				mat.dynamicFriction = Math.sqrt(sphere.material.dynamicFriction * box.material.dynamicFriction);
+				mat.friction = Math.sqrt(sphere.material.friction * box.material.friction);
 				collInfo.mat = mat;
 				collArr.push(collInfo);
 				
 				info.body0.collisions.push(collInfo);
-				info.body1.collisions.push(collInfo);
+			    info.body1.collisions.push(collInfo);
 			}
 		}
 	}
+	
 }

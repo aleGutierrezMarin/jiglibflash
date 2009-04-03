@@ -1,11 +1,11 @@
-/*
+﻿/*
  *  PAPER    ON   ERVIS  NPAPER ISION  PE  IS ON  PERVI IO  APER  SI  PA
  *  AP  VI  ONPA  RV  IO PA     SI  PA ER  SI NP PE     ON AP  VI ION AP
  *  PERVI  ON  PE VISIO  APER   IONPA  RV  IO PA  RVIS  NP PE  IS ONPAPE
  *  ER     NPAPER IS     PE     ON  PE  ISIO  AP     IO PA ER  SI NP PER
  *  RV     PA  RV SI     ERVISI NP  ER   IO   PE VISIO  AP  VISI  PA  RV3D
  *  ______________________________________________________________________
- *  papervision3d.org ï¿?blog.papervision3d.org ï¿?osflash.org/papervision3d
+ *  papervision3d.org 茂驴?blog.papervision3d.org 茂驴?osflash.org/papervision3d
  */
 
 /*
@@ -219,6 +219,35 @@ package jiglib.math {
 				0
 				};
 			}
+		}
+		
+		public static function getNormal(v0:JNumber3D, v1:JNumber3D, v2:JNumber3D):JNumber3D {
+			var E:JNumber3D = v1.clone();
+			E = JNumber3D.sub(E, v0);
+			var F:JNumber3D = v2.clone();
+			F = JNumber3D.sub(F, v1);
+			var N:JNumber3D = JNumber3D.cross(F, E);
+			N.normalize();
+			
+			return N;
+		}
+		
+		public function copyFromArray(arr:Array):void {
+			if (arr.length >= 3) {
+				this.x = arr[0];
+				this.y = arr[1];
+				this.z = arr[2];
+			}
+		}
+		
+		public static function limiteNumber(num:Number,min:Number,max:Number):Number {
+			var n:Number = num;
+			if (n < min) {
+				n = min;
+			} else if (n > max) {
+				n = max;
+			}
+			return n;
 		}
 
 		static public function get UP():JNumber3D {

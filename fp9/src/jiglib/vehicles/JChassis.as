@@ -25,28 +25,28 @@ distribution.
 
 package jiglib.vehicles {
 	import jiglib.geometry.JBox;
-	import jiglib.plugin.ISkin3D;	
+	import jiglib.plugin.ISkin3D;
 
 	public class JChassis extends JBox {
-
+		
 		private var _car:JCar;
-
+		
 		public function JChassis(car:JCar, skin:ISkin3D, width:Number = 40, depth:Number = 70, height:Number = 30) {
 			super(skin, width, depth, height);
 			
 			_car = car;
 		}
-
+		
 		public function get car():JCar {
 			return _car;
 		}
-
+		
 		override public function addExternalForces(dt:Number):void {
 			this.clearForces();
 			this.addGravity();
 			_car.addExternalForces(dt);
 		}
-
+		
 		override public function postPhysics(dt:Number):void {
 			_car.postPhysics(dt);
 		}

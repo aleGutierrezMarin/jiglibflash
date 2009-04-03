@@ -25,7 +25,8 @@ distribution.
 
 package jiglib.collision {
 	import jiglib.math.JNumber3D;
-	import jiglib.physics.MaterialProperties;	
+	import jiglib.physics.MaterialProperties;	
+
 	public class CollisionInfo {
 		public var mat:MaterialProperties = new MaterialProperties();
 		public var objInfo:CollDetectInfo;

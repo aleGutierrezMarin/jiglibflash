@@ -27,35 +27,35 @@ package jiglib.geometry {
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
-	import jiglib.plugin.ISkin3D;	
-
+	import jiglib.plugin.ISkin3D;
+	
 	public class JPlane extends RigidBody {
-
+		
 		private var _normal:JNumber3D;
 		private var _distance:Number;
-
+		
 		public function JPlane(skin:ISkin3D) {
 			
 			super(skin);
 			_type = "PLANE";
-			
 			_normal = new JNumber3D(0, 0, -1);
 			_distance = 0;
+			this.movable = false;
 		}
-
+		
 		public function get normal():JNumber3D {
 			return _normal;
 		}
-
+		
 		public function get distance():Number {
 			return _distance;
 		}
-
+		 
 		public function pointPlaneDistance(pt:JNumber3D):Number {
 			return JNumber3D.dot(_normal, pt) - _distance;
 		}
-
-		override public function segmentIntersect(out:Object, seg:JSegment):Boolean {
+		
+		override public function segmentIntersect(out:Object, seg:JSegment,state:PhysicsState):Boolean {
 			out.fracOut = 0;
 			out.posOut = new JNumber3D();
 			out.normalOut = new JNumber3D();
@@ -75,6 +75,7 @@ package jiglib.geometry {
 					out.fracOut = frac;
 					out.posOut = seg.getPoint(frac);
 					out.normalOut = _normal.clone();
+					out.normalOut.normalize();
 					return true;
 				}
 			} else {

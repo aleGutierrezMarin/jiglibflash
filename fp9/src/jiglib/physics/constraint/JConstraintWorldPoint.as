@@ -25,34 +25,34 @@ distribution.
 
 
 package jiglib.physics.constraint {
-	import jiglib.math.JMatrix3D;
-	import jiglib.math.JNumber3D;
-	import jiglib.physics.RigidBody;	
 
+	import jiglib.math.*;
+	import jiglib.physics.RigidBody;
+	
 	public class JConstraintWorldPoint extends JConstraint {
-
+		
 		private const minVelForProcessing:Number = 0.001;
 		private const allowedDeviation:Number = 0.01;
 		private const timescale:Number = 4;
-
+		
 		private var _body:RigidBody;
 		private var _pointOnBody:JNumber3D;
 		private var _worldPosition:JNumber3D;
-
+		
 		public function JConstraintWorldPoint(body:RigidBody, pointOnBody:JNumber3D, worldPosition:JNumber3D) {
 			_body = body;
 			_pointOnBody = pointOnBody;
 			_worldPosition = worldPosition;
 		}
-
+		
 		public function set worldPosition(pos:JNumber3D):void {
 			_worldPosition = pos;
 		}
-
+		
 		public function get worldPosition():JNumber3D {
 			return _worldPosition;
 		}
-
+		
 		override public function apply(dt:Number):Boolean {
 			this.satisfied = true;
 			

@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -26,41 +26,48 @@ distribution.
 package jiglib.collision {
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
-	import jiglib.physics.RigidBody;	
-
+	import jiglib.physics.RigidBody;
+	
 	public class CollisionSystem {
-
+		
 		private var detectionFunctors:Array;
 		private var collBody:Array;
-
+		
 		public function CollisionSystem() {
 			collBody = new Array();
 			detectionFunctors = new Array();
 			detectionFunctors["BOX"] = new Array();
 			detectionFunctors["BOX"]["BOX"] = new CollDetectBoxBox();
 			detectionFunctors["BOX"]["SPHERE"] = new CollDetectSphereBox();
+			detectionFunctors["BOX"]["CAPSULE"]=new CollDetectCapsuleBox();
 			detectionFunctors["BOX"]["PLANE"] = new CollDetectBoxPlane();
 			detectionFunctors["SPHERE"] = new Array();
 			detectionFunctors["SPHERE"]["BOX"] = new CollDetectSphereBox();
 			detectionFunctors["SPHERE"]["SPHERE"] = new CollDetectSphereSphere();
+			detectionFunctors["SPHERE"]["CAPSULE"]=new CollDetectSphereCapsule();
 			detectionFunctors["SPHERE"]["PLANE"] = new CollDetectSpherePlane();
 			detectionFunctors["PLANE"] = new Array();
 			detectionFunctors["PLANE"]["BOX"] = new CollDetectBoxPlane();
 			detectionFunctors["PLANE"]["SPHERE"] = new CollDetectSpherePlane();
+			detectionFunctors["PLANE"]["CAPSULE"]=new CollDetectCapsulePlane();
+			detectionFunctors["CAPSULE"] = new Array();
+			detectionFunctors["CAPSULE"]["CAPSULE"] = new CollDetectCapsuleCapsule();
+			detectionFunctors["CAPSULE"]["BOX"] = new CollDetectCapsuleBox();
+			detectionFunctors["CAPSULE"]["SPHERE"] = new CollDetectSphereCapsule();
+			detectionFunctors["CAPSULE"]["PLANE"] = new CollDetectCapsulePlane();
 		}
-
+		
 		public function addCollisionBody(body:RigidBody):void {
 			if (!findBody(body)) {
 				collBody.push(body);
 			}
 		}
-
 		public function removeCollisionBody(body:RigidBody):void {
 			if (findBody(body)) {
 				collBody.splice(collBody.indexOf(body), 1);
 			}
 		}
-
+		
 		public function detectCollisions(body:RigidBody, collArr:Array):void {
 			if (!body.isActive()) {
 				return;
@@ -78,7 +85,7 @@ package jiglib.collision {
 				}
 			}
 		}
-
+		
 		public function detectAllCollisions(bodies:Array, collArr:Array):void {
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
@@ -102,7 +109,7 @@ package jiglib.collision {
 				}
 			}
 		}
-
+		
 		public function segmentIntersect(out:Object, seg:JSegment, ownerBody:RigidBody):Boolean {
 			out.fracOut = JNumber3D.NUM_HUGE;
 			out.posOut = new JNumber3D();
@@ -111,7 +118,7 @@ package jiglib.collision {
 			var obj:Object = new Object();
 			for (var i:String in collBody) {
 				if (collBody[i] != ownerBody && segmentBounding(seg, collBody[i])) {
-					if (collBody[i].SegmentIntersect(obj, seg)) {
+					if (collBody[i].segmentIntersect(obj, seg, collBody[i].currentState)) {
 						if (obj.fracOut < out.fracOut) {
 							out.posOut = obj.posOut;
 							out.normalOut = obj.normalOut;
@@ -133,7 +140,7 @@ package jiglib.collision {
 			}
 			return true;
 		}
-
+		
 		public function segmentBounding(seg:JSegment,obj:RigidBody):Boolean {
 			var pos:JNumber3D = seg.getPoint(0.5);
 			var r:Number = seg.delta.modulo / 2;
@@ -150,7 +157,7 @@ package jiglib.collision {
 				return true;
 			}
 		}
-
+		 
 		private function findBody(body:RigidBody):Boolean {
 			for (var i:String in collBody) {
 				if (body == collBody[i]) {
@@ -160,4 +167,5 @@ package jiglib.collision {
 			return false;
 		}
 	}
+	
 }

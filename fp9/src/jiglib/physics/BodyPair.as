@@ -24,14 +24,14 @@ distribution.
  */
 
 package jiglib.physics {
-	import jiglib.math.JNumber3D;		
-
+	import jiglib.math.JNumber3D;
+	
 	public class BodyPair {
-
+		
 		public var body0:RigidBody;
 		public var body1:RigidBody;
 		public var r:JNumber3D;
-
+		 
 		public function BodyPair(_body0:RigidBody, _body1:RigidBody, r0:JNumber3D, r1:JNumber3D) {
 			
 			if (_body0.id > _body1.id) {
@@ -44,5 +44,7 @@ package jiglib.physics {
 				this.r = r1;
 			}
 		}
+		
 	}
+	
 }

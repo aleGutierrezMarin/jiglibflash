@@ -1,4 +1,4 @@
-﻿package bartek {
+﻿package {
 	import jiglib.geometry.JSphere;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.papervision3d.Papervision3DPhysics;

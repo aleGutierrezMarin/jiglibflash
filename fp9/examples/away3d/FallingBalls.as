@@ -1,4 +1,4 @@
-﻿package bartek {
+﻿package {
 	import away3d.containers.View3D;
 	import away3d.materials.WireframeMaterial;
 	
@@ -15,12 +15,12 @@
 	/**
 	 * @author bartekd
 	 */
-	public class AwayBalls extends Sprite {
+	public class FallingBalls extends Sprite {
 		
 		private var view:View3D;
 		private var physics:Away3DPhysics;
 
-		public function AwayBalls() {
+		public function FallingBalls() {
 			stage.quality = StageQuality.LOW;
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;

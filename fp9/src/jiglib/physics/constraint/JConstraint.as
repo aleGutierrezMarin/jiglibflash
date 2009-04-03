@@ -24,32 +24,32 @@ distribution.
  */
 
 package jiglib.physics.constraint {
-	import jiglib.physics.PhysicsSystem;		
-
+	import jiglib.physics.PhysicsSystem;
+	
 	public class JConstraint {
-
+		
 		private var _satisfied:Boolean;
 		private var _constraintEnabled:Boolean;
-
+		
 		public function JConstraint() {
 		}
-
+		
 		public function set satisfied(s:Boolean):void {
 			_satisfied = s;
 		}
-
+		
 		public function get satisfied():Boolean {
 			return _satisfied;
 		}
-
+		
 		public function preApply(dt:Number):void {
 			_satisfied = false;
 		}
-
+		
 		public function apply(dt:Number):Boolean {
 			return false;
 		}
-
+		
 		public function enableConstraint():void {
 			if (_constraintEnabled) {
 				return;
@@ -57,7 +57,7 @@ package jiglib.physics.constraint {
 			_constraintEnabled = true;
 			PhysicsSystem.getInstance().addConstraint(this);
 		}
-
+		
 		public function disableConstraint():void {
 			if (!_constraintEnabled) {
 				return;
@@ -65,9 +65,10 @@ package jiglib.physics.constraint {
 			_constraintEnabled = false;
 			PhysicsSystem.getInstance().removeConstraint(this);
 		}
-
+		
 		public function get constraintEnabled():Boolean {
 			return _constraintEnabled;
 		}
 	}
+	
 }

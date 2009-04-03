@@ -24,28 +24,29 @@ distribution.
  */
 
 package jiglib.physics.constraint {
+
 	import jiglib.math.*;
-	import jiglib.physics.RigidBody;	
-
+	import jiglib.physics.RigidBody;
+	
 	public class JConstraintPoint extends JConstraint {
-
+		
 		private const _maxVelMag:Number = 20;
-		private const _minVelForProcessing:Number = 0.01;
-
+        private const _minVelForProcessing:Number = 0.01;
+		
 		
 		private var _body0:RigidBody;
 		private var _body1:RigidBody;
 		private var _body0Pos:JNumber3D;
 		private var _body1Pos:JNumber3D;
-
+		
 		private var _timescale:Number;
 		private var _allowedDistance:Number;
-
+		
 		private var r0:JNumber3D;
 		private var r1:JNumber3D;
 		private var _worldPos:JNumber3D;
 		private var _vrExtra:JNumber3D;
-
+		
 		public function JConstraintPoint(body0:RigidBody, body0Pos:JNumber3D, body1:RigidBody, body1Pos:JNumber3D, allowedDistance:Number = 1, timescale:Number = 1) {
 			_body0 = body0;
 			_body0Pos = body0Pos;
@@ -57,7 +58,7 @@ package jiglib.physics.constraint {
 				_timescale = JNumber3D.NUM_TINY;
 			}
 		}
-
+		
 		override public function preApply(dt:Number):void {
 			this.satisfied = false;
 			
@@ -78,7 +79,7 @@ package jiglib.physics.constraint {
 				_vrExtra = JNumber3D.ZERO;
 			}
 		}
-
+		
 		override public function apply(dt:Number):Boolean {
 			this.satisfied = true;
 			
@@ -119,5 +120,7 @@ package jiglib.physics.constraint {
 			this.satisfied = true;
 			return true;
 		}
+		
 	}
+	
 }
