@@ -54,6 +54,10 @@ package jiglib.collision {
 			if (!capsule.hitTestObject3D(box)) {
 				return;
 			}
+			
+			var collPts:Array = new Array();
+			var cpInfo:CollPointInfo;
+			
 			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], capsule.length));
 			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], capsule.length));
 			var radius:Number = capsule.radius;
@@ -87,14 +91,54 @@ package jiglib.collision {
 					dir = JNumber3D.UP;
 					JMatrix3D.multiplyVector(JMatrix3D.rotationMatrix(0, 0, 1, 360 * Math.random()), dir);
 				}
-				
-				var collPts:Array = new Array();
-				var cpInfo:CollPointInfo = new CollPointInfo();
+				 
+				cpInfo = new CollPointInfo();
 				cpInfo.r0 = JNumber3D.sub(boxPos, capsule.oldState.position);
 				cpInfo.r1 = JNumber3D.sub(boxPos, box.oldState.position);
 				cpInfo.initialPenetration = depth;
 				collPts.push(cpInfo);
+			}
+			
+			
+			oldSeg = new JSegment(capsule.getEndPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], capsule.length));
+			newSeg = new JSegment(capsule.getEndPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], capsule.length));
+			 
+			oldObj = new Object();
+			oldDistSq = oldSeg.segmentBoxDistanceSq(oldObj, box, box.oldState);
+			newObj = new Object();
+			newDistSq = newSeg.segmentBoxDistanceSq(newObj, box, box.currentState);
+			
+			if (Math.min(oldDistSq, newDistSq) < Math.pow(radius + JConfig.collToll, 2)) {
+				segPos = oldSeg.getPoint(Number(oldObj.pfLParam));
+				boxPos = box.oldState.position.clone();
+				boxPos = JNumber3D.add(boxPos, JNumber3D.multiply(arr[0], oldObj.pfLParam0));
+				boxPos = JNumber3D.add(boxPos, JNumber3D.multiply(arr[1], oldObj.pfLParam1));
+				boxPos = JNumber3D.add(boxPos, JNumber3D.multiply(arr[2], oldObj.pfLParam2));
 				
+				dist = Math.sqrt(oldDistSq);
+				depth = radius - dist;
+				
+				if (dist > JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(segPos, boxPos);
+					dir.normalize();
+				}
+				else if (JNumber3D.sub(segPos, box.oldState.position).modulo > JNumber3D.NUM_TINY) {
+					dir = JNumber3D.sub(segPos, box.oldState.position);
+					dir.normalize();
+				}
+				else {
+					dir = JNumber3D.UP;
+					JMatrix3D.multiplyVector(JMatrix3D.rotationMatrix(0, 0, 1, 360 * Math.random()), dir);
+				}
+				 
+				cpInfo = new CollPointInfo();
+				cpInfo.r0 = JNumber3D.sub(boxPos, capsule.oldState.position);
+				cpInfo.r1 = JNumber3D.sub(boxPos, box.oldState.position);
+				cpInfo.initialPenetration = depth;
+				collPts.push(cpInfo);
+			}
+			
+			if (collPts.length > 0) {
 				var collInfo:CollisionInfo=new CollisionInfo();
 			    collInfo.objInfo=info;
 			    collInfo.dirToBody = dir;

@@ -95,6 +95,7 @@ package jiglib.collision {
 				mat.friction = Math.sqrt(capsule.material.friction * plane.material.friction);
 				collInfo.mat = mat;
 				collArr.push(collInfo);
+				
 				info.body0.collisions.push(collInfo);
 			    info.body1.collisions.push(collInfo);
 			}
