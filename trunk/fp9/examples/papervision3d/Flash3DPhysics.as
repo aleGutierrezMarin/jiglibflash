@@ -40,8 +40,6 @@ package
 		private var ballBody:Array;
 		private var boxBody:Array;
 		private var capsuleBody:Array;
-		private var chainBody:Array;
-		private var chain:Array;
 		
 		private var onDraging:Boolean = false;
 		
@@ -266,7 +264,28 @@ package
 				{
 					ballBody[i].moveTo(new JNumber3D( 0, 1000 + (60 * Number(i) + 60), 0));
 				}
-				 
+			}
+			
+			for (i in boxBody)
+			{
+				if (boxBody[i].currentState.position.y < -200)
+				{
+					boxBody[i].moveTo(new JNumber3D(0, 1000 + (60 * Number(i) + 60), 0));
+				}
+			}
+			
+			for (i in capsuleBody)
+			{
+				if (capsuleBody[i].currentState.position.y < -200)
+				{
+					capsuleBody[i].moveTo(new JNumber3D(0, 1000 + (60 * Number(i) + 60), 0));
+				}
+			}
+		}
+		
+		private function testFreezeObject():void {
+			for (var i:String in ballBody)
+			{
 				if (ballBody[i].isActive())
 				{
 					shadeMateria = (Number(i) == 0)? new FlatShadeMaterial(mylight, 0xff8888):new FlatShadeMaterial(mylight, 0xeeee00);
@@ -283,11 +302,6 @@ package
 			
 			for (i in boxBody)
 			{
-				if (boxBody[i].currentState.position.y < -200)
-				{
-					boxBody[i].moveTo(new JNumber3D(0, 1000 + (60 * Number(i) + 60), 0));
-				}
-				
 				if (boxBody[i].isActive())
 				{
 					shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
@@ -303,11 +317,6 @@ package
 			}
 			for (i in capsuleBody)
 			{
-				if (capsuleBody[i].currentState.position.y < -200)
-				{
-					capsuleBody[i].moveTo(new JNumber3D(0, 1000 + (60 * Number(i) + 60), 0));
-				}
-				
 				if (capsuleBody[i].isActive())
 				{
 					shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
@@ -349,6 +358,7 @@ package
 			
 			physics.step();
 			resetBox();
+			//testFreezeObject();
 			super.onRenderTick(event);
 		}
 	}
