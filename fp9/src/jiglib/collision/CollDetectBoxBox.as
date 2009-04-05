@@ -36,9 +36,9 @@ package jiglib.collision {
 		private var combinationDist:Number;
 		 
 		public function CollDetectBoxBox() {
-			this.name = "BoxBox";
-			this.type0 = "BOX";
-			this.type1 = "BOX";
+			name = "BoxBox";
+			type0 = "BOX";
+			type1 = "BOX";
 		}
 		 
 		private function disjoint(out:Object, axis:JNumber3D, box0:JBox, box1:JBox):Boolean {

@@ -40,7 +40,7 @@ package jiglib.geometry {
 			_type = "SPHERE";
 			_radius = r;
 			_boundingSphere = _radius;
-			this.mass = 1;
+			mass = 1;
 		}
 		 
 		public function set radius(r:Number):void {
