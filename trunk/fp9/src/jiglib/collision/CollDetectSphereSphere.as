@@ -33,9 +33,9 @@ package jiglib.collision {
 	public class CollDetectSphereSphere extends CollDetectFunctor {
 		
 		public function CollDetectSphereSphere() {
-			this.name = "SphereSphere";
-			this.type0 = "SPHERE";
-			this.type1 = "SPHERE";
+			name = "SphereSphere";
+			type0 = "SPHERE";
+			type1 = "SPHERE";
 		}
 		
 		override public function collDetect(info:CollDetectInfo, collArr:Array):void {

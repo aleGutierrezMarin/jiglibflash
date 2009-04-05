@@ -34,9 +34,9 @@ package jiglib.collision {
 	public class CollDetectBoxPlane extends CollDetectFunctor {
 		
 		public function CollDetectBoxPlane() {
-			this.name = "BoxPlane";
-			this.type0 = "BOX";
-			this.type1 = "PLANE";
+			name = "BoxPlane";
+			type0 = "BOX";
+			type1 = "PLANE";
 		}
 		
 		override public function collDetect(info:CollDetectInfo, collArr:Array):void {

@@ -65,7 +65,7 @@ package jiglib.physics {
 		private var _storedPositionForActivation:JNumber3D;
 		private var _lastPositionForDeactivation:JNumber3D;
 		private var _lastOrientationForDeactivation:JMatrix3D;
-		
+		 
 		public var collisions:Array;
 		private var _material:MaterialProperties;
 		
@@ -446,6 +446,7 @@ package jiglib.physics {
 
 		public function set movable(mov:Boolean):void {
 			_movable = mov;
+			_activity = mov;
 			_origMovable = mov;
 		}
 		

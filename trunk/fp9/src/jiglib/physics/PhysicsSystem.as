@@ -677,7 +677,7 @@ package jiglib.physics {
 			for (var i:uint = orig_num; i < _collisions.length; i++) {
 				other_body=_collisions[i].objInfo.body0;
 				thisBody_normal=_collisions[i].dirToBody;
-				if(other_body==body) {
+				if (other_body == body) {
 					other_body=_collisions[i].objInfo.body1;
 					thisBody_normal=JNumber3D.multiply(_collisions[i].dirToBody,-1);
 				}
