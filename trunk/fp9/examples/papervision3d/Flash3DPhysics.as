@@ -112,7 +112,7 @@ package
 				color = (i == 0)?0xff8888:0xeeee00;
 				shadeMateria = new FlatShadeMaterial(mylight, color);
 				shadeMateria.interactive = true;
-				ballBody[i] = physics.createSphere(shadeMateria, 20);
+				ballBody[i] = physics.createSphere(shadeMateria, 22);
 				ballBody[i].skin.mesh.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
 				ballBody[i].mass = 3;
 				ballBody[i].moveTo(new JNumber3D( -100, 30 + (50 * i + 50), -100));
