@@ -70,9 +70,13 @@ package
 
 		private function init3D():void
 		{
+			JConfig.angVelThreshold = 5;
+			JConfig.posThreshold = 0.2;
+			JConfig.deactivationTime = 0.5;
 			JConfig.numCollisionIterations = 4;
 			JConfig.numContactIterations = 8;
-			physics = new Papervision3DPhysics(scene, 0.2);
+			
+			physics = new Papervision3DPhysics(scene, 8);
 			
 			Mouse3D.enabled = true;
 			mouse3D = viewport.interactiveSceneManager.mouse3D;
@@ -356,7 +360,8 @@ package
 				ballBody[0].addWorldForce(new JNumber3D(0, 100, 0), ballBody[0].currentState.position);
 			}
 			
-			physics.step();
+			//physics.step();//dynamic timeStep
+			PhysicsSystem.getInstance().integrate(0.2);//static timeStep
 			resetBox();
 			//testFreezeObject();
 			super.onRenderTick(event);
