@@ -83,7 +83,7 @@ package jiglib.physics.constraint {
 		override public function apply(dt:Number):Boolean {
 			this.satisfied = true;
 			
-			if (!_body0.isActive() && !_body0.isActive()) {
+			if (!_body0.isActive() && !_body1.isActive()) {
 				return false;
 			}
 			
