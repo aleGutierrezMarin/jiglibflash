@@ -32,10 +32,10 @@ package jiglib.vehicles {
 
 	public class JWheel {
 		
-		private const noslipVel:Number = 0.5;
-		private const slipVel:Number = 0.5;
-		private const slipFactor:Number = 0.8;
-		private const smallVel:Number = 8;
+		private const noslipVel:Number = 0.2;
+		private const slipVel:Number = 0.4;
+		private const slipFactor:Number = 0.7;
+		private const smallVel:Number = 3;
 		
 		private var _car:JCar;
 		private var _pos:JNumber3D;
