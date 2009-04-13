@@ -108,9 +108,11 @@ package jiglib.physics {
 				_gravityAxis = 2;
 			}
 		}
+		
 		public function get gravity():JNumber3D {
 			return _gravity;
 		}
+		
 		public function get gravityAxis():int {
 			return _gravityAxis;
 		}
@@ -125,11 +127,18 @@ package jiglib.physics {
 				_collisionSystem.addCollisionBody(body);
 			}
 		}
+		
 		public function removeBody(body:RigidBody):void {
 			if (findBody(body)) {
 			    _bodies.splice(_bodies.indexOf(body), 1);
 				_collisionSystem.removeCollisionBody(body);
+				body = null;
 			}
+		}
+		
+		public function removeAllBodys():void {
+			_bodies = new Array();
+			_collisionSystem.removeAllCollisionBodys();
 		}
 		
 		public function addConstraint(constraint:JConstraint):void {
@@ -137,10 +146,15 @@ package jiglib.physics {
 			    _constraints.push(constraint);
 			}
 		}
+		
 		public function removeConstraint(constraint:JConstraint):void {
 			if (findConstraint(constraint)) {
 			    _constraints.splice(_constraints.indexOf(constraint), 1);
 			}
+		}
+		
+		public function removeAllConstraints():void {
+			_constraints = new Array();
 		}
 		
 		public function setSolverType(type:String):void {

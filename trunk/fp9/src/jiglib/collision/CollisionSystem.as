@@ -62,10 +62,15 @@ package jiglib.collision {
 				collBody.push(body);
 			}
 		}
+		
 		public function removeCollisionBody(body:RigidBody):void {
 			if (findBody(body)) {
 				collBody.splice(collBody.indexOf(body), 1);
 			}
+		}
+		
+		public function removeAllCollisionBodys():void {
+			collBody = new Array();
 		}
 		
 		public function detectCollisions(body:RigidBody, collArr:Array):void {
