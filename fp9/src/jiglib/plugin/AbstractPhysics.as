@@ -1,8 +1,10 @@
-package jiglib.plugin {
+﻿package jiglib.plugin {
+	import flash.utils.getTimer;
+	
 	import jiglib.physics.PhysicsSystem;
 	import jiglib.physics.RigidBody;
-	
-	import flash.utils.getTimer;	
+	import jiglib.physics.constraint.JConstraint;
+	import jiglib.physics.constraint.JConstraintPoint;	
 
 	/**
 	 * @author bartekd
@@ -21,6 +23,14 @@ package jiglib.plugin {
 		
 		public function addBody(body:RigidBody):void {
 			PhysicsSystem.getInstance().addBody(body as RigidBody);
+		}
+		
+		public function addConstraint(constraint:JConstraint):void {
+			PhysicsSystem.getInstance().addConstraint(constraint as JConstraintPoint);
+		}
+		
+		public function get engine():PhysicsSystem {
+			return PhysicsSystem.getInstance();
 		}
 		
 		public function step():void {
