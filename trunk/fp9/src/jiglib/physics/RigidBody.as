@@ -152,7 +152,7 @@ package jiglib.physics {
 		 */
 		public function set rotationY(py:Number):void {
 			var rad:Number = (_useDegrees) ? degreesToRadians(py) : py;
-			_rotationY = prady;
+			_rotationY = rad;
 			setOrientation(createRotationMatrix());
 		}
 
