@@ -14,5 +14,6 @@ package jiglib.cof {
 		public static var numPenetrationRelaxationTimesteps:Number = 7; // number of timesteps to resolve penetration over
 		public static var numCollisionIterations:Number = 4; // number of collision iterations
 		public static var numContactIterations:Number = 4; // number of contact iteratrions
+		public static var rotationType:String = "RADIANS"; // can be either RADIANS or DEGREES;
 	}
 }
