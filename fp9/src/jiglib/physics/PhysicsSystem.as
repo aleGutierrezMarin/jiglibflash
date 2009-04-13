@@ -132,7 +132,6 @@ package jiglib.physics {
 			if (findBody(body)) {
 			    _bodies.splice(_bodies.indexOf(body), 1);
 				_collisionSystem.removeCollisionBody(body);
-				body = null;
 			}
 		}
 		
