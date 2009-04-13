@@ -75,8 +75,12 @@ package jiglib.physics {
 		private var _rotationX:Number = 0;
 		private var _rotationY:Number = 0;
 		private var _rotationZ:Number = 0;
+		
+		private var _useDegrees:Boolean;
 	     
 	    public function RigidBody(skin:ISkin3D) {
+			_useDegrees = (JConfig.rotationType == "DEGREES") ? true : false;
+			
 			_id = idCounter++;
 			 
 			_skin = skin;
@@ -111,41 +115,72 @@ package jiglib.physics {
 			_type = "Object3D";
 			_boundingSphere = 0;
 	    }
+	    
+	    private function radiansToDegrees(rad:Number):Number
+		{
+			return rad * 180/Math.PI;
+		}
+ 
+		private function degreesToRadians(deg:Number):Number
+		{
+			return deg * Math.PI/180;
+		}
 		
 		public function get rotationX():Number {
-			return _rotationX;
+			return (_useDegrees) ? radiansToDegrees(_rotationX) : _rotationX;
 		}
 
 		public function get rotationY():Number {
-			return _rotationY;
+			return (_useDegrees) ? radiansToDegrees(_rotationY) : _rotationY;
 		}
 
 		public function get rotationZ():Number {
-			return _rotationZ;
+			return (_useDegrees) ? radiansToDegrees(_rotationZ) : _rotationZ;
 		}
 
 		/**
-		 * px - angle in Radians
+		 * px - angle in Radians or Degrees
 		 */
 		public function set rotationX(px:Number):void {
-			_rotationX = px;
+			var rad:Number = (_useDegrees) ? degreesToRadians(px) : px;
+			_rotationX = rad;
 			setOrientation(createRotationMatrix());
 		}
 
 		/**
-		 * py - angle in Radians
+		 * py - angle in Radians or Degrees
 		 */
 		public function set rotationY(py:Number):void {
-			_rotationY = py;
+			var rad:Number = (_useDegrees) ? degreesToRadians(py) : py;
+			_rotationY = prady;
 			setOrientation(createRotationMatrix());
 		}
 
 		/**
-		 * pz - angle in Radians
+		 * pz - angle in Radians or Degrees
 		 */
 		public function set rotationZ(pz:Number):void {
-			_rotationZ = pz;
+			var rad:Number = (_useDegrees) ? degreesToRadians(pz) : pz;
+			_rotationZ = rad;
 			setOrientation(createRotationMatrix());
+		}
+		
+		public function pitch(rot:Number):void
+		{
+			var rad:Number = (_useDegrees) ? degreesToRadians(rot) : rot;
+			setOrientation(JMatrix3D.multiply(currentState.orientation, JMatrix3D.rotationX(rot)));
+		}
+		
+		public function yaw(rot:Number):void
+		{
+			var rad:Number = (_useDegrees) ? degreesToRadians(rot) : rot;
+			setOrientation(JMatrix3D.multiply(currentState.orientation, JMatrix3D.rotationY(rot)));
+		}
+		
+		public function roll(rot:Number):void
+		{
+			var rad:Number = (_useDegrees) ? degreesToRadians(rot) : rot;
+			setOrientation(JMatrix3D.multiply(currentState.orientation, JMatrix3D.rotationZ(rot)));
 		}
 		 
 		private function createRotationMatrix():JMatrix3D {
