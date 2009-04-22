@@ -37,6 +37,9 @@ package jiglib.physics {
 		private var _id:int;
 		private var _skin:ISkin3D;
 		 
+		protected var _type:String;
+		protected var _boundingSphere:Number;
+		
 		protected var _currState:PhysicsState;
 		private var _oldState:PhysicsState;
 		private var _storeState:PhysicsState;
@@ -66,18 +69,16 @@ package jiglib.physics {
 		private var _lastPositionForDeactivation:JNumber3D;
 		private var _lastOrientationForDeactivation:JMatrix3D;
 		 
-		public var collisions:Array;
 		private var _material:MaterialProperties;
-		
-		protected var _type:String;
-		protected var _boundingSphere:Number;
 		 
 		private var _rotationX:Number = 0;
 		private var _rotationY:Number = 0;
 		private var _rotationZ:Number = 0;
-		
 		private var _useDegrees:Boolean;
 	     
+		private var _nonCollidables:Array;
+		public var collisions:Array;
+		 
 	    public function RigidBody(skin:ISkin3D) {
 			_useDegrees = (JConfig.rotationType == "DEGREES") ? true : false;
 			
@@ -107,6 +108,8 @@ package jiglib.physics {
 			_origMovable = true;
 			 
 			collisions = new Array();
+			_nonCollidables = new Array();
+			 
 			_storedPositionForActivation = new JNumber3D();
 			_bodiesToBeActivatedOnMovement = new Array();
 			_lastPositionForDeactivation = _currState.position.clone();
@@ -599,6 +602,27 @@ package jiglib.physics {
 			return false;
 		}
 		
+		private function findNonCollidablesBody(body:RigidBody):Boolean {
+			for (var i:String in _nonCollidables) {
+				if (body == _nonCollidables[i]) {
+					return true;
+				}
+			}
+			return false;
+		}
+		 
+		public function disableCollisions(body:RigidBody):void {
+			if (!findNonCollidablesBody(body)) {
+				_nonCollidables.push(body);
+			}
+		}
+		
+		public function enableCollisions(body:RigidBody):void {
+			if (findNonCollidablesBody(body)) {
+				_nonCollidables.splice(_nonCollidables.indexOf(body), 1);
+			}
+		}
+		
 		public function copyCurrentStateToOld():void {
 			_currState.position.copyTo(_oldState.position);
 			_oldState.orientation.copy(_currState.orientation);
@@ -662,6 +686,10 @@ package jiglib.physics {
 		
 		public function get worldInvInertia():JMatrix3D {
 			return _worldInvInertia;
+		}
+		
+		public function get nonCollidables():Array {
+			return _nonCollidables;
 		}
 		
 		public function limitVel():void {

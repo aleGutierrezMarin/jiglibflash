@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright (c) 2007 Danny Chapman 
 http://www.rowlhouse.co.uk
 
@@ -23,85 +23,83 @@ distribution.
  * @link http://code.google.com/p/jiglibflash
  */
 
+ 
 package jiglib.physics.constraint {
-
+	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 	
-	public class JConstraintPoint extends JConstraint {
+	public class JConstraintMaxDistance extends JConstraint {
 		
 		private const _maxVelMag:Number = 20;
         private const _minVelForProcessing:Number = 0.01;
-		
-		
+		 
 		private var _body0:RigidBody;
 		private var _body1:RigidBody;
 		private var _body0Pos:JNumber3D;
 		private var _body1Pos:JNumber3D;
-		
-		private var _timescale:Number;
-		private var _allowedDistance:Number;
-		
+		private var _maxDistance:Number;
+		 
 		private var r0:JNumber3D;
 		private var r1:JNumber3D;
 		private var _worldPos:JNumber3D;
-		private var _vrExtra:JNumber3D;
-		
-		public function JConstraintPoint(body0:RigidBody, body0Pos:JNumber3D, body1:RigidBody, body1Pos:JNumber3D, allowedDistance:Number = 1, timescale:Number = 1) {
+		private var _currentRelPos0:JNumber3D;
+		 
+		public function JConstraintMaxDistance(body0:RigidBody, body0Pos:JNumber3D, body1:RigidBody, body1Pos:JNumber3D, maxDistance:Number = 1) {
 			super();
 			_body0 = body0;
 			_body0Pos = body0Pos;
 			_body1 = body1;
 			_body1Pos = body1Pos;
-			_allowedDistance = allowedDistance;
-			_timescale = timescale;
-			if (_timescale < JNumber3D.NUM_TINY) {
-				_timescale = JNumber3D.NUM_TINY;
-			}
+			_maxDistance = maxDistance;
 		}
-		
+		 
 		override public function preApply(dt:Number):void {
 			this.satisfied = false;
-			
+			 
 			r0 = _body0Pos.clone();
 			JMatrix3D.multiplyVector(_body0.currentState.orientation, r0);
 			r1 = _body1Pos.clone();
 			JMatrix3D.multiplyVector(_body1.currentState.orientation, r1);
-			
+			 
 			var worldPos0:JNumber3D = JNumber3D.add(_body0.currentState.position, r0);
 			var worldPos1:JNumber3D = JNumber3D.add(_body1.currentState.position, r1);
 			_worldPos = JNumber3D.multiply(JNumber3D.add(worldPos0, worldPos1), 0.5);
-			
-			var deviation:JNumber3D = JNumber3D.sub(worldPos0, worldPos1);
-			var deviationAmount:Number = deviation.modulo;
-			if (deviationAmount > _allowedDistance) {
-				_vrExtra = JNumber3D.multiply(deviation, (deviationAmount - _allowedDistance) / (deviationAmount * Math.max(_timescale, dt)));
-			} else {
-				_vrExtra = JNumber3D.ZERO;
-			}
+			 
+			_currentRelPos0 = JNumber3D.sub(worldPos0, worldPos1);
 		}
-		
+		 
 		override public function apply(dt:Number):Boolean {
 			this.satisfied = true;
 			
 			if (!_body0.isActive() && !_body1.isActive()) {
 				return false;
 			}
-			
+			 
 			var currentVel0:JNumber3D = _body0.getVelocity(r0);
 			var currentVel1:JNumber3D = _body1.getVelocity(r1);
-			var Vr:JNumber3D = JNumber3D.add(_vrExtra, JNumber3D.sub(currentVel0, currentVel1));
-			
-			var normalVel:Number = Vr.modulo;
-			if (normalVel < _minVelForProcessing) {
+			 
+			var predRelPos0:JNumber3D = JNumber3D.add(_currentRelPos0, JNumber3D.multiply(JNumber3D.sub(currentVel0, currentVel1), dt));
+			var clampedRelPos0:JNumber3D = predRelPos0.clone();
+			var clampedRelPos0Mag:Number = clampedRelPos0.modulo;
+			if (clampedRelPos0Mag <= JNumber3D.NUM_TINY) {
 				return false;
 			}
-			
+			if (clampedRelPos0Mag > _maxDistance) {
+				clampedRelPos0 = JNumber3D.multiply(clampedRelPos0, _maxDistance / clampedRelPos0Mag);
+			}
+			 
+			var desiredRelVel0:JNumber3D = JNumber3D.divide(JNumber3D.sub(clampedRelPos0, _currentRelPos0), dt);
+			var Vr:JNumber3D = JNumber3D.sub(JNumber3D.sub(currentVel0, currentVel1), desiredRelVel0);
+			 
+			var normalVel:Number = Vr.modulo;
 			if (normalVel > _maxVelMag) {
 				Vr = JNumber3D.multiply(Vr, _maxVelMag / normalVel);
 				normalVel = _maxVelMag;
+			} else if (normalVel < _minVelForProcessing) {
+				return false;
 			}
-			
+			 
 			var N:JNumber3D = JNumber3D.divide(Vr, normalVel);
 			var tempVec1:JNumber3D = JNumber3D.cross(N, r0);
 			JMatrix3D.multiplyVector(_body0.worldInvInertia, tempVec1);
@@ -121,7 +119,6 @@ package jiglib.physics.constraint {
 			this.satisfied = true;
 			return true;
 		}
-		
 	}
 	
 }

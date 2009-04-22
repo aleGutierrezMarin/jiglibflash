@@ -61,7 +61,6 @@
 			planeToDragOn = new Plane3D(dragNormal, new Number3D(0, 0, 0)); //-initialMousePosition.z
 			var bodyPoint:JNumber3D = JNumber3D.sub(initialMousePosition, body.currentState.position);
 			dragConstraint = new JConstraintWorldPoint(body, bodyPoint, initialMousePosition);
-			physics.addConstraint(dragConstraint);
 			viewport.containerSprite.stage.addEventListener(MouseEvent.MOUSE_MOVE, startDrag);
 		}
 		
@@ -94,7 +93,7 @@
 		public function destroy():void
 		{
 			viewport.containerSprite.stage.removeEventListener(MouseEvent.MOUSE_MOVE, startDrag);
-			PhysicsSystem.getInstance().removeConstraint(dragConstraint);
+			dragConstraint.disableConstraint();
 			body.setActive();
 			
 			body = null;

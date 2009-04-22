@@ -89,7 +89,7 @@
 			carBody.chassis.rotationY = 90;
 			carBody.chassis.mass = 9;
 			carBody.chassis.sideLengths = new JNumber3D(40, 20, 90);
-			PhysicsSystem.getInstance().addBody(carBody.chassis);
+			physics.addBody(carBody.chassis);
 			 
 			carBody.setupWheel("WheelFL", new JNumber3D( -20, -10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
 			carBody.setupWheel("WheelFR", new JNumber3D(20, -10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
@@ -209,7 +209,7 @@
 		 
 		protected override function onRenderTick(event:Event = null):void {
 			//physics.step();
-			PhysicsSystem.getInstance().integrate(0.12);
+			physics.engine.integrate(0.12);
 			updateWheelSkin();
 			super.onRenderTick(event);
 		}

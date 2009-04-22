@@ -81,7 +81,7 @@ package jiglib.collision {
 			var fu:CollDetectFunctor;
 			 
 			for (var i:String in collBody) { 
-				if (body != collBody[i] && detectionFunctors[body.type][collBody[i].type] != undefined) {
+				if (body != collBody[i] && checkCollidables(body, collBody[i]) && detectionFunctors[body.type][collBody[i].type] != undefined) {
 					info = new CollDetectInfo();
 					info.body0 = body;
 					info.body1 = collBody[i];
@@ -104,7 +104,7 @@ package jiglib.collision {
 						continue;
 					}
 					
-					if (detectionFunctors[bodies[i].type][collBody[j].type] != undefined) {
+					if (checkCollidables(bodies[i], collBody[j]) && detectionFunctors[bodies[i].type][collBody[j].type] != undefined) {
 						info = new CollDetectInfo();
 						info.body0 = bodies[i];
 						info.body1 = collBody[j];
@@ -170,6 +170,24 @@ package jiglib.collision {
 				}
 			}
 			return false;
+		}
+		
+		private function checkCollidables(body0:RigidBody, body1:RigidBody):Boolean {
+			if (body0.nonCollidables.length == 0 && body1.nonCollidables.length == 0) {
+				return true;
+			}
+			
+			for (var i:String in body0.nonCollidables) {
+				if (body1 == body0.nonCollidables[i]) {
+					return false;
+				}
+			}
+			for (i in body1.nonCollidables) {
+				if (body0 == body1.nonCollidables[i]) {
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 	
