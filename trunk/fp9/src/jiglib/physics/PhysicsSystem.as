@@ -46,6 +46,7 @@ package jiglib.physics {
 		private var _activeBodies:Array;
 		private var _collisions:Array;
 		private var _constraints:Array;
+		private var _controllers:Array;
 		 
 		 
 		private var _gravityAxis:int;
@@ -64,7 +65,7 @@ package jiglib.physics {
 		
 		public static function getInstance():PhysicsSystem {
 	    	if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.3 (2009-4-2)");
+				trace("version: JigLibFlash v0.32 (2009-4-22)");
 			    _currentPhysicsSystem = new PhysicsSystem();
 		    }
 		    return _currentPhysicsSystem;
@@ -78,6 +79,7 @@ package jiglib.physics {
 			_collisions = new Array();
 			_activeBodies = new Array();
 			_constraints = new Array();
+			_controllers = new Array();
 			
 			_cachedContacts = new Array();
 			_collisionSystem = new CollisionSystem();
@@ -88,6 +90,10 @@ package jiglib.physics {
 		private function getAllExternalForces(dt:Number):void {
 			for (var i:String in _bodies) {
 				_bodies[i].addExternalForces(dt);
+			}
+			
+			for (i in _controllers) {
+				_controllers[i].updateController(dt);
 			}
 		}
 		
@@ -156,6 +162,22 @@ package jiglib.physics {
 			_constraints = new Array();
 		}
 		
+		public function addController(controller:PhysicsController):void {
+			if (!findController(controller)) {
+			    _controllers.push(controller);
+			}
+		}
+		
+		public function removeController(controller:PhysicsController):void {
+			if (findController(controller)) {
+			    _controllers.splice(_controllers.indexOf(controller), 1);
+			}
+		}
+		
+		public function removeAllControllers():void {
+			_controllers = new Array();
+		}
+		
 		public function setSolverType(type:String):void {
 			switch(type) {
 				case "FAST":
@@ -196,6 +218,14 @@ package jiglib.physics {
 		private function findConstraint(constraint:JConstraint):Boolean {
 			for (var i:String in _constraints) {
 				if (constraint == _constraints[i]) {
+					return true;
+				}
+			}
+			return false;
+		}
+		private function findController(controller:PhysicsController):Boolean {
+			for (var i:String in _controllers) {
+				if (controller == _controllers[i]) {
 					return true;
 				}
 			}
@@ -661,8 +691,8 @@ package jiglib.physics {
 				
 				if(forceInelastic) {
 			    	for (var j:uint = origNumCollisions; j < _collisions.length; j++) {
-						_collisions[i].mat.restitution = 0;
-					    _collisions[i].satisfied = false;
+						_collisions[j].mat.restitution = 0;
+					    _collisions[j].satisfied = false;
 			    		preProcessContactFn(_collisions[j], dt);
 			    	}
 			    } else {

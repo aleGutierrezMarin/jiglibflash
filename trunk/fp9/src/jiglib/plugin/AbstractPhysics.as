@@ -25,8 +25,8 @@
 			PhysicsSystem.getInstance().addBody(body as RigidBody);
 		}
 		
-		public function addConstraint(constraint:JConstraint):void {
-			PhysicsSystem.getInstance().addConstraint(constraint as JConstraintPoint);
+		public function removeBody(body:RigidBody):void {
+			PhysicsSystem.getInstance().removeBody(body as RigidBody);
 		}
 		
 		public function get engine():PhysicsSystem {

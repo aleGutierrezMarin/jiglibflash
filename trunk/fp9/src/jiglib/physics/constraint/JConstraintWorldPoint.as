@@ -40,6 +40,7 @@ package jiglib.physics.constraint {
 		private var _worldPosition:JNumber3D;
 		
 		public function JConstraintWorldPoint(body:RigidBody, pointOnBody:JNumber3D, worldPosition:JNumber3D) {
+			super();
 			_body = body;
 			_pointOnBody = pointOnBody;
 			_worldPosition = worldPosition;

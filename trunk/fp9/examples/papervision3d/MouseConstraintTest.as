@@ -37,7 +37,7 @@ package
 			
 			super(stage.stageWidth, stage.stageHeight, true, true, CameraType.TARGET);
 			
-			physics = new Papervision3DPhysics(scene, 1);
+			physics = new Papervision3DPhysics(scene, 8);
 						
 			setupVPLayer();
 			setupLighting();

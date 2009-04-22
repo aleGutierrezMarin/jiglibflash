@@ -26,7 +26,7 @@
 	 * 
 	 */
 	[SWF(width="900", height="700", backgroundColor="#000000", frameRate="60")]
-	public class JigLibFlash_constraints extends BasicView
+	public class Constraints extends BasicView
 	{
 		
 		private var physics:Papervision3DPhysics;
@@ -34,11 +34,11 @@
 		private var sceneLight:PointLight3D;
 		private var mouseConstraint:MouseConstraint;
 		
-		public function JigLibFlash_constraints()
+		public function Constraints()
 		{
 			super(stage.stageWidth, stage.stageHeight, true, true, CameraType.TARGET);
 			
-			physics = new Papervision3DPhysics(scene, 20);
+			physics = new Papervision3DPhysics(scene, 8);
 						
 			setupVPLayer();
 			setupLighting();
@@ -89,7 +89,7 @@
 			for(var a:Number = 0; a<5; a++){
 				var flatShadedMaterial:FlatShadeMaterial = new FlatShadeMaterial(sceneLight, 0xFF0000 * Math.random());
 				flatShadedMaterial.interactive = true;
-			
+			 
 				sphere = physics.createSphere(flatShadedMaterial, 100);
 				vplObjects.addDisplayObject3D(physics.getMesh(sphere));
 				physics.getMesh(sphere).addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
@@ -99,9 +99,7 @@
 				if(a != 0){
 					var pos1:JNumber3D = JNumber3D.multiply(JNumber3D.UP, -prevSphere.boundingSphere);
 					var pos2:JNumber3D = JNumber3D.multiply(JNumber3D.UP, sphere.boundingSphere);
-					var constraint:JConstraintPoint = new JConstraintPoint(prevSphere, pos1, sphere, pos2, 2, 0.2);
-					physics.addConstraint(constraint);
-				
+					var constraint:JConstraintPoint = new JConstraintPoint(prevSphere, pos1, sphere, pos2, 0, 0.1);
 				}
 				prevSphere = sphere;
 			}

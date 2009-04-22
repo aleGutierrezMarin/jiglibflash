@@ -23,54 +23,37 @@ distribution.
  * @link http://code.google.com/p/jiglibflash
  */
 
-package jiglib.physics.constraint {
-	import jiglib.physics.PhysicsSystem;
+package jiglib.physics {
 	
-	public class JConstraint {
+	public class PhysicsController {
 		
-		private var _satisfied:Boolean;
-		private var _constraintEnabled:Boolean;
+		private var _controllerEnabled:Boolean;
 		
-		public function JConstraint() {
-			_constraintEnabled = false;
-			enableConstraint();
+		public function PhysicsController() {
+			_controllerEnabled = false;
 		}
 		
-		public function set satisfied(s:Boolean):void {
-			_satisfied = s;
+		public function updateController(dt:Number):void {
 		}
 		
-		public function get satisfied():Boolean {
-			return _satisfied;
-		}
-		
-		public function preApply(dt:Number):void {
-			_satisfied = false;
-		}
-		
-		public function apply(dt:Number):Boolean {
-			return false;
-		}
-		
-		public function enableConstraint():void {
-			if (_constraintEnabled) {
+		public function enableController():void {
+			if (_controllerEnabled) {
 				return;
 			}
-			_constraintEnabled = true;
-			PhysicsSystem.getInstance().addConstraint(this);
+			_controllerEnabled = true;
+			PhysicsSystem.getInstance().addController(this);
 		}
 		
-		public function disableConstraint():void {
-			if (!_constraintEnabled) {
+		public function disableController():void {
+			if (!_controllerEnabled) {
 				return;
 			}
-			_constraintEnabled = false;
-			PhysicsSystem.getInstance().removeConstraint(this);
+			_controllerEnabled = false;
+			PhysicsSystem.getInstance().removeController(this);
 		}
 		
-		public function get constraintEnabled():Boolean {
-			return _constraintEnabled;
+		public function get controllerEnabled():Boolean {
+			return _controllerEnabled;
 		}
 	}
-	
 }
