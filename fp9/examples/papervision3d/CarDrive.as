@@ -86,7 +86,7 @@
 			carBody = new JCar(new Pv3dMesh(carSkin));
 			carBody.setCar(40,5,500);
 			carBody.chassis.moveTo(new JNumber3D( 0, 100, 0));
-			carBody.chassis.rotationY = Math.PI / 2;
+			carBody.chassis.rotationY = 90;
 			carBody.chassis.mass = 9;
 			carBody.chassis.sideLengths = new JNumber3D(40, 20, 90);
 			PhysicsSystem.getInstance().addBody(carBody.chassis);
@@ -121,13 +121,13 @@
 			var ramp1:RigidBody = physics.createCube(materiaList, 400, 200, 10);
 			ramp1.movable = false;
 			ramp1.moveTo(new JNumber3D(0, 33, 250));
-			ramp1.rotationX = -Math.PI / 9;
+			ramp1.rotationX = -20;
 			vplCar.addDisplayObject3D(physics.getMesh(ramp1));
 			
 			var ramp2:RigidBody = physics.createCube(materiaList, 400, 200, 10);
 			ramp2.movable = false;
 			ramp2.moveTo(new JNumber3D(0, 33, 440));
-			ramp2.rotationX = Math.PI / 9;
+			ramp2.rotationX = 20;
 			vplCar.addDisplayObject3D(physics.getMesh(ramp2));
 			
 			shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
