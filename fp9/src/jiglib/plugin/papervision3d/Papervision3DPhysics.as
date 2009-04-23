@@ -6,22 +6,21 @@ package jiglib.plugin.papervision3d {
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;
 	
+	import org.papervision3d.core.proto.DisplayObjectContainer3D;
 	import org.papervision3d.core.proto.MaterialObject3D;
 	import org.papervision3d.materials.utils.MaterialsList;
 	import org.papervision3d.objects.DisplayObject3D;
 	import org.papervision3d.objects.primitives.Cube;
 	import org.papervision3d.objects.primitives.Plane;
-	import org.papervision3d.objects.primitives.Sphere;
-	import org.papervision3d.scenes.Scene3D;		
-
+	import org.papervision3d.objects.primitives.Sphere;		
 	/**
 	 * @author bartekd
 	 */
 	public class Papervision3DPhysics extends AbstractPhysics {
 
-		private var scene:Scene3D;
+		private var scene:DisplayObjectContainer3D;
 
-		public function Papervision3DPhysics(scene:Scene3D, speed:Number = 1) {
+		public function Papervision3DPhysics(scene:DisplayObjectContainer3D, speed:Number = 1) {
 			super(speed);
 			this.scene = scene;
 		}
