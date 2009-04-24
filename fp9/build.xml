@@ -79,7 +79,7 @@
 		<echo>Generating swc using ${app.home}/src</echo>
 		<exec executable="${compc.exe}">
 			<arg line="-source-path ${app.home}/src ${sandy3d.home} ${away3d.home} ${papervision3d.home}"/>
-			<arg line="-output swc/jiglibflash-${version}.swc"/>
+			<arg line="-output swc/jiglibflash.swc"/>
 			<arg line="-include-sources ${app.home}/src"/>
 			<arg line="-external-library-path ${playerglobal}" />
 			<arg line="-external-library-path swc/sandy.swc" />
