@@ -46,7 +46,7 @@ package jiglib.collision {
 				return;
 			}
 			
-			var collPts:Array = new Array();
+			var collPts:Array = [];
 			var cpInfo:CollPointInfo;
 				
 			var oldSeg0:JSegment = new JSegment(capsule0.getBottomPos(capsule0.oldState), JNumber3D.multiply(capsule0.oldState.orientation.getCols()[1], capsule0.length));

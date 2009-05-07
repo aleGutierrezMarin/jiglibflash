@@ -167,8 +167,8 @@ package jiglib.vehicles {
 			var maxNumRays:int = 10;
 			var numRays:int = Math.min(_numRays, maxNumRays);
 			 
-			var objArr:Array = new Array();
-			var segments:Array = new Array();
+			var objArr:Array = [];
+			var segments:Array = [];
 			
 			var deltaFwd:Number = (2 * _radius) / (numRays + 1);
 			var deltaFwdStart:Number = deltaFwd;

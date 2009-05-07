@@ -80,7 +80,7 @@ package jiglib.collision {
 				
 				var worldPos:JNumber3D = JNumber3D.add(segPos, JNumber3D.multiply(delta, capsule.radius - 0.5 * depth));
 				 
-				var collPts:Array = new Array();
+				var collPts:Array = [];
 				var cpInfo:CollPointInfo = new CollPointInfo();
 				cpInfo.r0 = JNumber3D.sub(worldPos, sphere.oldState.position);
 				cpInfo.r1 = JNumber3D.sub(worldPos, capsule.oldState.position);

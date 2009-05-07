@@ -34,14 +34,14 @@ package jiglib.geometry {
 		
 		private var _sideLengths:JNumber3D;
 		private var _points:Array;
-		private var _edges:Array=new Array({ ind0:0, ind1:1 }, { ind0:3, ind1:1 }, { ind0:2, ind1:3 },
-			                               { ind0:2, ind1:0 }, { ind0:4, ind1:5 }, { ind0:5, ind1:7 },
-							               { ind0:6, ind1:7 }, { ind0:4, ind1:6 }, { ind0:7, ind1:1 },
-							               { ind0:5, ind1:3 }, { ind0:4, ind1:2 }, { ind0:6, ind1:0 });
+		private var _edges:Array = [ { ind0:0, ind1:1 }, { ind0:3, ind1:1 }, { ind0:2, ind1:3 },
+			                         { ind0:2, ind1:0 }, { ind0:4, ind1:5 }, { ind0:5, ind1:7 },
+							         { ind0:6, ind1:7 }, { ind0:4, ind1:6 }, { ind0:7, ind1:1 },
+							         { ind0:5, ind1:3 }, { ind0:4, ind1:2 }, { ind0:6, ind1:0 } ];
 										 
-		private var _face:Array = new Array([6, 7, 1, 0], [5, 4, 2, 3], 
-											[3, 1, 7, 5], [4, 6, 0, 2], 
-											[1, 3, 2, 0], [7, 6, 4, 5]);
+		private var _face:Array = [[6, 7, 1, 0], [5, 4, 2, 3], 
+								   [3, 1, 7, 5], [4, 6, 0, 2], 
+								   [1, 3, 2, 0], [7, 6, 4, 5]];
 		 
 		public function JBox(skin:ISkin3D, width:Number, depth:Number, height:Number) {
 			
@@ -56,7 +56,7 @@ package jiglib.geometry {
 		
 		private function initPoint():void {
 			var halfSide:JNumber3D = getHalfSideLengths();
-			_points = new Array();
+			_points = [];
 			_points[0] = new JNumber3D(halfSide.x, -halfSide.y, halfSide.z);
 			_points[1] = new JNumber3D(halfSide.x, halfSide.y, halfSide.z);
 			_points[2] = new JNumber3D(-halfSide.x, -halfSide.y, halfSide.z);
@@ -110,7 +110,7 @@ package jiglib.geometry {
 		
 		public function getCornerPoints(state:PhysicsState):Array {
 			var vertex:JNumber3D;
-			var arr:Array = new Array();
+			var arr:Array = [];
 			var transform:JMatrix3D=JMatrix3D.multiply(JMatrix3D.translationMatrix(state.position.x, state.position.y, state.position.z), state.orientation);
 			for (var i:String in _points) {
 				vertex = new JNumber3D(_points[i].x, _points[i].y, _points[i].z);
@@ -182,7 +182,7 @@ package jiglib.geometry {
 		}
 		
 		public function getSupportVertices(axis:JNumber3D):Array {
-			var vertices:Array = new Array();
+			var vertices:Array = [];
 			var d:Array = new Array(3);
 			var H:JNumber3D;
 			var temp:Array = currentState.orientation.getCols();

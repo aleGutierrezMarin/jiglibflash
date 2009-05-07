@@ -57,7 +57,7 @@ package jiglib.collision {
 			
 			var newPts:Array = box.getCornerPoints(box.currentState);
 			var oldPts:Array = box.getCornerPoints(box.oldState);
-			var collPts:Array = new Array();
+			var collPts:Array = [];
 			var cpInfo:CollPointInfo;
 			var newPt:JNumber3D;
 			var oldPt:JNumber3D;

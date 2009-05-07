@@ -154,7 +154,7 @@ package jiglib.collision {
 			var ClipperNormal:JNumber3D = JNumber3D.getNormal(Clipper[0], Clipper[1], Clipper[2]);
 			var clipper_d:Number = JNumber3D.dot(Clipper[0], ClipperNormal);
 			 
-			var temp:Array = new Array();
+			var temp:Array = [];
 			for (var i:String in CB) {
 				getPointFaceContacts(CB[i], ClipperNormal, clipper_d, temp, CA);
 			}
@@ -170,7 +170,8 @@ package jiglib.collision {
 			var N:JNumber3D;
 			var D:JNumber3D;
 			var temp:Array = axPolygonVertices.concat();
-			for (var ip1:int = 0; ip1 < axClipperVertices.length; i = ip1, ip1++) {
+			var len:int = axClipperVertices.length;
+			for (var ip1:int = 0; ip1 < len; i = ip1, ip1++) {
 				D = JNumber3D.sub(axClipperVertices[ip1], axClipperVertices[i]);
 				N = JNumber3D.cross(ClipperNormal, D);
 				var dis:Number = JNumber3D.dot(axClipperVertices[i], N);
@@ -184,7 +185,7 @@ package jiglib.collision {
 		}
 		
 		private function planeClip(A:Array, B:Array, xPlaneNormal:JNumber3D, PlaneD:Number):Boolean {
-			var bBack:Array = new Array();
+			var bBack:Array = [];
 			var bBackVerts:Boolean = false;
 			var bFrontVerts:Boolean = false;
 			
@@ -241,20 +242,20 @@ package jiglib.collision {
 			var dirs0Arr:Array = box0.currentState.orientation.getCols();
 			var dirs1Arr:Array = box1.currentState.orientation.getCols();
 			 
-			var axes:Array = new Array(dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
-			                           dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
-									   JNumber3D.cross(dirs1Arr[0], dirs0Arr[0]),
-									   JNumber3D.cross(dirs1Arr[0], dirs0Arr[1]),
-									   JNumber3D.cross(dirs1Arr[0], dirs0Arr[2]),
-									   JNumber3D.cross(dirs1Arr[1], dirs0Arr[0]),
-									   JNumber3D.cross(dirs1Arr[1], dirs0Arr[1]),
-									   JNumber3D.cross(dirs1Arr[1], dirs0Arr[2]),
-									   JNumber3D.cross(dirs1Arr[2], dirs0Arr[0]),
-									   JNumber3D.cross(dirs1Arr[2], dirs0Arr[1]),
-									   JNumber3D.cross(dirs1Arr[2], dirs0Arr[2]));
-									   
+			var axes:Array = [dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
+			                  dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
+							  JNumber3D.cross(dirs1Arr[0], dirs0Arr[0]),
+							  JNumber3D.cross(dirs1Arr[0], dirs0Arr[1]),
+							  JNumber3D.cross(dirs1Arr[0], dirs0Arr[2]),
+							  JNumber3D.cross(dirs1Arr[1], dirs0Arr[0]),
+							  JNumber3D.cross(dirs1Arr[1], dirs0Arr[1]),
+							  JNumber3D.cross(dirs1Arr[1], dirs0Arr[2]),
+							  JNumber3D.cross(dirs1Arr[2], dirs0Arr[0]),
+							  JNumber3D.cross(dirs1Arr[2], dirs0Arr[1]),
+							  JNumber3D.cross(dirs1Arr[2], dirs0Arr[2])];
+							
 			var l2:Number;
-			var overlapDepths:Array = new Array();
+			var overlapDepths:Array = [];
 			for (var i:String in axes) {
 				overlapDepths[i] = new Object();
 				overlapDepths[i].flag = false;
@@ -302,7 +303,7 @@ package jiglib.collision {
 		
 		private function boxEdgesCollDetect(info:CollDetectInfo, collArr:Array, box0:JBox, box1:JBox, N:JNumber3D, depth:Number, axis:int):void {
 			var contactPointsFromOld:Boolean = true;
-			var contactPoint:Array = new Array();
+			var contactPoint:Array = [];
 			combinationDist = 0.5 * Math.min(Math.min(box0.sideLengths.x, box0.sideLengths.y, box0.sideLengths.z), Math.min(box1.sideLengths.x, box1.sideLengths.y, box1.sideLengths.z));
 			combinationDist *= combinationDist;
 			
@@ -318,7 +319,7 @@ package jiglib.collision {
 			var bodyDeltaLen:Number = JNumber3D.dot(bodyDelta, N);
 			var oldDepth:Number = depth + bodyDeltaLen;
 			 
-			var collPts:Array = new Array();
+			var collPts:Array = [];
 			if (contactPoint.length > 0) {
 				var cpInfo:CollPointInfo;
 				for (var i:String in contactPoint) {
@@ -354,8 +355,8 @@ package jiglib.collision {
 		}
 		
 		private function boxSortCollDetect(info:CollDetectInfo, collArr:Array, box0:JBox, box1:JBox, N:JNumber3D, depth:Number):void {
-			var contactA:Array = new Array();
-			var contactB:Array = new Array();
+			var contactA:Array = [];
+			var contactB:Array = [];
 			var supportVertA:Array = box0.getSupportVertices(N);
 			var supportVertB:Array = box1.getSupportVertices(JNumber3D.multiply(N, -1));
 			var iNumVertsA:int = supportVertA.length;
@@ -407,7 +408,7 @@ package jiglib.collision {
 			}
 			
 			var cpInfo:CollPointInfo;
-			var collPts:Array = new Array();
+			var collPts:Array = [];
 			if (contactA.length > 0 && contactB.length > 0) {
 				var num:int = (contactA.length > contactB.length)?contactB.length:contactA.length;
 				for (var j:int = 0; j < num; j++ ) {

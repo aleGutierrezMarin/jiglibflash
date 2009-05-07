@@ -70,7 +70,7 @@ package jiglib.collision {
 		}
 		
 		public function removeAllCollisionBodys():void {
-			collBody = new Array();
+			collBody = [];
 		}
 		
 		public function detectCollisions(body:RigidBody, collArr:Array):void {
