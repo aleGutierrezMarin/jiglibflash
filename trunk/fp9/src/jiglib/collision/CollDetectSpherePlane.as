@@ -57,7 +57,7 @@ package jiglib.collision {
 				return;
 			}
 			
-			var collPts:Array = new Array();
+			var collPts:Array = [];
 			var cpInfo:CollPointInfo;
 			var depth:Number = sphere.radius - oldDist;
 			

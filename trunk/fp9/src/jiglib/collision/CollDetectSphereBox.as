@@ -66,7 +66,7 @@ package jiglib.collision {
 			var newDepth:Number = sphere.radius - newDist;
 			if (Math.max(oldDepth, newDepth) > -JConfig.collToll) {
 				var dir:JNumber3D;
-				var collPts:Array = new Array();
+				var collPts:Array = [];
 				if (oldDist < -JNumber3D.NUM_TINY) {
 					dir = JNumber3D.sub(JNumber3D.sub(oldBoxPoint.pos, sphere.oldState.position), oldBoxPoint.pos);
 					dir.normalize();

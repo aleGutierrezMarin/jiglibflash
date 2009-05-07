@@ -74,7 +74,7 @@ package jiglib.physics {
 			var allowedDistanceMid:Number = 0.005;
 			var allowedDistanceSide:Number = sidewaysSlack * hingeHalfWidth;
 			
-			sidePointConstraints = new Array();
+			sidePointConstraints = [];
 			sidePointConstraints[0] = new JConstraintMaxDistance(_body0, relPos0a, _body1, relPos1a, allowedDistanceSide);
 			sidePointConstraints[1] = new JConstraintMaxDistance(_body0, relPos0b, _body1, relPos1b, allowedDistanceSide);
 			

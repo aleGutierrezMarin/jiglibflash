@@ -3,6 +3,8 @@ package jiglib.cof {
 	public class JConfig {
 		public static var solverType:String = "ACCUMULATED"; //allowable value: FAST,NORMAL,ACCUMULATED
 		public static var boxCollisionsType:String = "EDGEBASE"; //allowable value: EDGEBASE or SORTBASE
+		public static var rotationType:String = "DEGREES"; // can be either RADIANS or DEGREES;
+		public static var limitVelocities:Boolean = false; // if limit the max value of body's velocity;
 		public static var allowedPenetration:Number = 0.0001; // How much penetration to allow
 		public static var collToll:Number = 0.005; // the tolerance for collision detection 
 		public static var damping:Number = 0.995;
@@ -14,6 +16,5 @@ package jiglib.cof {
 		public static var numPenetrationRelaxationTimesteps:Number = 7; // number of timesteps to resolve penetration over
 		public static var numCollisionIterations:Number = 4; // number of collision iterations
 		public static var numContactIterations:Number = 4; // number of contact iteratrions
-		public static var rotationType:String = "DEGREES"; // can be either RADIANS or DEGREES;
 	}
 }

@@ -65,7 +65,7 @@ package jiglib.physics {
 		
 		public static function getInstance():PhysicsSystem {
 	    	if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.32 (2009-4-22)");
+				trace("version: JigLibFlash v0.32 (2009-5-7)");
 			    _currentPhysicsSystem = new PhysicsSystem();
 		    }
 		    return _currentPhysicsSystem;
@@ -142,7 +142,7 @@ package jiglib.physics {
 		}
 		
 		public function removeAllBodys():void {
-			_bodies = new Array();
+			_bodies = [];
 			_collisionSystem.removeAllCollisionBodys();
 		}
 		
@@ -159,7 +159,7 @@ package jiglib.physics {
 		}
 		
 		public function removeAllConstraints():void {
-			_constraints = new Array();
+			_constraints = [];
 		}
 		
 		public function addController(controller:PhysicsController):void {
@@ -175,7 +175,7 @@ package jiglib.physics {
 		}
 		
 		public function removeAllControllers():void {
-			_controllers = new Array();
+			_controllers = [];
 		}
 		
 		public function setSolverType(type:String):void {
@@ -243,31 +243,32 @@ package jiglib.physics {
 			var approachScale:Number = 0;
 			var ptInfo:CollPointInfo;
 			var tempV:JNumber3D;
-			var ptNum:Number = Number(collision.pointInfo.length);
+			var ptNum:int = collision.pointInfo.length;
 			
 			if (ptNum > 1) {
 				var avR0:JNumber3D = new JNumber3D();
 				var avR1:JNumber3D = new JNumber3D();
 				var avDepth:Number = 0;
 				
-				for(var i:uint=0; i<ptNum; i++) {
+				for(var i:int=0; i<ptNum; i++) {
 					ptInfo=collision.pointInfo[i];
 					avR0 = JNumber3D.add(avR0, ptInfo.r0);
 					avR1 = JNumber3D.add(avR1, ptInfo.r1);
 					avDepth += ptInfo.initialPenetration;
 				}
-				avR0 = JNumber3D.divide(avR0, ptNum);
-				avR1 = JNumber3D.divide(avR1, ptNum);
+				avR0 = JNumber3D.divide(avR0, Number(ptNum));
+				avR1 = JNumber3D.divide(avR1, Number(ptNum));
 				avDepth /= ptNum;
 				 
-				collision.pointInfo = new Array();
+				collision.pointInfo = [];
 				collision.pointInfo[0] = new CollPointInfo();
 				collision.pointInfo[0].r0 = avR0;
 				collision.pointInfo[0].r1 = avR1;
 				collision.pointInfo[0].initialPenetration = avDepth;
 			}
 			 
-			for(i=0; i<collision.pointInfo.length; i++) {
+			var len:int = collision.pointInfo.length;
+			for (i = 0; i < len; i++) {
 				ptInfo=collision.pointInfo[i];
 				if(!body0.movable) {
 					ptInfo.denominator=0;
@@ -313,7 +314,8 @@ package jiglib.physics {
 			var approachScale:Number = 0;
 			var ptInfo:CollPointInfo;
 			var tempV:JNumber3D;
-			for(var i:uint=0; i<collision.pointInfo.length; i++) {
+			var len:int = collision.pointInfo.length;
+			for (var i:int = 0; i < len; i++) {
 				ptInfo=collision.pointInfo[i];
 				if(!body0.movable) {
 					ptInfo.denominator=0;
@@ -361,7 +363,8 @@ package jiglib.physics {
 			var ptInfo:CollPointInfo;
 			var approachScale:Number = 0;
 			
-			for(var i:uint=0; i<collision.pointInfo.length; i++) {
+			var len:int = collision.pointInfo.length;
+			for (var i:int = 0; i < len; i++) {
 				ptInfo = collision.pointInfo[i];
 				if(!body0.movable) {
 					ptInfo.denominator=0;
@@ -449,7 +452,8 @@ package jiglib.physics {
 			var Vr1:JNumber3D;
 			var ptInfo:CollPointInfo;
 			
-			for (var i:uint = 0; i < collision.pointInfo.length; i++) {
+			var len:int = collision.pointInfo.length;
+			for (var i:int = 0; i < len; i++) {
 				ptInfo = collision.pointInfo[i];
 				
 				Vr0 = body0.getVelocity(ptInfo.r0);
@@ -527,7 +531,8 @@ package jiglib.physics {
 			var Vr1:JNumber3D;
 			var ptInfo:CollPointInfo;
 			
-			for(var i:uint=0; i<collision.pointInfo.length; i++) {
+			var len:int = collision.pointInfo.length;
+			for (var i:int = 0; i < len; i++) {
 				ptInfo = collision.pointInfo[i];
 				 
 				Vr0 = body0.getVelocity(ptInfo.r0);
@@ -626,7 +631,7 @@ package jiglib.physics {
 		}
 		
 		private function updateContactCache():void {
-			_cachedContacts=new Array();
+			_cachedContacts = [];
 			var collInfo:CollisionInfo;
 			var ptInfo:CollPointInfo;
 			var fricImpulse:JNumber3D;
@@ -668,6 +673,7 @@ package jiglib.physics {
 			
 			var flag:Boolean;
 			var gotOne:Boolean;
+			var len:int;
 			for (var step:uint = 0; step < iter; step++) {
 				gotOne = false;
 				for(i in _collisions) {
@@ -689,15 +695,17 @@ package jiglib.physics {
 				}
 				tryToActivateAllFrozenObjects();
 				
-				if(forceInelastic) {
-			    	for (var j:uint = origNumCollisions; j < _collisions.length; j++) {
+				if (forceInelastic) {
+					len = _collisions.length;
+			    	for (var j:int = origNumCollisions; j < len; j++) {
 						_collisions[j].mat.restitution = 0;
 					    _collisions[j].satisfied = false;
 			    		preProcessContactFn(_collisions[j], dt);
 			    	}
 			    } else {
-			    	for (j = origNumCollisions; j < _collisions.length; j++) {
-			    		preProcessCollisionFn(_collisions[j],dt);
+					len = _collisions.length;
+			    	for (j = origNumCollisions; j < len; j++) {
+			    		preProcessCollisionFn(_collisions[j], dt);
 			    	}
 			    }
 			    origNumCollisions = _collisions.length;
@@ -713,11 +721,12 @@ package jiglib.physics {
 			}
 			body.setActive();
 			_activeBodies.push(body);
-			var orig_num:uint=_collisions.length;
+			var orig_num:int = _collisions.length;
 			_collisionSystem.detectCollisions(body, _collisions);
 			var other_body:RigidBody;
 			var thisBody_normal:JNumber3D;
-			for (var i:uint = orig_num; i < _collisions.length; i++) {
+			var len:int = _collisions.length;
+			for (var i:int = orig_num; i < len; i++) {
 				other_body=_collisions[i].objInfo.body0;
 				thisBody_normal=_collisions[i].dirToBody;
 				if (other_body == body) {
@@ -757,7 +766,7 @@ package jiglib.physics {
 			for(var i:String in _bodies) {
 				if(_bodies[i].isActive()) {
 					_bodies[i].doMovementActivations();
-					if(_bodies[i].collisions.length>0) {
+					if (_bodies[i].collisions.length > 0) {
 						for(var j:String in _bodies[i].collisions) {
 							other_body=_bodies[i].collisions[j].objInfo.body0;
 							if(other_body==_bodies[i]) {
@@ -818,9 +827,9 @@ package jiglib.physics {
 			updateAllPositions(dt);
 			
 			for(i in _bodies) {
-				_bodies[i].collisions=new Array();
+				_bodies[i].collisions = [];
 			}
-			_collisions=new Array();
+			_collisions = [];
 			_collisionSystem.detectAllCollisions(_activeBodies, _collisions);
 			
 			for(i in _activeBodies) {
@@ -837,7 +846,7 @@ package jiglib.physics {
 		}
 		 
 		private function findAllActiveBodies():void {
-			_activeBodies = new Array();
+			_activeBodies = [];
 			for (var i:String in _bodies) {
 				if (_bodies[i].isActive()) {
 					_activeBodies.push(_bodies[i]);
@@ -861,7 +870,9 @@ package jiglib.physics {
 			tryToFreezeAllObjects(dt);
 			activateAllFrozenObjectsLeftHanging();
 			 
-			//limitAllVelocities();
+			if (JConfig.limitVelocities) {
+				limitAllVelocities();
+			}
 			updateAllPositions(dt);
 			notifyAllPostPhysics(dt);
 			 

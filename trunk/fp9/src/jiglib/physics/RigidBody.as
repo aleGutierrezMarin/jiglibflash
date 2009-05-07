@@ -562,11 +562,12 @@ package jiglib.physics {
 			for (var i:int = 0; i < _bodiesToBeActivatedOnMovement.length; i++ ) {
 				PhysicsSystem.getInstance().activateObject(_bodiesToBeActivatedOnMovement[i]);
 			}
-			_bodiesToBeActivatedOnMovement = new Array();
+			_bodiesToBeActivatedOnMovement = [];
 		}
 		
 		public function addMovementActivation(pos:JNumber3D, otherBody:RigidBody):void {
-			for (var i:int = 0; i < _bodiesToBeActivatedOnMovement.length; i++ ) {
+			var len:int = _bodiesToBeActivatedOnMovement.length;
+			for (var i:int = 0; i < len; i++ ) {
 				if (_bodiesToBeActivatedOnMovement[i] == otherBody) {
 					return;
 				}

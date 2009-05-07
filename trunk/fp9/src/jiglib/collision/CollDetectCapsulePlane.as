@@ -50,7 +50,7 @@ package jiglib.collision {
 			var capsule:JCapsule = info.body0 as JCapsule;
 			var plane:JPlane = info.body1 as JPlane;
 			
-			var collPts:Array = new Array();
+			var collPts:Array = [];
 			var cpInfo:CollPointInfo;
 			
 			var oldPos:JNumber3D = capsule.getBottomPos(capsule.oldState);

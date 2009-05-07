@@ -95,7 +95,7 @@ package jiglib.vehicles {
 		
 		public function setSteer(wheels:Array,val:Number):void {
 			_destSteering = val;
-			_steerWheels = new Array();
+			_steerWheels = [];
 			for (var i:String in wheels) {
 				if (findWheel(wheels[i])) {
 					_steerWheels[wheels[i]] = _wheels[wheels[i]];
