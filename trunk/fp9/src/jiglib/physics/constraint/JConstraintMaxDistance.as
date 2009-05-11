@@ -52,6 +52,8 @@ package jiglib.physics.constraint {
 			_body1 = body1;
 			_body1Pos = body1Pos;
 			_maxDistance = maxDistance;
+			body0.addConstraint(this);
+			body1.addConstraint(this);
 		}
 		 
 		override public function preApply(dt:Number):void {

@@ -113,13 +113,13 @@ package
 			 
 			chain = new Array();
 			chainBody = new Array();
-			for (var i:int = 0; i < 8; i++)
+			for (var i:int = 0; i < 10; i++)
 			{
 				shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
 				shadeMateria.interactive = true;
 				chainBody[i] = physics.createSphere(shadeMateria, 20, 3, 2);
 				chainBody[i].skin.mesh.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
-				chainBody[i].moveTo(new JNumber3D( 0, 30 + (25 * i + 25), 0));
+				chainBody[i].moveTo(new JNumber3D( 0, 130 + (25 * i + 25), 0));
 				if (i > 0) {
 					//disable some collisions between adjacent pairs
 					chainBody[i].disableCollisions(chainBody[i - 1]);
@@ -127,12 +127,12 @@ package
 				vplObjects.addDisplayObject3D(chainBody[i].skin.mesh);
 			}
 			 
-			//var pos1:JNumber3D;
-			//var pos2:JNumber3D;
+			var pos1:JNumber3D;
+			var pos2:JNumber3D;
 			for (i = 1; i < chainBody.length; i++ )
 			{
-				//pos1 = JNumber3D.multiply(JNumber3D.UP, -chainBody[i - 1].boundingSphere);
-				//pos2 = JNumber3D.multiply(JNumber3D.UP, chainBody[i].boundingSphere);
+				pos1 = JNumber3D.multiply(JNumber3D.UP, -chainBody[i - 1].boundingSphere);
+				pos2 = JNumber3D.multiply(JNumber3D.UP, chainBody[i].boundingSphere);
 				//chain[i] = new JConstraintPoint(chainBody[i - 1], pos1, chainBody[i], pos2, 3, 0.01);
 				//chain[i] = new JConstraintMaxDistance(chainBody[i - 1], pos1, chainBody[i], pos2, 10);
 				
