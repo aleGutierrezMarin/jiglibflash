@@ -44,6 +44,7 @@ package jiglib.physics.constraint {
 			_body = body;
 			_pointOnBody = pointOnBody;
 			_worldPosition = worldPosition;
+			body.addConstraint(this);
 		}
 		
 		public function set worldPosition(pos:JNumber3D):void {
@@ -84,11 +85,11 @@ package jiglib.physics.constraint {
 			var tempV:JNumber3D = JNumber3D.cross(N, R);
 			JMatrix3D.multiplyVector(_body.worldInvInertia, tempV);
 			var denominator:Number = _body.invMass + JNumber3D.dot(N, JNumber3D.cross(R, tempV));
-			
+			 
 			if (denominator < JNumber3D.NUM_TINY) {
 				return false;
 			}
-			
+			 
 			var normalImpulse:Number = -normalVel / denominator;
 			
 			_body.applyWorldImpulse(JNumber3D.multiply(N, normalImpulse), worldPos);

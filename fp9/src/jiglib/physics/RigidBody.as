@@ -26,6 +26,7 @@ distribution.
 package jiglib.physics {
 	
 	import jiglib.cof.JConfig;
+	import jiglib.physics.constraint.JConstraint;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.JMatrix3D;
 	import jiglib.math.JNumber3D;
@@ -77,6 +78,7 @@ package jiglib.physics {
 		private var _useDegrees:Boolean;
 	     
 		private var _nonCollidables:Array;
+		private var _constraints:Array;
 		public var collisions:Array;
 		 
 	    public function RigidBody(skin:ISkin3D) {
@@ -108,6 +110,7 @@ package jiglib.physics {
 			_origMovable = true;
 			 
 			collisions = new Array();
+			_constraints = new Array();
 			_nonCollidables = new Array();
 			 
 			_storedPositionForActivation = new JNumber3D();
@@ -362,6 +365,31 @@ package jiglib.physics {
 			_velChanged = true;
 		}
 		
+		public function addConstraint(constraint:JConstraint):void {
+			if (!findConstraint(constraint)) {
+			    _constraints.push(constraint);
+			}
+		}
+		
+		public function removeConstraint(constraint:JConstraint):void {
+			if (findConstraint(constraint)) {
+			    _constraints.splice(_constraints.indexOf(constraint), 1);
+			}
+		}
+		
+		public function removeAllConstraints():void {
+			_constraints = [];
+		}
+		
+		private function findConstraint(constraint:JConstraint):Boolean {
+			for (var i:String in _constraints) {
+				if (constraint == _constraints[i]) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
 		public function updateVelocity(dt:Number):void {
 			if (!_movable || !_activity) {
 				return;
@@ -579,7 +607,10 @@ package jiglib.physics {
 		}
 		
 		public function setConstraintsAndCollisionsUnsatisfied():void {
-			for (var i:String in collisions) {
+			for (var i:String in _constraints) {
+				_constraints[i].satisfied = false;
+			}
+			for (i in collisions) {
 				collisions[i].satisfied = false;
 			}
 		}

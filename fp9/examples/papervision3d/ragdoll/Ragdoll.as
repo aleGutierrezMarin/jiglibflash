@@ -107,15 +107,15 @@ package {
 			
 			_joints = new Array();
 			// set up the hinge joints.
-			_joints["neck"] = new HingeJoint(_limbs["torso"], _limbs["head"], JNumber3D.RIGHT, new JNumber3D(0, 20, 0), 4, 20, 50, 0.4, 0.5);
-			_joints["shoulder_left"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_left"], JNumber3D.RIGHT, new JNumber3D(16, 20, 0), 4, 150, 10, 0.8, 0.5);
-			_joints["shoulder_right"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_right"], JNumber3D.RIGHT, new JNumber3D( -16, 20, 0), 4, 150, 10, 0.8, 0.5);
-			_joints["elbow_left"] = new HingeJoint(_limbs["upper_arm_left"], _limbs["lower_arm_left"], JNumber3D.RIGHT, new JNumber3D( 0, -10, 0), 4, 70, 0, 0.1, 0.5);
-			_joints["elbow_right"] = new HingeJoint(_limbs["upper_arm_right"], _limbs["lower_arm_right"], JNumber3D.RIGHT, new JNumber3D( 0, -10, 0), 4, 70, 0, 0.1, 0.5);
-			_joints["hip_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["torso"], JNumber3D.RIGHT, new JNumber3D(0, 15, 0), 4, 10, 70, 0.6, 0.5);
-			_joints["hip_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["torso"], JNumber3D.RIGHT, new JNumber3D(0, 15, 0), 4, 10, 70, 0.6, 0.5);
-			_joints["knee_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["lower_leg_left"], JNumber3D.RIGHT, new JNumber3D( 0, -15, 0), 4, 0, 50, 0.1, 0.5);
-			_joints["knee_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["lower_leg_right"], JNumber3D.RIGHT, new JNumber3D( 0, -15, 0), 4, 0, 50, 0.1, 0.5);
+			_joints["neck"] = new HingeJoint(_limbs["torso"], _limbs["head"], JNumber3D.RIGHT, new JNumber3D(0, 20, 0), 5, 20, 50, 0.4, 0.5);
+			_joints["shoulder_left"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_left"], JNumber3D.RIGHT, new JNumber3D(16, 20, 0), 5, 150, 10, 0.8, 0.5);
+			_joints["shoulder_right"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_right"], JNumber3D.RIGHT, new JNumber3D( -16, 20, 0), 5, 150, 10, 0.8, 0.5);
+			_joints["elbow_left"] = new HingeJoint(_limbs["upper_arm_left"], _limbs["lower_arm_left"], JNumber3D.RIGHT, new JNumber3D( 0, -10, 0), 5, 80, 0, 0.1, 0.5);
+			_joints["elbow_right"] = new HingeJoint(_limbs["upper_arm_right"], _limbs["lower_arm_right"], JNumber3D.RIGHT, new JNumber3D( 0, -10, 0), 5, 80, 0, 0.1, 0.5);
+			_joints["hip_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["torso"], JNumber3D.RIGHT, new JNumber3D(0, 15, 0), 5, 20, 130, 0.6, 0.5);
+			_joints["hip_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["torso"], JNumber3D.RIGHT, new JNumber3D(0, 15, 0), 5, 20, 130, 0.6, 0.5);
+			_joints["knee_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["lower_leg_left"], JNumber3D.RIGHT, new JNumber3D( 0, -15, 0), 5, 0, 70, 0.1, 0.5);
+			_joints["knee_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["lower_leg_right"], JNumber3D.RIGHT, new JNumber3D( 0, -15, 0), 5, 0, 70, 0.1, 0.5);
 		}
 		
 		public function get limbs():Array {

@@ -88,11 +88,11 @@
 		{
 			JConfig.limitVelocities = true;
 			JConfig.deactivationTime = 0.5;
-			JConfig.velThreshold = 0.8;
+			JConfig.velThreshold = 0.6;
 			JConfig.angVelThreshold = 10;
-			JConfig.posThreshold = 0.6;
-			JConfig.orientThreshold = 0.6;
-			JConfig.numPenetrationRelaxationTimesteps = 20;
+			JConfig.posThreshold = 0.2;
+			JConfig.orientThreshold = 0.4;
+			JConfig.numPenetrationRelaxationTimesteps = 10;
 			
 			physics = new Papervision3DPhysics(scene, 6);
 			
