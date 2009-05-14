@@ -87,7 +87,7 @@ package
 
 		private function initObject():void
 		{
-			JConfig.limitVelocities = true;
+			JConfig.limitLinVelocities = 200;
 			physics = new Papervision3DPhysics(scene, 8);
 			
 			shadeMateria = new FlatShadeMaterial(mylight, 0x77ee77);

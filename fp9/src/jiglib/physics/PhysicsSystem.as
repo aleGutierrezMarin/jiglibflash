@@ -65,7 +65,7 @@ package jiglib.physics {
 		
 		public static function getInstance():PhysicsSystem {
 	    	if (!_currentPhysicsSystem) {
-				trace("version: JigLibFlash v0.32 (2009-5-11)");
+				trace("version: JigLibFlash v0.32 (2009-5-14)");
 			    _currentPhysicsSystem = new PhysicsSystem();
 		    }
 		    return _currentPhysicsSystem;
@@ -661,9 +661,9 @@ package jiglib.physics {
 			
 			if(forceInelastic) {
 				for(var i:String in _collisions) {
+					preProcessContactFn(_collisions[i], dt);
 					_collisions[i].mat.restitution = 0;
 					_collisions[i].satisfied = false;
-					preProcessContactFn(_collisions[i], dt);
 				}
 			} else {
 				for(i in _collisions) {
@@ -870,9 +870,8 @@ package jiglib.physics {
 			tryToFreezeAllObjects(dt);
 			activateAllFrozenObjectsLeftHanging();
 			 
-			if (JConfig.limitVelocities) {
-				limitAllVelocities();
-			}
+			limitAllVelocities();
+			 
 			updateAllPositions(dt);
 			notifyAllPostPhysics(dt);
 			 

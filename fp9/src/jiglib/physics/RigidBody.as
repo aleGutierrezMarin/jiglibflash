@@ -400,15 +400,19 @@ package jiglib.physics {
 			JMatrix3D.multiplyVector(_worldInvInertia, rac);
 			_currState.rotVelocity = JNumber3D.add(_currState.rotVelocity, rac);
 			
-			_currState.linVelocity = JNumber3D.multiply(_currState.linVelocity, JConfig.damping);
-	    	_currState.rotVelocity = JNumber3D.multiply(_currState.rotVelocity, JConfig.damping);
+			var damping:Number = JConfig.damping;
+			_currState.linVelocity = JNumber3D.multiply(_currState.linVelocity, damping);
+	    	_currState.rotVelocity = JNumber3D.multiply(_currState.rotVelocity, damping);
 		}
 		 
 		public function updatePosition(dt:Number):void {
 			if (!_movable || !_activity) {
 				return;
 			}
-			 
+			
+			var angMomBefore:JNumber3D = _currState.rotVelocity.clone();
+			JMatrix3D.multiplyVector(_worldInertia, angMomBefore);
+			
 			_currState.position = JNumber3D.add(_currState.position, JNumber3D.multiply(_currState.linVelocity, dt));
 			
 			var dir:JNumber3D = _currState.rotVelocity.clone();
@@ -422,6 +426,9 @@ package jiglib.physics {
 				_worldInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.orientation, _bodyInertia), _invOrientation);
 				_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.orientation, _bodyInvInertia), _invOrientation);
 			}
+			
+			JMatrix3D.multiplyVector(_worldInvInertia, angMomBefore);
+			_currState.rotVelocity = angMomBefore.clone();
 		}
 		
 		public function updatePositionWithAux(dt:Number):void {
@@ -438,6 +445,9 @@ package jiglib.physics {
 				_currLinVelocityAux.copyFromArray(arr);
 			}
 			
+			var angMomBefore:JNumber3D = _currState.rotVelocity.clone();
+			JMatrix3D.multiplyVector(_worldInertia, angMomBefore);
+			
 			_currState.position = JNumber3D.add(_currState.position, JNumber3D.multiply(JNumber3D.add(_currState.linVelocity, _currLinVelocityAux), dt));
 			
 			var dir:JNumber3D = JNumber3D.add(_currState.rotVelocity, _currRotVelocityAux);
@@ -453,6 +463,9 @@ package jiglib.physics {
 			}
 			_currLinVelocityAux = JNumber3D.ZERO;
 			_currRotVelocityAux = JNumber3D.ZERO;
+			
+			JMatrix3D.multiplyVector(_worldInvInertia, angMomBefore);
+			_currState.rotVelocity = angMomBefore.clone();
 		}
 		
 		public function postPhysics(dt:Number):void {
@@ -468,10 +481,11 @@ package jiglib.physics {
 				return;
 			}
 			
+			var ot:Number = JConfig.orientThreshold;
 			var deltaMat:JMatrix3D = JMatrix3D.sub(_currState.orientation, _lastOrientationForDeactivation);
-			if (deltaMat.getCols()[0].modulo > JConfig.orientThreshold || 
-			    deltaMat.getCols()[1].modulo > JConfig.orientThreshold || 
-				deltaMat.getCols()[2].modulo > JConfig.orientThreshold) {
+			if (deltaMat.getCols()[0].modulo > ot || 
+			    deltaMat.getCols()[1].modulo > ot || 
+				deltaMat.getCols()[2].modulo > ot) {
 				
 				_lastOrientationForDeactivation.copy(_currState.orientation);
 				_inactiveTime = 0;
@@ -725,14 +739,16 @@ package jiglib.physics {
 		}
 		
 		public function limitVel():void {
-			_currState.linVelocity.x = JNumber3D.limiteNumber(_currState.linVelocity.x, -100, 100);
-			_currState.linVelocity.y = JNumber3D.limiteNumber(_currState.linVelocity.y, -100, 100);
-			_currState.linVelocity.z = JNumber3D.limiteNumber(_currState.linVelocity.z, -100, 100);
+			var maxValue:Number = JConfig.limitLinVelocities;
+			_currState.linVelocity.x = JNumber3D.limiteNumber(_currState.linVelocity.x, -maxValue, maxValue);
+			_currState.linVelocity.y = JNumber3D.limiteNumber(_currState.linVelocity.y, -maxValue, maxValue);
+			_currState.linVelocity.z = JNumber3D.limiteNumber(_currState.linVelocity.z, -maxValue, maxValue);
 		}
 		public function limitAngVel():void {
-			var fx:Number = Math.abs(_currState.rotVelocity.x) / 50;
-			var fy:Number = Math.abs(_currState.rotVelocity.y) / 50;
-			var fz:Number = Math.abs(_currState.rotVelocity.z) / 50;
+			var maxValue:Number = JConfig.limitAngVelocities;
+			var fx:Number = Math.abs(_currState.rotVelocity.x) / maxValue;
+			var fy:Number = Math.abs(_currState.rotVelocity.y) / maxValue;
+			var fz:Number = Math.abs(_currState.rotVelocity.z) / maxValue;
 			var f:Number = Math.max(fx, fy, fz);
 			if (f > 1) {
 				_currState.rotVelocity = JNumber3D.divide(_currState.rotVelocity, f);
