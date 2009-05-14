@@ -86,15 +86,16 @@
 
 		private function initObjects():void
 		{
-			JConfig.limitVelocities = true;
 			JConfig.deactivationTime = 0.5;
 			JConfig.velThreshold = 0.6;
-			JConfig.angVelThreshold = 10;
 			JConfig.posThreshold = 0.2;
 			JConfig.orientThreshold = 0.4;
-			JConfig.numPenetrationRelaxationTimesteps = 10;
+			JConfig.numCollisionIterations = 2;
+			JConfig.numContactIterations = 4;
+			JConfig.limitLinVelocities = 100;
+			JConfig.limitAngVelocities = 10;
 			
-			physics = new Papervision3DPhysics(scene, 6);
+			physics = new Papervision3DPhysics(scene, 8);
 			
 			shadeMateria = new FlatShadeMaterial(mylight, 0x77ee77);
 			var materiaList :MaterialsList = new MaterialsList();
