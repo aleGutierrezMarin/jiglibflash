@@ -88,6 +88,7 @@ package
 		private function initObject():void
 		{
 			JConfig.limitLinVelocities = 200;
+			JConfig.numContactIterations = 8;
 			physics = new Papervision3DPhysics(scene, 8);
 			
 			shadeMateria = new FlatShadeMaterial(mylight, 0x77ee77);
@@ -114,7 +115,7 @@ package
 			 
 			chain = new Array();
 			chainBody = new Array();
-			for (var i:int = 0; i < 10; i++)
+			for (var i:int = 0; i < 8; i++)
 			{
 				shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
 				shadeMateria.interactive = true;
