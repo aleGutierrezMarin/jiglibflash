@@ -56,6 +56,10 @@ package jiglib.plugin.away3d {
 			tr.swy = m.n42; 
 			tr.swz = m.n43; 
 			tr.tw = m.n44;
+			
+			var scale:Matrix3D = new Matrix3D();
+			scale.scaleMatrix(_mesh.scaleX, _mesh.scaleY, _mesh.scaleZ);
+			tr.multiply(tr, scale);
 			_mesh.transform = tr;
 		}
 		
