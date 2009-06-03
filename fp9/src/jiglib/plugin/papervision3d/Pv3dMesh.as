@@ -56,6 +56,9 @@ package jiglib.plugin.papervision3d {
 			tr.n42 = m.n42; 
 			tr.n43 = m.n43; 
 			tr.n44 = m.n44;
+			
+			var scale:Matrix3D = Matrix3D.scaleMatrix(do3d.scaleX, do3d.scaleY, do3d.scaleZ);
+			tr = Matrix3D.multiply(tr, scale);
 			do3d.transform = tr;
 		}
 		
