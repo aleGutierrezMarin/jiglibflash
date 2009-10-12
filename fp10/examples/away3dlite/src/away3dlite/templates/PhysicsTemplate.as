@@ -15,8 +15,8 @@ package away3dlite.templates
 	/**
 	 * Physics Template
 	 * 
- 	 * @see http://away3d.googlecode.com/svn/branches/JigLibLite/src
- 	 * @see http://away3d.googlecode.com/svn/trunk/fp10/Examples/JigLibLite
+ 	 * @see http://away3d.googlecode.com/svn/trunk/fp10/Away3DLite/src
+	 * @see http://jiglibflash.googlecode.com/svn/trunk/fp10/src
  	 * 
 	 * @author katopz
 	 */
