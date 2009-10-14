@@ -15,29 +15,31 @@
 		private var stepTime:int;
 		private var speed:Number;
 		private var deltaTime:Number = 0;
+		private var physicsSystem:PhysicsSystem;
 		
 		public function AbstractPhysics(speed:Number = 5) {
 			this.speed = speed;
 			initTime = getTimer();
+			physicsSystem = PhysicsSystem.getInstance();
 		}
 		
 		public function addBody(body:RigidBody):void {
-			PhysicsSystem.getInstance().addBody(body as RigidBody);
+			physicsSystem.addBody(body as RigidBody);
 		}
 		
 		public function removeBody(body:RigidBody):void {
-			PhysicsSystem.getInstance().removeBody(body as RigidBody);
+			physicsSystem.removeBody(body as RigidBody);
 		}
 		
 		public function get engine():PhysicsSystem {
-			return PhysicsSystem.getInstance();
+			return physicsSystem;
 		}
 		
 		public function step():void {
 			stepTime = getTimer();
 	        deltaTime = ((stepTime - initTime) / 1000) * speed;
 	        initTime = stepTime;
-	        PhysicsSystem.getInstance().integrate(deltaTime);
+	        physicsSystem.integrate(deltaTime);
 		}
 	}
 }
