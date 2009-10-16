@@ -83,13 +83,17 @@ package jiglib.math
 			var vx:Number = v.x;
 			var vy:Number = v.y;
 			var vz:Number = v.z;
+
+			if (vx == 0 && vy == 0 && vz == 0) { return; }
+			
 			var _rawData:Vector.<Number> =  matrix3D.rawData;
 			
 			v.x = vx * _rawData[0] + vy * _rawData[4] + vz * _rawData[8]  + _rawData[12];
 			v.y = vx * _rawData[1] + vy * _rawData[5] + vz * _rawData[9]  + _rawData[13];
 			v.z = vx * _rawData[2] + vy * _rawData[6] + vz * _rawData[10] + _rawData[14];
-			
+		
 			v = matrix3D.transformVector(v);
+			
 		}
 	}
 }

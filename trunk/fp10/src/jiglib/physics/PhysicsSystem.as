@@ -435,6 +435,9 @@ package jiglib.physics
 			var tempV:Vector3D;
 			var ptInfo:CollPointInfo;
 			var approachScale:Number = 0;
+			var numTiny:Number = JNumber3D.NUM_TINY;
+			var allowedPenetration:Number = JConfig.allowedPenetration;
+			
 
 			var len:int = collision.pointInfo.length;
 			for (var i:int = 0; i < len; i++)
@@ -457,26 +460,26 @@ package jiglib.physics
 					JMatrix3D.multiplyVector(body1.worldInvInertia, tempV);
 					ptInfo.denominator += (body1.invMass + N.dotProduct(tempV.crossProduct(ptInfo.r1)));
 				}
-				if (ptInfo.denominator < JNumber3D.NUM_TINY)
+				if (ptInfo.denominator < numTiny)
 				{
-					ptInfo.denominator = JNumber3D.NUM_TINY;
+					ptInfo.denominator = numTiny;
 				}
-				if (ptInfo.initialPenetration > JConfig.allowedPenetration)
+				if (ptInfo.initialPenetration > allowedPenetration)
 				{
-					ptInfo.minSeparationVel = (ptInfo.initialPenetration - JConfig.allowedPenetration) / timescale;
+					ptInfo.minSeparationVel = (ptInfo.initialPenetration -allowedPenetration) / timescale;
 				}
 				else
 				{
-					approachScale = -0.1 * (ptInfo.initialPenetration - JConfig.allowedPenetration) / JConfig.allowedPenetration;
-					if (approachScale < JNumber3D.NUM_TINY)
+					approachScale = -0.1 * (ptInfo.initialPenetration - allowedPenetration) / allowedPenetration;
+					if (approachScale < numTiny)
 					{
-						approachScale = JNumber3D.NUM_TINY;
+						approachScale = numTiny;
 					}
 					else if (approachScale > 1)
 					{
 						approachScale = 1;
 					}
-					ptInfo.minSeparationVel = approachScale * (ptInfo.initialPenetration - JConfig.allowedPenetration) / Math.max(dt, JNumber3D.NUM_TINY);
+					ptInfo.minSeparationVel = approachScale * (ptInfo.initialPenetration - allowedPenetration) / Math.max(dt, numTiny);
 				}
 
 				ptInfo.accumulatedNormalImpulse = 0;
@@ -1018,7 +1021,7 @@ package jiglib.physics
 		private function findAllActiveBodies():void
 		{
 			_activeBodies = new Vector.<RigidBody>();
-			//var i:int = 0;
+		
 			for each (var _body:RigidBody in _bodies)
 			{
 				if (_body.isActive)

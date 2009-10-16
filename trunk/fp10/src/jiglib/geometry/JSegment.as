@@ -494,19 +494,20 @@ package jiglib.geometry
 
 		private function sqrDistanceLine(out:Object, rkLine:JRay, rkBox:JBox, boxState:PhysicsState):Number
 		{
+			var orientationCols:Vector.<Vector3D> = boxState.orientationCols;
 			out.num = 0;
 			out.num0 = 0;
 			out.num1 = 0;
 			out.num2 = 0;
 
 			var kDiff:Vector3D = rkLine.origin.subtract(boxState.position);
-			var kPnt:Vector3D = new Vector3D(kDiff.dotProduct(boxState.getOrientationCols()[0]),
-				kDiff.dotProduct(boxState.getOrientationCols()[1]),
-				kDiff.dotProduct(boxState.getOrientationCols()[2]));
+			var kPnt:Vector3D = new Vector3D(kDiff.dotProduct(orientationCols[0]),
+				kDiff.dotProduct(orientationCols[1]),
+				kDiff.dotProduct(orientationCols[2]));
 
-			var kDir:Vector3D = new Vector3D(rkLine.dir.dotProduct(boxState.getOrientationCols()[0]),
-				rkLine.dir.dotProduct(boxState.getOrientationCols()[1]),
-				rkLine.dir.dotProduct(boxState.getOrientationCols()[2]));
+			var kDir:Vector3D = new Vector3D(rkLine.dir.dotProduct(orientationCols[0]),
+				rkLine.dir.dotProduct(orientationCols[1]),
+				rkLine.dir.dotProduct(orientationCols[2]));
 
 			var kPntArr:Array = JNumber3D.toArray(kPnt);
 			var kDirArr:Array = JNumber3D.toArray(kDir);
@@ -610,11 +611,11 @@ package jiglib.geometry
 
 		private function sqrDistancePoint(out:Object, rkPoint:Vector3D, rkBox:JBox, boxState:PhysicsState):Number
 		{
-
+			var orientationVector:Vector.<Vector3D> = boxState.orientationCols;
 			var kDiff:Vector3D = rkPoint.subtract(boxState.position);
-			var kClosest:Vector3D = new Vector3D(kDiff.dotProduct(boxState.getOrientationCols()[0]),
-				kDiff.dotProduct(boxState.getOrientationCols()[1]),
-				kDiff.dotProduct(boxState.getOrientationCols()[2]));
+			var kClosest:Vector3D = new Vector3D(kDiff.dotProduct(orientationVector[0]),
+				kDiff.dotProduct(orientationVector[1]),
+				kDiff.dotProduct(orientationVector[2]));
 
 			var fSqrDistance:Number = 0;
 			var fDelta:Number;
