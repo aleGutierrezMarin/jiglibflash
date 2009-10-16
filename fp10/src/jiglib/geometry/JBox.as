@@ -91,9 +91,9 @@ package jiglib.geometry
 		public function getSpan(axis:Vector3D):SpanData
 		{
 			var obj:SpanData = new SpanData();
-			var s:Number = Math.abs(axis.dotProduct(currentState.getOrientationCols()[0])) * (0.5 * _sideLengths.x);
-			var u:Number = Math.abs(axis.dotProduct(currentState.getOrientationCols()[1])) * (0.5 * _sideLengths.y);
-			var d:Number = Math.abs(axis.dotProduct(currentState.getOrientationCols()[2])) * (0.5 * _sideLengths.z);
+			var s:Number = Math.abs(axis.dotProduct(currentState.orientationCols[0])) * (0.5 * _sideLengths.x);
+			var u:Number = Math.abs(axis.dotProduct(currentState.orientationCols[1])) * (0.5 * _sideLengths.y);
+			var d:Number = Math.abs(axis.dotProduct(currentState.orientationCols[2])) * (0.5 * _sideLengths.z);
 			var r:Number = s + u + d;
 			var p:Number = currentState.position.dotProduct(axis);
 			obj.min = p - r;
@@ -181,7 +181,7 @@ package jiglib.geometry
 			var dirVec:Vector3D;
 			for (var dir:int; dir < 3; dir++)
 			{
-				dirVec = currentState.getOrientationCols()[dir].clone();
+				dirVec = currentState.orientationCols[dir].clone();
 				dirVec.normalize();
 				if (Math.abs(dirVec.dotProduct(p)) > JNumber3D.toArray(h)[dir] + JNumber3D.NUM_TINY)
 				{
@@ -269,14 +269,19 @@ package jiglib.geometry
 			var t:Number;
 			var t1:Number;
 			var t2:Number;
+			
+			var orientationCol:Vector.<Vector3D> = state.orientationCols;
+			var directionVectorArray:Array = JNumber3D.toArray(h);
+			var directionVectorNumber:Number;
 			for (dir = 0; dir < 3; dir++)
 			{
-				e = state.getOrientationCols()[dir].dotProduct(p);
-				f = state.getOrientationCols()[dir].dotProduct(seg.delta);
+				directionVectorNumber = directionVectorArray[dir];
+				e = orientationCol[dir].dotProduct(p);
+				f = orientationCol[dir].dotProduct(seg.delta);
 				if (Math.abs(f) > JNumber3D.NUM_TINY)
 				{
-					t1 = (e + JNumber3D.toArray(h)[dir]) / f;
-					t2 = (e - JNumber3D.toArray(h)[dir]) / f;
+					t1 = (e + directionVectorNumber) / f;
+					t2 = (e - directionVectorNumber) / f;
 					if (t1 > t2)
 					{
 						t = t1;
@@ -298,7 +303,7 @@ package jiglib.geometry
 					if (max < 0)
 						return false;
 				}
-				else if (-e - JNumber3D.toArray(h)[dir] > 0 || -e + JNumber3D.toArray(h)[dir] < 0)
+				else if (-e - directionVectorNumber > 0 || -e + directionVectorNumber < 0)
 				{
 					return false;
 				}
@@ -316,23 +321,22 @@ package jiglib.geometry
 			}
 			if (frac < 0)
 				frac = 0;
-			if (frac > 1)
-				frac = 1;
+			/*if (frac > 1)
+				frac = 1;*/
 			if (frac > 1 - JNumber3D.NUM_TINY)
 			{
 				return false;
 			}
 			out.fracOut = frac;
 			out.posOut = seg.getPoint(frac);
-			if (state.getOrientationCols()[dir].dotProduct(seg.delta) < 0)
+			if (orientationCol[dir].dotProduct(seg.delta) < 0)
 			{
-				out.normalOut = JNumber3D.getScaleVector(state.getOrientationCols()[dir], -1);
+				out.normalOut = JNumber3D.getScaleVector(orientationCol[dir], -1);
 			}
 			else
 			{
 				out.normalOut = state.getOrientationCols()[dir];
 			}
-			out.normalOut.normalize();
 			return true;
 		}
 

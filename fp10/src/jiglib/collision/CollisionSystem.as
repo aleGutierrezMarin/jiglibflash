@@ -111,8 +111,13 @@ package jiglib.collision
 		{
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
+			var bodyID:int;
+			var bodyType:String;
+			
 			for each (var _body:RigidBody in bodies)
 			{
+				bodyID = _body.id;
+				bodyType = _body.type;
 				for each (var _collBody:RigidBody in collBody)
 				{
 					if (_body == _collBody)
@@ -120,12 +125,12 @@ package jiglib.collision
 						continue;
 					}
 
-					if (_collBody.isActive && _body.id > _collBody.id)
+					if (_collBody.isActive && bodyID > _collBody.id)
 					{
 						continue;
 					}
 
-					if (checkCollidables(_body, _collBody) && detectionFunctors[_body.type][_collBody.type] != undefined)
+					if (checkCollidables(_body, _collBody) && detectionFunctors[bodyType][_collBody.type] != undefined)
 					{
 						info = new CollDetectInfo();
 						info.body0 = _body;

@@ -25,6 +25,7 @@
 
 package jiglib.collision
 {
+	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
 	import jiglib.cof.JConfig;
@@ -39,7 +40,7 @@ package jiglib.collision
 	{
 		private const MAX_SUPPORT_VERTS:Number = 10;
 		private var combinationDist:Number;
-
+		
 		public function CollDetectBoxBox()
 		{
 			name = "BoxBox";
@@ -51,24 +52,28 @@ package jiglib.collision
 		{
 			var obj0:SpanData = box0.getSpan(axis);
 			var obj1:SpanData = box1.getSpan(axis);
-
-			if (obj0.min > (obj1.max + JConfig.collToll + JNumber3D.NUM_TINY) || obj1.min > (obj0.max + JConfig.collToll + JNumber3D.NUM_TINY))
+			var obj0Min:Number = obj0.min;
+			var obj0Max:Number = obj0.max;
+			var obj1Min:Number = obj1.min;
+			var obj1Max:Number = obj1.max;
+			
+			if (obj0Min > (obj1Max + JConfig.collToll + JNumber3D.NUM_TINY) || obj1Min > (obj0Max + JConfig.collToll + JNumber3D.NUM_TINY))
 			{
 				out.flag = true;
 				return true;
 			}
-			if ((obj0.max > obj1.max) && (obj1.min > obj0.min))
+			if ((obj0Max > obj1Max) && (obj1Min > obj0Min))
 			{
-				out.depth = Math.min(obj0.max - obj1.min, obj1.max - obj0.min);
+				out.depth = Math.min(obj0Max - obj1Min, obj1Max - obj0Min);
 			}
-			else if ((obj1.max > obj0.max) && (obj0.min > obj1.min))
+			else if ((obj1Max > obj0Max) && (obj0Min > obj1Min))
 			{
-				out.depth = Math.min(obj1.max - obj0.min, obj0.max - obj1.min);
+				out.depth = Math.min(obj1Max - obj0Min, obj0Max - obj1Min);
 			}
 			else
 			{
-				out.depth = Math.min(obj0.max, obj1.max);
-				out.depth -= Math.max(obj0.min, obj1.min);
+				out.depth = Math.min(obj0Max, obj1Max);
+				out.depth -= Math.max(obj0Min, obj1Min);
 			}
 			out.flag = false;
 			return false;
@@ -291,10 +296,13 @@ package jiglib.collision
 				return;
 			}
 
-			var dirs0Arr:Vector.<Vector3D> = box0.currentState.getOrientationCols();
-			var dirs1Arr:Vector.<Vector3D> = box1.currentState.getOrientationCols();
-
-			var axes:Vector.<Vector3D> = Vector.<Vector3D>([dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
+			var numTiny:Number = JNumber3D.NUM_TINY;
+			var numHuge:Number = JNumber3D.NUM_HUGE;
+			
+			var dirs0Arr:Vector.<Vector3D> = box0.currentState.orientationCols;
+			var dirs1Arr:Vector.<Vector3D> = box1.currentState.orientationCols;
+			
+			 var axes:Vector.<Vector3D> = Vector.<Vector3D>([dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
 				dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
 				dirs0Arr[0].crossProduct(dirs1Arr[0]),
 				dirs0Arr[1].crossProduct(dirs1Arr[0]),
@@ -305,17 +313,20 @@ package jiglib.collision
 				dirs0Arr[0].crossProduct(dirs1Arr[2]),
 				dirs0Arr[1].crossProduct(dirs1Arr[2]),
 				dirs0Arr[2].crossProduct(dirs1Arr[2])]);
+				
 
 			var l2:Number;
 			var overlapDepths:Vector.<SpanData> = new Vector.<SpanData>();
 			var i:uint = 0;
-			for (i = 0; i < axes.length; i++)
+			var axesLength:int = axes.length;
+
+			for (i = 0; i < axesLength; i++)
 			{
 				var _overlapDepth:SpanData = overlapDepths[i] = new SpanData();
-				_overlapDepth.depth = JNumber3D.NUM_HUGE;
+				_overlapDepth.depth = numHuge;
 
 				l2 = axes[i].lengthSquared;
-				if (l2 < JNumber3D.NUM_TINY)
+				if (l2 < numTiny)
 				{
 					continue;
 				}
@@ -327,13 +338,13 @@ package jiglib.collision
 				}
 			}
 
-			var minDepth:Number = JNumber3D.NUM_HUGE;
+			var minDepth:Number = numHuge;
 			var minAxis:int = -1;
-
-			for (i = 0; i < axes.length; i++)
+			axesLength = axes.length;
+			for (i = 0; i < axesLength; i++)
 			{
 				l2 = axes[i].lengthSquared;
-				if (l2 < JNumber3D.NUM_TINY)
+				if (l2 < numTiny)
 				{
 					continue;
 				}
@@ -389,25 +400,27 @@ package jiglib.collision
 			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
 			if (contactPoints.length > 0)
 			{
+				var box0ReqPosition:Vector3D;
+				var box1ReqPosition:Vector3D;
 				var cpInfo:CollPointInfo;
+				
+				if (contactPointsFromOld)
+				{
+					box0ReqPosition = box0.oldState.position;
+					box1ReqPosition = box1.oldState.position;
+				}
+				{
+					box0ReqPosition = box0.currentState.position;
+					box1ReqPosition = box1.currentState.position;
+				}
+	
 				for each (var contactPoint:Vector3D in contactPoints)
 				{
-					if (contactPointsFromOld)
-					{
-						cpInfo = new CollPointInfo();
-						cpInfo.r0 = contactPoint.subtract( box0.oldState.position);
-						cpInfo.r1 = contactPoint.subtract( box1.oldState.position);
-						cpInfo.initialPenetration = oldDepth;
-						collPts.push(cpInfo);
-					}
-					else
-					{
-						cpInfo = new CollPointInfo();
-						cpInfo.r0 = contactPoint.subtract( box0.currentState.position);
-						cpInfo.r1 = contactPoint.subtract( box1.currentState.position);
-						cpInfo.initialPenetration = oldDepth;
-						collPts.push(cpInfo);
-					}
+					cpInfo = new CollPointInfo();
+					cpInfo.r0 = contactPoint.subtract( box0ReqPosition);
+					cpInfo.r1 = contactPoint.subtract( box1ReqPosition);
+					cpInfo.initialPenetration = oldDepth;
+					collPts.push(cpInfo);
 				}
 
 				var collInfo:CollisionInfo = new CollisionInfo();

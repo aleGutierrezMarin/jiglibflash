@@ -16,12 +16,10 @@
 		{
 			return [v.x, v.y, v.z];
 		}
-
+		
 		public static function getScaleVector(v:Vector3D, s:Number):Vector3D
 		{
-			var vector3D:Vector3D = v.clone();
-			vector3D.scaleBy(s);
-			return vector3D;
+			return new Vector3D(v.x*s,v.y*s,v.z*s,v.w);
 		}
 
 		public static function getDivideVector(v:Vector3D, w:Number):Vector3D
