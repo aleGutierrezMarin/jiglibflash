@@ -92,8 +92,6 @@
 			JConfig.orientThreshold = 0.4;
 			JConfig.numCollisionIterations = 2;
 			JConfig.numContactIterations = 4;
-			JConfig.limitLinVelocities = 100;
-			JConfig.limitAngVelocities = 10;
 			
 			physics = new Papervision3DPhysics(scene, 8);
 			

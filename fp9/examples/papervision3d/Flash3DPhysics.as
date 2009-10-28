@@ -70,11 +70,8 @@ package
 
 		private function init3D():void
 		{
-			JConfig.angVelThreshold = 5;
-			JConfig.posThreshold = 0.2;
-			JConfig.deactivationTime = 0.5;
 			JConfig.numCollisionIterations = 4;
-			JConfig.numContactIterations = 8;
+			JConfig.numContactIterations = 15;
 			
 			physics = new Papervision3DPhysics(scene, 8);
 			
@@ -95,12 +92,6 @@ package
 			ground.friction = 0.2;
 			ground.restitution = 0.8;
 			viewport.getChildLayer(physics.getMesh(ground)).layerIndex = 1;
-			
-			/*ground = physics.createGround(shadeMateria, 500, 0);
-			ground.friction = 0.2;
-			ground.restitution = 0.8;
-			viewport.getChildLayer(physics.getMesh(ground)).layerIndex = 1;
-			 */
 			 
 			var vplObjects:ViewportLayer = new ViewportLayer(viewport,null);
 			vplObjects.layerIndex = 2;
@@ -109,7 +100,7 @@ package
 			
 			ballBody = new Array();
 			var color:uint;
-			for (var i:int = 0; i < 3; i++)
+			for (var i:int = 0; i < 5; i++)
 			{
 				color = (i == 0)?0xff8888:0xeeee00;
 				shadeMateria = new FlatShadeMaterial(mylight, color);
@@ -121,23 +112,22 @@ package
 				vplObjects.addDisplayObject3D(ballBody[i].skin.mesh);
 			}
 			 
-			 
 			shadeMateria = new FlatShadeMaterial(mylight,0xeeee00);
 			shadeMateria.interactive = true;
 			materiaList = new MaterialsList();
 			materiaList.addMaterial(shadeMateria,"all");
 			boxBody=new Array();
-			for (i = 0; i < 3; i++)
+			for (i = 0; i < 5; i++)
 			{
-				boxBody[i] = physics.createCube(materiaList, 40, 40, 40);
+				boxBody[i] = physics.createCube(materiaList, 50, 40, 30);
 				boxBody[i].skin.mesh.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
-				boxBody[i].moveTo(new JNumber3D(0, 30 + (50 * i + 50), 0));
+				boxBody[i].moveTo(new JNumber3D(0, 50 + (50 * i + 50), 0));
 				vplObjects.addDisplayObject3D(boxBody[i].skin.mesh);
 			}
 			
 			var capsuleSkin:Cylinder;
 			capsuleBody = new Array();
-			for (i = 0; i < 3; i++)
+			for (i = 0; i < 5; i++)
 			{
 				capsuleSkin = new Cylinder(shadeMateria, 20, 50);
 				capsuleSkin.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);

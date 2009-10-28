@@ -83,7 +83,7 @@ package jiglib.geometry {
 			}
 		}
 		
-		override protected function updateState():void {	
+		override protected function updateState():void {
 			super.updateState();
 			_normal = new JNumber3D(0, 0, -1);
 			JMatrix3D.multiplyVector(_currState.orientation, _normal);

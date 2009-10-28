@@ -52,6 +52,7 @@ package jiglib.geometry {
 			_boundingSphere = 0.5 * _sideLengths.modulo;
 			initPoint();
 			mass = 1;
+			updateBoundingBox();
 		}
 		
 		private function initPoint():void {
@@ -73,8 +74,10 @@ package jiglib.geometry {
 			initPoint();
 			setInertia(getInertiaProperties(mass));
 			setActive();
+			updateBoundingBox();
 		}
 		 
+		//Returns the full side lengths
 		public function get sideLengths():JNumber3D {
 			return _sideLengths;
 		}
@@ -91,10 +94,12 @@ package jiglib.geometry {
 			return 2 * (_sideLengths.x * _sideLengths.y + _sideLengths.x * _sideLengths.z + _sideLengths.y * _sideLengths.z);
 		}
 		
+		// Returns the half-side lengths
 		public function getHalfSideLengths():JNumber3D {
 			return JNumber3D.multiply(_sideLengths, 0.5);
 		}
 		
+		// Gets the minimum and maximum extents of the box along the axis, relative to the centre of the box.
 		public function getSpan(axis:JNumber3D):Object {
 			var obj:Object = new Object();
 			var s:Number = Math.abs(JNumber3D.dot(axis, currentState.orientation.getCols()[0])) * (0.5 * _sideLengths.x);
@@ -108,6 +113,7 @@ package jiglib.geometry {
 			return obj;
 		}
 		
+		// Gets the corner points
 		public function getCornerPoints(state:PhysicsState):Array {
 			var vertex:JNumber3D;
 			var arr:Array = [];
@@ -163,6 +169,9 @@ package jiglib.geometry {
             return sqDistance;
 		}
 		
+		
+		// Returns the distance from the point to the box, (-ve if the
+		// point is inside the box), and optionally the closest point on the box.
 		public function getDistanceToPoint(state:PhysicsState, closestBoxPoint:Object, point:JNumber3D):Number {
 			return Math.sqrt(getSqDistanceToPoint(state, closestBoxPoint, point));
 		}
@@ -307,6 +316,11 @@ package jiglib.geometry {
 			inertiaTensor.n22 = (m / 12) * (_sideLengths.x * _sideLengths.x + _sideLengths.z * _sideLengths.z);
 			inertiaTensor.n33 = (m / 12) * (_sideLengths.x * _sideLengths.x + _sideLengths.y * _sideLengths.y);
 			return inertiaTensor;
+		}
+		
+		override protected function updateBoundingBox():void {
+			_boundingBox.clear();
+			_boundingBox.addBox(this);
 		}
 	}
 }

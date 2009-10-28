@@ -29,6 +29,7 @@ package jiglib.physics.constraint {
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 	
+	// Constraints a point on one body to be fixed to a point on another body
 	public class JConstraintMaxDistance extends JConstraint {
 		
 		private const _maxVelMag:Number = 20;

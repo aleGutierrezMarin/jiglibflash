@@ -56,6 +56,7 @@ package jiglib.vehicles {
 		private var _axisAngle:Number;
 		private var _displacement:Number;
 		private var _upSpeed:Number;
+		private var _rotDamping:Number;
 		
 		private var _locked:Boolean;
 		private var _lastDisplacement:Number;
@@ -81,6 +82,14 @@ package jiglib.vehicles {
 			_car = car;
 		}
 		
+		/*
+		 * pos: position relative to car, in car's space
+		 * axisUp: in car's space
+		 * spring: force per suspension offset
+		 * travel: suspension travel upwards
+		 * inertia: inertia about the axel
+		 * radius: wheel radius
+		 */
 		public function setup(pos:JNumber3D, axisUp:JNumber3D,
 		                      spring:Number=0, travel:Number=0, 
 							  inertia:Number=0, radius:Number=0,
@@ -100,10 +109,12 @@ package jiglib.vehicles {
 			reset();
 		}
 		
+		// power
 		public function addTorque(torque:Number):void {
 			_driveTorque += torque;
 		}
 		
+		// lock/unlock the wheel
 		public function setLock(lock:Boolean):void {
 			_locked = lock;
 		}
@@ -111,22 +122,27 @@ package jiglib.vehicles {
 		public function setSteerAngle(steer:Number):void {
 			_steerAngle = steer;
 		}
+		// get steering angle in degrees
 		public function getSteerAngle():Number {
 			return _steerAngle;
 		}
 		
+		// the basic origin position
 		public function getPos():JNumber3D {
 			return _pos;
 		}
+		// the suspension axis in the car's frame
 		public function getLocalAxisUp():JNumber3D {
 			return _axisUp;
 		}
 		public function getActualPos():JNumber3D {
 			return JNumber3D.add(_pos, JNumber3D.multiply(_axisUp, _displacement));
 		}
+		// wheel radius
 		public function getRadius():Number {
 			return _radius;
 		}
+		// the displacement along our up axis
 		public function getDisplacement():Number {
 			return _displacement;
 		}
@@ -136,10 +152,18 @@ package jiglib.vehicles {
 		public function getRollAngle():Number {
 			return 0.1 * _angVel * 180 / Math.PI;
 		}
+		public function setRotationDamping(vel:Number):void {
+			_rotDamping = vel;
+		}
+		public function getRotationDamping():Number {
+			return _rotDamping;
+		}
+		//if it's on the ground.
 		public function getOnFloor():Boolean {
 			return _lastOnFloor;
 		}
 		
+		// Adds the forces die to this wheel to the parent. Return value indicates if it's on the ground.
 		public function addForcesToCar(dt:Number):Boolean {
 			var force:JNumber3D = new JNumber3D();
 			_lastDisplacement = _displacement;
@@ -300,6 +324,7 @@ package jiglib.vehicles {
 			return true;
 		}
 		
+		// Updates the rotational state etc
 		public function update(dt:Number):void {
 			if (dt <= 0) {
 				return;
@@ -328,7 +353,7 @@ package jiglib.vehicles {
 				} else if(_angVel>100) {
 					_angVel = 100;
 				}
-				_angVel *= 0.99;
+				_angVel *= _rotDamping;
 				_axisAngle += (_angVel * dt * 180 / Math.PI);
 			}
 			
@@ -347,6 +372,7 @@ package jiglib.vehicles {
 			_lastDisplacement = 0;
 			_lastOnFloor = false;
 			_angVelForGrip = 0;
+			_rotDamping = 0.99;
 		}
 		
 	}

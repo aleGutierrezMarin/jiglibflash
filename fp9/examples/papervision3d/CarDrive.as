@@ -91,10 +91,10 @@
 			carBody.chassis.sideLengths = new JNumber3D(40, 20, 90);
 			physics.addBody(carBody.chassis);
 			 
-			carBody.setupWheel("WheelFL", new JNumber3D( -20, -10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelFR", new JNumber3D(20, -10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBL", new JNumber3D( -20, -10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBR", new JNumber3D(20, -10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFL", new JNumber3D( -20, -10, 25), 1.2, 1.2, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFR", new JNumber3D(20, -10, 25), 1.2, 1.2, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelBL", new JNumber3D( -20, -10, -25), 1.2, 1.2, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelBR", new JNumber3D(20, -10, -25), 1.2, 1.2, 3, 8, 0.4, 0.5, 2);
 			 
 			var shadeMateria:FlatShadeMaterial = new FlatShadeMaterial(mylight, 0x777777);
 			steerFL = carSkin.getChildByName( "WheelFL", true );

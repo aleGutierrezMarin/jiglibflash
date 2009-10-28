@@ -122,6 +122,7 @@ package jiglib.vehicles {
 			}
 		}
 		
+		// Update stuff at the end of physics
 		public function postPhysics(dt:Number):void {
 			for (var i:String in _wheels) {
 				_wheels[i].update(dt);

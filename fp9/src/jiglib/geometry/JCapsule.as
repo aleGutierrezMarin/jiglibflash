@@ -43,12 +43,14 @@ package jiglib.geometry{
 			_length = l;
 			_boundingSphere = getBoundingSphere(r, l);
 			mass = 1;
+			updateBoundingBox();
 		}
 		 
 		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = getBoundingSphere(_radius, _length);
 			setInertia(getInertiaProperties(mass));
+			updateBoundingBox();
 			setActive();
 		}
 		public function get radius():Number {
@@ -59,6 +61,7 @@ package jiglib.geometry{
 			_length = l;
 			_boundingSphere = getBoundingSphere(_radius, _length);
 			setInertia(getInertiaProperties(mass));
+			updateBoundingBox();
 			setActive();
 		}
 		public function get length():Number {
@@ -67,14 +70,12 @@ package jiglib.geometry{
 		 
 		public function getBottomPos(state:PhysicsState):JNumber3D {
 			var temp:JNumber3D = state.orientation.getCols()[1];
-			temp.normalize();
-			return JNumber3D.add(state.position, JNumber3D.multiply(temp, -_length / 2));
+			return JNumber3D.add(state.position, JNumber3D.multiply(temp, -_length / 2 - _radius));
 		}
 		 
 		public function getEndPos(state:PhysicsState):JNumber3D {
 			var temp:JNumber3D = state.orientation.getCols()[1];
-			temp.normalize();
-			return JNumber3D.add(state.position, JNumber3D.multiply(temp, _length / 2));
+			return JNumber3D.add(state.position, JNumber3D.multiply(temp, _length / 2 + _radius));
 		}
 		 
 		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
@@ -149,11 +150,16 @@ package jiglib.geometry{
 			 
 			return inertiaTensor;
 		}
-		
+		 
+		override protected function updateBoundingBox():void {
+			_boundingBox.clear();
+			_boundingBox.addCapsule(this);
+		}
+		 
 		private function getBoundingSphere(r:Number, l:Number):Number {
 			return Math.sqrt(Math.pow(l / 2, 2) + r * r) + r;
 		}
-		
+		 
 		private function getVolume():Number {
 			return (4 / 3) * Math.PI * _radius * _radius * _radius + _length * Math.PI * _radius * _radius;
 		}

@@ -32,7 +32,7 @@
 
 			super(800, 600, true, false, CameraType.TARGET);
 			
-			physics = new Papervision3DPhysics(scene, 1);
+			physics = new Papervision3DPhysics(scene, 10);
 			
 			for (var i:int = 0; i < 10; i++) {
 //				var sphere:RigidBody = physics.createSphere(new WireframeMaterial(0xffffff), 30, 6, 6);

@@ -28,6 +28,7 @@ package jiglib.physics.constraint {
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 	
+	// Constraints a point on one body to be fixed to a point on another body
 	public class JConstraintPoint extends JConstraint {
 		
 		private const _maxVelMag:Number = 20;
@@ -47,6 +48,10 @@ package jiglib.physics.constraint {
 		private var _worldPos:JNumber3D;
 		private var _vrExtra:JNumber3D;
 		
+		/// allowed_distance indicated how much the points are allowed to deviate.
+		/// timescale indicates the timescale over which deviation is eliminated
+		/// (suggest a few times dt - be careful if there's a variable timestep!)
+		/// if timescale < 0 then the value indicates the number of dts
 		public function JConstraintPoint(body0:RigidBody, body0Pos:JNumber3D, body1:RigidBody, body1Pos:JNumber3D, allowedDistance:Number = 1, timescale:Number = 1) {
 			super();
 			_body0 = body0;
