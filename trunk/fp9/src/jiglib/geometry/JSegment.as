@@ -27,6 +27,7 @@ package jiglib.geometry {
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsState;
 	
+	// A Segment is a line that starts at origin and goes only as far as (origin + delta).
 	public class JSegment {
 		
 		private var _origin:JNumber3D;

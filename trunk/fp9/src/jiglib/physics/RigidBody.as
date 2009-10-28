@@ -28,6 +28,7 @@ package jiglib.physics {
 	import jiglib.cof.JConfig;
 	import jiglib.physics.constraint.JConstraint;
 	import jiglib.geometry.JSegment;
+	import jiglib.geometry.JAABox;
 	import jiglib.math.JMatrix3D;
 	import jiglib.math.JNumber3D;
 	import jiglib.plugin.ISkin3D;
@@ -40,7 +41,8 @@ package jiglib.physics {
 		 
 		protected var _type:String;
 		protected var _boundingSphere:Number;
-		
+		protected var _boundingBox:JAABox;
+		 
 		protected var _currState:PhysicsState;
 		private var _oldState:PhysicsState;
 		private var _storeState:PhysicsState;
@@ -57,6 +59,11 @@ package jiglib.physics {
 		 
 		private var _force:JNumber3D;
 		private var _torque:JNumber3D;
+		
+		private var _linVelDamping:JNumber3D;
+		private var _rotVelDamping:JNumber3D;
+		private var _maxLinVelocities:Number;
+		private var _maxRotVelocities:Number;
 		 
 		private var _velChanged:Boolean;
 		private var _activity:Boolean;
@@ -64,11 +71,12 @@ package jiglib.physics {
 		private var _origMovable:Boolean;
 		private var _inactiveTime:Number;
 		 
+		// The list of bodies that need to be activated when we move away from our stored position
 		private var _bodiesToBeActivatedOnMovement:Array;
 		 
-		private var _storedPositionForActivation:JNumber3D;
-		private var _lastPositionForDeactivation:JNumber3D;
-		private var _lastOrientationForDeactivation:JMatrix3D;
+		private var _storedPositionForActivation:JNumber3D;// The position stored when we need to notify other bodies
+		private var _lastPositionForDeactivation:JNumber3D;// last position for when trying the deactivate
+		private var _lastOrientationForDeactivation:JMatrix3D;// last orientation for when trying to deactivate
 		 
 		private var _material:MaterialProperties;
 		 
@@ -81,7 +89,7 @@ package jiglib.physics {
 		private var _constraints:Array;
 		public var collisions:Array;
 		 
-	    public function RigidBody(skin:ISkin3D) {
+	    public function RigidBody(skin:ISkin3D = null) {
 			_useDegrees = (JConfig.rotationType == "DEGREES") ? true : false;
 			
 			_id = idCounter++;
@@ -101,6 +109,11 @@ package jiglib.physics {
 			 
 	    	_force = new JNumber3D();
 	    	_torque = new JNumber3D();
+			
+			_linVelDamping = new JNumber3D(0.995, 0.995, 0.995);
+			_rotVelDamping = new JNumber3D(0.995, 0.995, 0.995);
+			_maxLinVelocities = 500;
+			_maxRotVelocities = 50;
 	    	 
 			_velChanged = false;
 			_inactiveTime = 0;
@@ -120,6 +133,8 @@ package jiglib.physics {
 			
 			_type = "Object3D";
 			_boundingSphere = 0;
+			_boundingBox = new JAABox(JNumber3D.ZERO, JNumber3D.ZERO);
+			_boundingBox.clear();
 	    }
 	    
 	    private function radiansToDegrees(rad:Number):Number
@@ -242,6 +257,7 @@ package jiglib.physics {
 			_currState.linVelocity = JNumber3D.ZERO;
 			_currState.rotVelocity = JNumber3D.ZERO;
 			copyCurrentStateToOld();
+			updateBoundingBox();
 		}
 		 
 		public function setVelocity(vel:JNumber3D):void {
@@ -289,6 +305,7 @@ package jiglib.physics {
 			addWorldTorque(t);
 		}
 	     
+		// functions to add forces in the world coordinate frame
 	    public function addWorldForce(f:JNumber3D, p:JNumber3D):void {
 			if(!_movable) {
 				return;
@@ -299,6 +316,7 @@ package jiglib.physics {
 			setActive();
 	    }
 		 
+		// functions to add forces in the body coordinate frame
 		public function addBodyForce(f:JNumber3D, p:JNumber3D):void {
 			if(!_movable) {
 				return;
@@ -308,11 +326,13 @@ package jiglib.physics {
 			addWorldForce(f, JNumber3D.add(_currState.position, p));
 		}
 		 
+		// This just sets all forces etc to zero
 		public function clearForces():void {
 	    	_force = JNumber3D.ZERO;
 	        _torque = JNumber3D.ZERO;
 	    }
 		 
+		// functions to add impulses in the world coordinate frame
 		public function applyWorldImpulse(impulse:JNumber3D, pos:JNumber3D):void {
 			if(!_movable) {
 				return;
@@ -339,6 +359,7 @@ package jiglib.physics {
 			_velChanged = true;
 		}
 		
+		// functions to add impulses in the body coordinate frame
 		public function applyBodyWorldImpulse(impulse:JNumber3D, delta:JNumber3D):void {
 			if(!_movable) {
 				return;
@@ -381,6 +402,7 @@ package jiglib.physics {
 			_constraints = [];
 		}
 		
+		
 		private function findConstraint(constraint:JConstraint):Boolean {
 			for (var i:String in _constraints) {
 				if (constraint == _constraints[i]) {
@@ -390,6 +412,7 @@ package jiglib.physics {
 			return false;
 		}
 		
+		// implementation updates the velocity/angular rotation with the force/torque.
 		public function updateVelocity(dt:Number):void {
 			if (!_movable || !_activity) {
 				return;
@@ -399,12 +422,9 @@ package jiglib.physics {
 			var rac:JNumber3D = JNumber3D.multiply(_torque, dt);
 			JMatrix3D.multiplyVector(_worldInvInertia, rac);
 			_currState.rotVelocity = JNumber3D.add(_currState.rotVelocity, rac);
-			
-			var damping:Number = JConfig.damping;
-			_currState.linVelocity = JNumber3D.multiply(_currState.linVelocity, damping);
-	    	_currState.rotVelocity = JNumber3D.multiply(_currState.rotVelocity, damping);
 		}
 		 
+		// implementation updates the position/orientation with the current velocties. 
 		public function updatePosition(dt:Number):void {
 			if (!_movable || !_activity) {
 				return;
@@ -429,8 +449,11 @@ package jiglib.physics {
 			
 			JMatrix3D.multiplyVector(_worldInvInertia, angMomBefore);
 			_currState.rotVelocity = angMomBefore.clone();
+			
+			updateBoundingBox();
 		}
 		
+		// Updates the position with the auxiliary velocities, and zeros them
 		public function updatePositionWithAux(dt:Number):void {
 			if (!_movable || !_activity) {
 				_currLinVelocityAux = JNumber3D.ZERO;
@@ -466,11 +489,14 @@ package jiglib.physics {
 			
 			JMatrix3D.multiplyVector(_worldInvInertia, angMomBefore);
 			_currState.rotVelocity = angMomBefore.clone();
+			
+			updateBoundingBox();
 		}
 		
 		public function postPhysics(dt:Number):void {
 		}
 		 
+		// function provided for the use of Physics system
 		public function tryToFreeze(dt:Number):void {
 			if (!_movable || !_activity) {
 				return;
@@ -516,10 +542,12 @@ package jiglib.physics {
 			_worldInvInertia = JMatrix3D.multiply(JMatrix3D.multiply(_currState.orientation, _bodyInvInertia), _invOrientation);
 		}
 		
+		// for deactivation
 		public function isActive():Boolean {
 			return _activity;
 		}
 		
+		// prevent velocity updates etc 
 		public function get movable():Boolean {
 			return _movable;
 		}
@@ -560,14 +588,17 @@ package jiglib.physics {
 			}
 		}
 		
+		// Returns the velocity of a point at body-relative position
 		public function getVelocity(relPos:JNumber3D):JNumber3D {
 			return JNumber3D.add(_currState.linVelocity, JNumber3D.cross(relPos, _currState.rotVelocity));
 		}
 		
+		// As GetVelocity but just uses the aux velocities
 		public function getVelocityAux(relPos:JNumber3D):JNumber3D {
 			return JNumber3D.add(_currLinVelocityAux, JNumber3D.cross(relPos, _currRotVelocityAux));
 		}
 		
+		// indicates if the velocity is above the threshold for freezing
 		public function getShouldBeActive():Boolean {
 			return ((_currState.linVelocity.modulo > JConfig.velThreshold) || 
                     (_currState.rotVelocity.modulo > JConfig.angVelThreshold));
@@ -577,7 +608,23 @@ package jiglib.physics {
                     (_currRotVelocityAux.modulo > JConfig.angVelThreshold));
 		}
 		
+		// damp movement as the body approaches deactivation
 		public function dampForDeactivation():void {
+
+			_currState.linVelocity.x *= _linVelDamping.x;
+			_currState.linVelocity.y *= _linVelDamping.y;
+			_currState.linVelocity.z *= _linVelDamping.z;
+			_currState.rotVelocity.x *= _rotVelDamping.x;
+			_currState.rotVelocity.y *= _rotVelDamping.y;
+			_currState.rotVelocity.z *= _rotVelDamping.z;
+			
+			_currLinVelocityAux.x *= _linVelDamping.x;
+			_currLinVelocityAux.y *= _linVelDamping.y;
+			_currLinVelocityAux.z *= _linVelDamping.z;
+			_currRotVelocityAux.x *= _rotVelDamping.x;
+			_currRotVelocityAux.y *= _rotVelDamping.y;
+			_currRotVelocityAux.z *= _rotVelDamping.z;
+			
 			var r:Number = 0.5;
 			var frac:Number = _inactiveTime / JConfig.deactivationTime;
 			if (frac < r) {
@@ -595,6 +642,9 @@ package jiglib.physics {
 	    	_currState.rotVelocity = JNumber3D.multiply(_currState.rotVelocity, scale);
 		}
 		 
+		// function provided for use of physics system. Activates any
+		// body in its list if it's moved more than a certain distance,
+		// in which case it also clears its list.
 		public function doMovementActivations():void {
 			if (_bodiesToBeActivatedOnMovement.length == 0 || 
 			    JNumber3D.sub(_currState.position, _storedPositionForActivation).modulo < JConfig.posThreshold) 
@@ -607,6 +657,9 @@ package jiglib.physics {
 			_bodiesToBeActivatedOnMovement = [];
 		}
 		
+		// adds the other body to the list of bodies to be activated if
+		// this body moves more than a certain distance from either a
+		// previously stored position, or the position passed in.
 		public function addMovementActivation(pos:JNumber3D, otherBody:RigidBody):void {
 			var len:int = _bodiesToBeActivatedOnMovement.length;
 			for (var i:int = 0; i < len; i++ ) {
@@ -620,6 +673,7 @@ package jiglib.physics {
 			_bodiesToBeActivatedOnMovement.push(otherBody);
 		}
 		
+		// Marks all constraints/collisions as being unsatisfied
 		public function setConstraintsAndCollisionsUnsatisfied():void {
 			for (var i:String in _constraints) {
 				_constraints[i].satisfied = false;
@@ -635,6 +689,9 @@ package jiglib.physics {
 		
 		public function getInertiaProperties(m:Number):JMatrix3D {
 			return new JMatrix3D();
+		}
+		
+		protected function updateBoundingBox():void {
 		}
 		
 		public function hitTestObject3D(obj3D:RigidBody):Boolean {
@@ -669,6 +726,7 @@ package jiglib.physics {
 			}
 		}
 		
+		// copies the current position etc to old - normally called only by physicsSystem.
 		public function copyCurrentStateToOld():void {
 			_currState.position.copyTo(_oldState.position);
 			_oldState.orientation.copy(_currState.orientation);
@@ -676,6 +734,7 @@ package jiglib.physics {
 			_currState.rotVelocity.copyTo(_oldState.rotVelocity);
 		}
 		
+		// Copy our current state into the stored state
 		public function storeState():void {
 			_currState.position.copyTo(_storeState.position);
 			_storeState.orientation.copy(_currState.orientation);
@@ -683,6 +742,7 @@ package jiglib.physics {
 			_currState.rotVelocity.copyTo(_storeState.rotVelocity);
 		}
 		 
+		// restore from the stored state into our current state.
 		public function restoreState():void {
 			_storeState.position.copyTo(_currState.position);
 			_currState.orientation.copy(_storeState.orientation);
@@ -690,10 +750,12 @@ package jiglib.physics {
 			_storeState.rotVelocity.copyTo(_currState.rotVelocity);
 		}
 		 
+		// the "working" state
 		public function get currentState():PhysicsState {
 			return _currState;
 		}
 		 
+		// the previous state - copied explicitly using copyCurrentStateToOld
 		public function get oldState():PhysicsState {
 			return _oldState;
 		}
@@ -714,10 +776,20 @@ package jiglib.physics {
 			return _boundingSphere;
 		}
 		
+		public function get boundingBox():JAABox {
+			return _boundingBox;
+		}
+		
+		// force in world frame
 		public function get force():JNumber3D {
 			return _force;
 		}
-		 
+		
+		// torque in world frame
+		public function get torque():JNumber3D{
+			return _torque;
+		}
+		
 		public function get mass():Number {
 			return _mass;
 		}
@@ -726,10 +798,12 @@ package jiglib.physics {
 			return _invMass;
 		}
 		
+		// inertia tensor in world space
 		public function get worldInertia():JMatrix3D {
 			return _worldInertia;
 		}
 		
+		// inverse inertia in world frame
 		public function get worldInvInertia():JMatrix3D {
 			return _worldInvInertia;
 		}
@@ -738,17 +812,51 @@ package jiglib.physics {
 			return _nonCollidables;
 		}
 		
+		//every dimension should be set to 0-1;
+		public function set linVelocityDamping(vel:JNumber3D):void {
+			_linVelDamping.x = JNumber3D.limiteNumber(vel.x, 0, 1);
+			_linVelDamping.y = JNumber3D.limiteNumber(vel.y, 0, 1);
+			_linVelDamping.z = JNumber3D.limiteNumber(vel.z, 0, 1);
+		}
+		public function get linVelocityDamping():JNumber3D {
+			return _linVelDamping;
+		}
+		
+		//every dimension should be set to 0-1;
+		public function set rotVelocityDamping(vel:JNumber3D):void {
+			_rotVelDamping.x = JNumber3D.limiteNumber(vel.x, 0, 1);
+			_rotVelDamping.y = JNumber3D.limiteNumber(vel.y, 0, 1);
+			_rotVelDamping.z = JNumber3D.limiteNumber(vel.z, 0, 1);
+		}
+		public function get rotVelocityDamping():JNumber3D {
+			return _rotVelDamping;
+		}
+		
+		//limit the max value of body's line velocity
+		public function set maxLinVelocities(vel:Number):void {
+			_maxLinVelocities = JNumber3D.limiteNumber(Math.abs(vel), 0, 500);
+		}
+		public function get maxLinVelocities():Number {
+			return _maxLinVelocities;
+		}
+		
+		//limit the max value of body's angle velocity
+		public function set maxRotVelocities(vel:Number):void {
+			_maxRotVelocities = JNumber3D.limiteNumber(Math.abs(vel), JNumber3D.NUM_TINY, 50);
+		}
+		public function get maxRotVelocities():Number {
+			return _maxRotVelocities;
+		}
+		
 		public function limitVel():void {
-			var maxValue:Number = JConfig.limitLinVelocities;
-			_currState.linVelocity.x = JNumber3D.limiteNumber(_currState.linVelocity.x, -maxValue, maxValue);
-			_currState.linVelocity.y = JNumber3D.limiteNumber(_currState.linVelocity.y, -maxValue, maxValue);
-			_currState.linVelocity.z = JNumber3D.limiteNumber(_currState.linVelocity.z, -maxValue, maxValue);
+			_currState.linVelocity.x = JNumber3D.limiteNumber(_currState.linVelocity.x, -_maxLinVelocities, _maxLinVelocities);
+			_currState.linVelocity.y = JNumber3D.limiteNumber(_currState.linVelocity.y, -_maxLinVelocities, _maxLinVelocities);
+			_currState.linVelocity.z = JNumber3D.limiteNumber(_currState.linVelocity.z, -_maxLinVelocities, _maxLinVelocities);
 		}
 		public function limitAngVel():void {
-			var maxValue:Number = JConfig.limitAngVelocities;
-			var fx:Number = Math.abs(_currState.rotVelocity.x) / maxValue;
-			var fy:Number = Math.abs(_currState.rotVelocity.y) / maxValue;
-			var fz:Number = Math.abs(_currState.rotVelocity.z) / maxValue;
+			var fx:Number = Math.abs(_currState.rotVelocity.x) / _maxRotVelocities;
+			var fy:Number = Math.abs(_currState.rotVelocity.y) / _maxRotVelocities;
+			var fz:Number = Math.abs(_currState.rotVelocity.z) / _maxRotVelocities;
 			var f:Number = Math.max(fx, fy, fz);
 			if (f > 1) {
 				_currState.rotVelocity = JNumber3D.divide(_currState.rotVelocity, f);
@@ -763,6 +871,7 @@ package jiglib.physics {
 			}
 		}
 		
+		//update skin
 		public function updateObject3D():void {
 			if (_skin != null) {
 				var m:JMatrix3D = JMatrix3D.multiply(JMatrix3D.translationMatrix(_currState.position.x, _currState.position.y, _currState.position.z), _currState.orientation);
@@ -774,20 +883,22 @@ package jiglib.physics {
 			return _material;
 		}
 		
+		//coefficient of elasticity
 		public function get restitution():Number {
 			return _material.restitution;
 		}
 		
 		public function set restitution(restitution:Number):void {
-			_material.restitution = restitution;
+			_material.restitution = JNumber3D.limiteNumber(restitution, 0, 1);
 		}
 		
+		//coefficient of friction
 		public function get friction():Number {
 			return _material.friction;
 		}
 		
 		public function set friction(friction:Number):void {
-			_material.friction = friction;
+			_material.friction = JNumber3D.limiteNumber(friction, 0, 1);
 		}
 	}
 }

@@ -73,6 +73,7 @@ package jiglib.collision {
 			collBody = [];
 		}
 		
+		// Detects collisions between the body and all the registered collision bodies
 		public function detectCollisions(body:RigidBody, collArr:Array):void {
 			if (!body.isActive()) {
 				return;
@@ -80,7 +81,7 @@ package jiglib.collision {
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
 			 
-			for (var i:String in collBody) { 
+			for (var i:String in collBody) {
 				if (body != collBody[i] && checkCollidables(body, collBody[i]) && detectionFunctors[body.type][collBody[i].type] != undefined) {
 					info = new CollDetectInfo();
 					info.body0 = body;
@@ -91,6 +92,7 @@ package jiglib.collision {
 			}
 		}
 		
+		// Detects collisions between the all bodies
 		public function detectAllCollisions(bodies:Array, collArr:Array):void {
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
@@ -171,7 +173,7 @@ package jiglib.collision {
 			}
 			return false;
 		}
-		
+		 
 		private function checkCollidables(body0:RigidBody, body1:RigidBody):Boolean {
 			if (body0.nonCollidables.length == 0 && body1.nonCollidables.length == 0) {
 				return true;

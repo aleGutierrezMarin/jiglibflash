@@ -53,6 +53,11 @@ package jiglib.collision {
 			if (!sphere.hitTestObject3D(box)) {
 				return;
 			}
+			
+			if (JConfig.aabbDetection && !sphere.boundingBox.overlapTest(box.boundingBox)) {
+				return;
+			}
+			
 			var spherePos:JNumber3D = sphere.oldState.position;
 			var boxPos:JNumber3D = box.oldState.position;
 			

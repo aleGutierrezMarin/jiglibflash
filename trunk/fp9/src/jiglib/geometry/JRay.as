@@ -26,6 +26,7 @@ distribution.
 package jiglib.geometry {
 	import jiglib.math.*;
 	
+	// A Ray is just a line that extends in the +ve direction
 	public class JRay {
 		
 		public var origin:JNumber3D;

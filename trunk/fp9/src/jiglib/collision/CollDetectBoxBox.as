@@ -41,6 +41,7 @@ package jiglib.collision {
 			type1 = "BOX";
 		}
 		 
+		//Returns true if disjoint.  Returns false if intersecting
 		private function disjoint(out:Object, axis:JNumber3D, box0:JBox, box1:JBox):Boolean {
 			var obj0:Object = box0.getSpan(axis);
 			var obj1:Object = box1.getSpan(axis);
@@ -239,9 +240,14 @@ package jiglib.collision {
 				return;
 			}
 			 
+			if (JConfig.aabbDetection && !box0.boundingBox.overlapTest(box1.boundingBox)) {
+				return;
+			}
+			
 			var dirs0Arr:Array = box0.currentState.orientation.getCols();
 			var dirs1Arr:Array = box1.currentState.orientation.getCols();
 			 
+			// the 15 potential separating axes
 			var axes:Array = [dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
 			                  dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
 							  JNumber3D.cross(dirs1Arr[0], dirs0Arr[0]),
@@ -255,7 +261,11 @@ package jiglib.collision {
 							  JNumber3D.cross(dirs1Arr[2], dirs0Arr[2])];
 							
 			var l2:Number;
+			// the overlap depths along each axis
 			var overlapDepths:Array = [];
+			
+			// see if the boxes are separate along any axis, and if not keep a 
+			// record of the depths along each axis
 			for (var i:String in axes) {
 				overlapDepths[i] = new Object();
 				overlapDepths[i].flag = false;
@@ -271,6 +281,7 @@ package jiglib.collision {
 				}
 			}
 			 
+			// The box overlap, find the separation depth closest to 0.
 			var minDepth:Number = JNumber3D.NUM_HUGE;
 			var minAxis:int = -1;
 			
@@ -280,6 +291,7 @@ package jiglib.collision {
 					continue;
 				}
 				
+				// If this axis is the minimum, select it
 				if (overlapDepths[i].depth < minDepth) {
 					minDepth = overlapDepths[i].depth;
 					minAxis = int(i);
@@ -288,6 +300,8 @@ package jiglib.collision {
 			if (minAxis == -1) {
 				return;
 			}
+			
+			// Make sure the axis is facing towards the box0. if not, invert it
 			var N:JNumber3D = axes[minAxis].clone();
 			if (JNumber3D.dot(JNumber3D.sub(box1.currentState.position, box0.currentState.position), N) > 0) {
 				N = JNumber3D.multiply(N, -1);

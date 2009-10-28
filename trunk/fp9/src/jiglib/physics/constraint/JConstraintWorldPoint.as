@@ -29,6 +29,7 @@ package jiglib.physics.constraint {
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
 	
+	 // Constrains a point within a rigid body to remain at a fixed world point
 	public class JConstraintWorldPoint extends JConstraint {
 		
 		private const minVelForProcessing:Number = 0.001;
@@ -39,6 +40,7 @@ package jiglib.physics.constraint {
 		private var _pointOnBody:JNumber3D;
 		private var _worldPosition:JNumber3D;
 		
+		// pointOnBody is in body coords
 		public function JConstraintWorldPoint(body:RigidBody, pointOnBody:JNumber3D, worldPosition:JNumber3D) {
 			super();
 			_body = body;

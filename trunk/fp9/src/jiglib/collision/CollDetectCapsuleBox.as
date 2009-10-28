@@ -54,12 +54,15 @@ package jiglib.collision {
 			if (!capsule.hitTestObject3D(box)) {
 				return;
 			}
+			if (JConfig.aabbDetection && !capsule.boundingBox.overlapTest(box.boundingBox)) {
+				return;
+			}
 			
 			var collPts:Array = [];
 			var cpInfo:CollPointInfo;
 			
-			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], capsule.length));
-			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], capsule.length));
+			var oldSeg:JSegment = new JSegment(capsule.getEndPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], -capsule.length));
+			var newSeg:JSegment = new JSegment(capsule.getEndPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], -capsule.length));
 			var radius:Number = capsule.radius;
 			
 			var oldObj:Object = new Object();
@@ -99,9 +102,8 @@ package jiglib.collision {
 				collPts.push(cpInfo);
 			}
 			
-			
-			oldSeg = new JSegment(capsule.getEndPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], capsule.length));
-			newSeg = new JSegment(capsule.getEndPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], capsule.length));
+			oldSeg = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.multiply(capsule.oldState.orientation.getCols()[1], capsule.length));
+			newSeg = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.multiply(capsule.currentState.orientation.getCols()[1], capsule.length));
 			 
 			oldObj = new Object();
 			oldDistSq = oldSeg.segmentBoxDistanceSq(oldObj, box, box.oldState);

@@ -3,6 +3,7 @@
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import jiglib.cof.JConfig;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.RigidBody;
 	import jiglib.physics.constraint.JConstraintPoint;
@@ -38,6 +39,7 @@
 		{
 			super(stage.stageWidth, stage.stageHeight, true, true, CameraType.TARGET);
 			
+			JConfig.numContactIterations = 12;
 			physics = new Papervision3DPhysics(scene, 8);
 						
 			setupVPLayer();
@@ -94,6 +96,7 @@
 				vplObjects.addDisplayObject3D(physics.getMesh(sphere));
 				physics.getMesh(sphere).addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
 				sphere.mass = 5;
+				sphere.maxLinVelocities = 200;
 				sphere.currentState.position = (a == 0) ? new JNumber3D(-500, 200, 0) : JNumber3D.add(prevSphere.currentState.position, new JNumber3D(200, 0, 0));
 				
 				if(a != 0){
