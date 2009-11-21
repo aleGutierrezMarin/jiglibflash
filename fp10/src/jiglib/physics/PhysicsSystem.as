@@ -68,7 +68,7 @@ package jiglib.physics
 		{
 			if (!_currentPhysicsSystem)
 			{
-				trace("version: JigLibFlash v0.32 (2009-5-14)");
+				trace("version: JigLibFlash fp10 v0.34 (2009-11-21)");
 				_currentPhysicsSystem = new PhysicsSystem();
 			}
 			return _currentPhysicsSystem;
@@ -126,6 +126,7 @@ package jiglib.physics
 			}
 		}
 
+		// global gravity acceleration
 		public function get gravity():Vector3D
 		{
 			return _gravity;
@@ -141,6 +142,7 @@ package jiglib.physics
 			return _bodies;
 		}
 
+		// Add a rigid body to the simulation
 		public function addBody(body:RigidBody):void
 		{
 			if (!findBody(body))
@@ -165,6 +167,7 @@ package jiglib.physics
 			_collisionSystem.removeAllCollisionBodys();
 		}
 
+		// Add a constraint to the simulation
 		public function addConstraint(constraint:JConstraint):void
 		{
 			if (!findConstraint(constraint))
@@ -186,6 +189,7 @@ package jiglib.physics
 			_constraints = new Vector.<JConstraint>();
 		}
 
+		// Add a physics controlled to the simulation
 		public function addController(controller:PhysicsController):void
 		{
 			if (!findController(controller))
@@ -274,6 +278,7 @@ package jiglib.physics
 			return false;
 		}
 
+		// fast-but-inaccurate pre-processor
 		private function preProcessCollisionFast(collision:CollisionInfo, dt:Number):void
 		{
 			collision.satisfied = false;
@@ -361,6 +366,7 @@ package jiglib.physics
 			}
 		}
 
+		// Special pre-processor for the normal solver
 		private function preProcessCollisionNormal(collision:CollisionInfo, dt:Number):void
 		{
 			collision.satisfied = false;
@@ -423,6 +429,7 @@ package jiglib.physics
 
 		}
 
+		// Special pre-processor for the accumulated solver
 		private function preProcessCollisionAccumulated(collision:CollisionInfo, dt:Number):void
 		{
 			collision.satisfied = false;
@@ -526,6 +533,11 @@ package jiglib.physics
 			}
 		}
 
+		/* Handle an individual collision by classifying it, calculating
+		 impulse, applying impulse and updating the velocities of the
+		 objects. Allows over-riding of the elasticity. Ret val indicates
+		 if an impulse was applied
+		*/
 		private function processCollision(collision:CollisionInfo, dt:Number):Boolean
 		{
 			collision.satisfied = true;
@@ -618,6 +630,7 @@ package jiglib.physics
 			return gotOne;
 		}
 
+		// Accumulated and clamp impulses
 		private function processCollisionAccumulated(collision:CollisionInfo, dt:Number):Boolean
 		{
 			collision.satisfied = true;
@@ -1031,6 +1044,9 @@ package jiglib.physics
 			}
 		}
 
+		// Integrates the system forwards by dt - the caller is
+		// responsible for making sure that repeated calls to this use
+		// the same dt (if desired)
 		public function integrate(dt:Number):void
 		{
 			_doingIntegration = true;

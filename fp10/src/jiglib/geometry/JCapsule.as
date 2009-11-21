@@ -45,12 +45,14 @@ package jiglib.geometry{
 			_length = l;
 			_boundingSphere = getBoundingSphere(r, l);
 			mass = 1;
+			updateBoundingBox();
 		}
 		 
 		public function set radius(r:Number):void {
 			_radius = r;
 			_boundingSphere = getBoundingSphere(_radius, _length);
 			setInertia(getInertiaProperties(mass));
+			updateBoundingBox();
 			setActive();
 		}
 		public function get radius():Number {
@@ -61,6 +63,7 @@ package jiglib.geometry{
 			_length = l;
 			_boundingSphere = getBoundingSphere(_radius, _length);
 			setInertia(getInertiaProperties(mass));
+			updateBoundingBox();
 			setActive();
 		}
 		public function get length():Number {
@@ -69,14 +72,14 @@ package jiglib.geometry{
 		 
 		public function getBottomPos(state:PhysicsState):Vector3D {
 			var temp:Vector3D = state.getOrientationCols()[1];
-			temp.normalize();
-			return state.position.add(JNumber3D.getScaleVector(temp, -_length / 2));
+			//temp.normalize();
+			return state.position.add(JNumber3D.getScaleVector(temp, -_length / 2 - _radius));
 		}
 		
 		public function getEndPos(state:PhysicsState):Vector3D {
 			var temp:Vector3D = state.getOrientationCols()[1];
-			temp.normalize();
-			return state.position.add(JNumber3D.getScaleVector(temp, _length / 2));
+			//temp.normalize();
+			return state.position.add(JNumber3D.getScaleVector(temp, _length / 2 + _radius));
 		}
 		 
 		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
@@ -88,7 +91,8 @@ package jiglib.geometry{
 			var kss:Number = Ks.dotProduct(Ks);
 			var radiusSq:Number = _radius * _radius;
 			
-			var cylinderAxis:JSegment = new JSegment(getBottomPos(state), state.getOrientationCols()[1]);
+			var cols:Vector.<Vector3D> = state.getOrientationCols();
+			var cylinderAxis:JSegment = new JSegment(getBottomPos(state), cols[1]);
 			var Ke:Vector3D = cylinderAxis.delta;
 			var Kg:Vector3D = cylinderAxis.origin.subtract(seg.origin);
 			var kee:Number = Ke.dotProduct(Ke);
@@ -106,7 +110,7 @@ package jiglib.geometry{
 				out.fracOut = 0;
 				out.posOut = seg.origin.clone();
 				out.normalOut = out.posOut.subtract(getBottomPos(state));
-				out.normalOut = out.normalOut.subtract(JNumber3D.getScaleVector(state.getOrientationCols()[1], out.normalOut.dotProduct(state.getOrientationCols()[1])));
+				out.normalOut = out.normalOut.subtract(JNumber3D.getScaleVector(cols[1], out.normalOut.dotProduct(cols[1])));
 				out.normalOut.normalize();
 				return true;
 			}
@@ -128,7 +132,7 @@ package jiglib.geometry{
 			out.fracOut = t;
 			out.posOut = seg.getPoint(t);
 			out.normalOut = out.posOut.subtract(getBottomPos(state));
-			out.normalOut = out.normalOut.subtract(JNumber3D.getScaleVector(state.getOrientationCols()[1], out.normalOut.dotProduct(state.getOrientationCols()[1])));
+			out.normalOut = out.normalOut.subtract(JNumber3D.getScaleVector(cols[1], out.normalOut.dotProduct(cols[1])));
 			out.normalOut.normalize();
 			return true;
 		}
@@ -152,6 +156,11 @@ package jiglib.geometry{
 			*/
 			
 			return JMatrix3D.getScaleMatrix(Ixx, Iyy, Izz);
+		}
+		
+		override protected function updateBoundingBox():void {
+			_boundingBox.clear();
+			_boundingBox.addCapsule(this);
 		}
 		
 		private function getBoundingSphere(r:Number, l:Number):Number {

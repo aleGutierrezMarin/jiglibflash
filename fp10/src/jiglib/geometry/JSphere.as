@@ -47,6 +47,7 @@ package jiglib.geometry
 			_radius = r;
 			_boundingSphere = _radius;
 			mass = 1;
+			updateBoundingBox();
 		}
 
 		public function set radius(r:Number):void
@@ -55,6 +56,7 @@ package jiglib.geometry
 			_boundingSphere = _radius;
 			setInertia(getInertiaProperties(mass));
 			setActive();
+			updateBoundingBox();
 		}
 
 		public function get radius():Number
@@ -109,6 +111,11 @@ package jiglib.geometry
 		{
 			var Ixx:Number = 0.4 * m * _radius * _radius;
 			return JMatrix3D.getScaleMatrix(Ixx, Ixx, Ixx);
+		}
+		
+		override protected function updateBoundingBox():void {
+			_boundingBox.clear();
+			_boundingBox.addSphere(this);
 		}
 	}
 }

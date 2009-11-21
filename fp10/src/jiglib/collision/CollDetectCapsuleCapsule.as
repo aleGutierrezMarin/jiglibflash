@@ -52,6 +52,10 @@ package jiglib.collision
 			{
 				return;
 			}
+			
+			if (JConfig.aabbDetection && !capsule0.boundingBox.overlapTest(capsule1.boundingBox)) {
+				return;
+			}
 
 			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
 			var cpInfo:CollPointInfo;

@@ -48,6 +48,7 @@ package jiglib.collision
 			type1 = "BOX";
 		}
 
+		//Returns true if disjoint.  Returns false if intersecting
 		private function disjoint(out:SpanData, axis:Vector3D, box0:JBox, box1:JBox):Boolean
 		{
 			var obj0:SpanData = box0.getSpan(axis);
@@ -295,13 +296,18 @@ package jiglib.collision
 			{
 				return;
 			}
+			
+			if (JConfig.aabbDetection && !box0.boundingBox.overlapTest(box1.boundingBox)) {
+				return;
+			}
 
 			var numTiny:Number = JNumber3D.NUM_TINY;
 			var numHuge:Number = JNumber3D.NUM_HUGE;
 			
-			var dirs0Arr:Vector.<Vector3D> = box0.currentState.orientationCols;
-			var dirs1Arr:Vector.<Vector3D> = box1.currentState.orientationCols;
+			var dirs0Arr:Vector.<Vector3D> = box0.currentState.getOrientationCols();
+			var dirs1Arr:Vector.<Vector3D> = box1.currentState.getOrientationCols();
 			
+			// the 15 potential separating axes
 			 var axes:Vector.<Vector3D> = Vector.<Vector3D>([dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
 				dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
 				dirs0Arr[0].crossProduct(dirs1Arr[0]),
@@ -314,12 +320,14 @@ package jiglib.collision
 				dirs0Arr[1].crossProduct(dirs1Arr[2]),
 				dirs0Arr[2].crossProduct(dirs1Arr[2])]);
 				
-
 			var l2:Number;
+			// the overlap depths along each axis
 			var overlapDepths:Vector.<SpanData> = new Vector.<SpanData>();
 			var i:uint = 0;
 			var axesLength:int = axes.length;
 
+			// see if the boxes are separate along any axis, and if not keep a 
+			// record of the depths along each axis
 			for (i = 0; i < axesLength; i++)
 			{
 				var _overlapDepth:SpanData = overlapDepths[i] = new SpanData();
@@ -338,6 +346,7 @@ package jiglib.collision
 				}
 			}
 
+			// The box overlap, find the separation depth closest to 0.
 			var minDepth:Number = numHuge;
 			var minAxis:int = -1;
 			axesLength = axes.length;
@@ -349,6 +358,7 @@ package jiglib.collision
 					continue;
 				}
 
+				// If this axis is the minimum, select it
 				if (overlapDepths[i].depth < minDepth)
 				{
 					minDepth = overlapDepths[i].depth;
@@ -359,6 +369,7 @@ package jiglib.collision
 			{
 				return;
 			}
+			// Make sure the axis is facing towards the box0. if not, invert it
 			var N:Vector3D = axes[minAxis].clone();
 			if (box1.currentState.position.subtract(box0.currentState.position).dotProduct(N) > 0)
 			{

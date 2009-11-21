@@ -25,7 +25,6 @@
 
 package jiglib.collision
 {
-
 	import flash.geom.Vector3D;
 
 	import jiglib.cof.JConfig;

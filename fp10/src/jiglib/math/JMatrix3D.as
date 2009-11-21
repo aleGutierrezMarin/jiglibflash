@@ -59,6 +59,15 @@ package jiglib.math
 			return matrix3D;
 		}
 		
+		public static function getSubMatrix(a:Matrix3D, b:Matrix3D):Matrix3D
+		{
+			var num:Vector.<Number> = new Vector.<Number>(16, true);
+			for (var i:int = 0; i < num.length; i++ ) {
+				num[i] = a.rawData[i] - a.rawData[i];
+			}
+			return new Matrix3D(num);
+		}
+		
 		public static function getRotationMatrixAxis(degree:Number, rotateAxis:Vector3D = null):Matrix3D
 		{
     		var matrix3D:Matrix3D = new Matrix3D();
@@ -92,7 +101,7 @@ package jiglib.math
 			v.y = vx * _rawData[1] + vy * _rawData[5] + vz * _rawData[9]  + _rawData[13];
 			v.z = vx * _rawData[2] + vy * _rawData[6] + vz * _rawData[10] + _rawData[14];
 		
-			v = matrix3D.transformVector(v);
+			//v = matrix3D.transformVector(v);
 			
 		}
 	}
