@@ -61,6 +61,10 @@ package jiglib.collision
 			{
 				return;
 			}
+			
+			if (JConfig.aabbDetection && !sphere.boundingBox.overlapTest(capsule.boundingBox)) {
+				return;
+			}
 
 			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], capsule.length));
 			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length));

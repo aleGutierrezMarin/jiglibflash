@@ -142,6 +142,7 @@ package jiglib.vehicles
 			}
 		}
 
+		// Update stuff at the end of physics
 		public function postPhysics(dt:Number):void
 		{
 			var wheel:JWheel;

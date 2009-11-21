@@ -85,6 +85,7 @@ package jiglib.collision
 			collBody = new Vector.<RigidBody>();
 		}
 
+		// Detects collisions between the body and all the registered collision bodies
 		public function detectCollisions(body:RigidBody, collArr:Vector.<CollisionInfo>):void
 		{
 			if (!body.isActive)
@@ -107,6 +108,7 @@ package jiglib.collision
 			}
 		}
 
+		// Detects collisions between the all bodies
 		public function detectAllCollisions(bodies:Vector.<RigidBody>, collArr:Vector.<CollisionInfo>):void
 		{
 			var info:CollDetectInfo;

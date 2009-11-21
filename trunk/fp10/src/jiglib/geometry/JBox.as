@@ -38,6 +38,7 @@ package jiglib.geometry
 			_boundingSphere = 0.5 * _sideLengths.length;
 			initPoint();
 			mass = 1;
+			updateBoundingBox();
 		}
 
 		private function initPoint():void
@@ -61,8 +62,10 @@ package jiglib.geometry
 			initPoint();
 			setInertia(getInertiaProperties(mass));
 			setActive();
+			updateBoundingBox();
 		}
 
+		//Returns the full side lengths
 		public function get sideLengths():Vector3D
 		{
 			return _sideLengths;
@@ -83,17 +86,20 @@ package jiglib.geometry
 			return 2 * (_sideLengths.x * _sideLengths.y + _sideLengths.x * _sideLengths.z + _sideLengths.y * _sideLengths.z);
 		}
 
+		// Returns the half-side lengths
 		public function getHalfSideLengths():Vector3D
 		{
 			return JNumber3D.getScaleVector(_sideLengths, 0.5);
 		}
 
+		// Gets the minimum and maximum extents of the box along the axis, relative to the centre of the box.
 		public function getSpan(axis:Vector3D):SpanData
 		{
+			var cols:Vector.<Vector3D> = currentState.getOrientationCols();
 			var obj:SpanData = new SpanData();
-			var s:Number = Math.abs(axis.dotProduct(currentState.orientationCols[0])) * (0.5 * _sideLengths.x);
-			var u:Number = Math.abs(axis.dotProduct(currentState.orientationCols[1])) * (0.5 * _sideLengths.y);
-			var d:Number = Math.abs(axis.dotProduct(currentState.orientationCols[2])) * (0.5 * _sideLengths.z);
+			var s:Number = Math.abs(axis.dotProduct(cols[0])) * (0.5 * _sideLengths.x);
+			var u:Number = Math.abs(axis.dotProduct(cols[1])) * (0.5 * _sideLengths.y);
+			var d:Number = Math.abs(axis.dotProduct(cols[2])) * (0.5 * _sideLengths.z);
 			var r:Number = s + u + d;
 			var p:Number = currentState.position.dotProduct(axis);
 			obj.min = p - r;
@@ -102,6 +108,7 @@ package jiglib.geometry
 			return obj;
 		}
 		
+		// Gets the corner points
 		public function getCornerPoints(state:PhysicsState):Vector.<Vector3D>
 		{
 			var vertex:Vector3D;
@@ -110,8 +117,12 @@ package jiglib.geometry
 			var transform:Matrix3D = JMatrix3D.getTranslationMatrix(state.position.x, state.position.y, state.position.z);
 			transform = JMatrix3D.getAppendMatrix3D(state.orientation, transform);
 			
-			for each (var _point:Vector3D in _points)
-				arr.push(transform.transformVector(new Vector3D(_point.x, _point.y, _point.z)));
+			for each (var _point:Vector3D in _points) {
+				vertex = new Vector3D(_point.x, _point.y, _point.z);
+				JMatrix3D.multiplyVector(transform, vertex);
+				arr.push(vertex);
+				//arr.push(transform.transformVector(new Vector3D(_point.x, _point.y, _point.z)));
+			}
 
 			arr.fixed = true;
 			return arr;
@@ -169,6 +180,8 @@ package jiglib.geometry
 			return sqDistance;
 		}
 
+		// Returns the distance from the point to the box, (-ve if the
+		// point is inside the box), and optionally the closest point on the box.
 		public function getDistanceToPoint(state:PhysicsState, closestBoxPoint:Object, point:Vector3D):Number
 		{
 			return Math.sqrt(getSqDistanceToPoint(state, closestBoxPoint, point));
@@ -179,9 +192,10 @@ package jiglib.geometry
 			var p:Vector3D = pos.subtract(currentState.position);
 			var h:Vector3D = JNumber3D.getScaleVector(_sideLengths, 0.5);
 			var dirVec:Vector3D;
+			var cols:Vector.<Vector3D> = currentState.getOrientationCols();
 			for (var dir:int; dir < 3; dir++)
 			{
-				dirVec = currentState.orientationCols[dir].clone();
+				dirVec = cols[dir].clone();
 				dirVec.normalize();
 				if (Math.abs(dirVec.dotProduct(p)) > JNumber3D.toArray(h)[dir] + JNumber3D.NUM_TINY)
 				{
@@ -270,7 +284,7 @@ package jiglib.geometry
 			var t1:Number;
 			var t2:Number;
 			
-			var orientationCol:Vector.<Vector3D> = state.orientationCols;
+			var orientationCol:Vector.<Vector3D> = state.getOrientationCols();
 			var directionVectorArray:Array = JNumber3D.toArray(h);
 			var directionVectorNumber:Number;
 			for (dir = 0; dir < 3; dir++)
@@ -335,7 +349,7 @@ package jiglib.geometry
 			}
 			else
 			{
-				out.normalOut = state.getOrientationCols()[dir];
+				out.normalOut = orientationCol[dir];
 			}
 			return true;
 		}
@@ -346,6 +360,11 @@ package jiglib.geometry
 			(m / 12) * (_sideLengths.y * _sideLengths.y + _sideLengths.z * _sideLengths.z),
 			(m / 12) * (_sideLengths.x * _sideLengths.x + _sideLengths.z * _sideLengths.z),
 			(m / 12) * (_sideLengths.x * _sideLengths.x + _sideLengths.y * _sideLengths.y))
+		}
+		
+		override protected function updateBoundingBox():void {
+			_boundingBox.clear();
+			_boundingBox.addBox(this);
 		}
 	}
 }

@@ -30,6 +30,7 @@ package jiglib.geometry
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsState;
 
+	// A Segment is a line that starts at origin and goes only as far as (origin + delta).
 	public class JSegment
 	{
 
@@ -77,8 +78,7 @@ package jiglib.geometry
 			return new JSegment(_origin, _delta);
 		}
 
-		public function segmentSegmentDistanceSq(out:Object, seg:JSegment):Number
-		{
+		public function segmentSegmentDistanceSq(out:Object, seg:JSegment):Number {
 			out.t0 = 0;
 			out.t1 = 0;
 
@@ -95,8 +95,7 @@ package jiglib.geometry
 			var fSqrDist:Number;
 			var fTmp:Number;
 
-			if (fDet >= JNumber3D.NUM_TINY)
-			{
+			if (fDet >= JNumber3D.NUM_TINY){
 				fB1 = -kDiff.dotProduct(seg.delta);
 				fS = fA01 * fB1 - fA11 * fB0;
 				fT = fA01 * fB0 - fA00 * fB1;
@@ -466,7 +465,6 @@ package jiglib.geometry
 			var obj:Object = {};
 			var kRay:JRay = new JRay(_origin, _delta);
 			var fSqrDistance:Number = sqrDistanceLine(obj, kRay, rkBox, boxState);
-
 			if (obj.num >= 0)
 			{
 				if (obj.num <= 1)
@@ -494,7 +492,7 @@ package jiglib.geometry
 
 		private function sqrDistanceLine(out:Object, rkLine:JRay, rkBox:JBox, boxState:PhysicsState):Number
 		{
-			var orientationCols:Vector.<Vector3D> = boxState.orientationCols;
+			var orientationCols:Vector.<Vector3D> = boxState.getOrientationCols();
 			out.num = 0;
 			out.num0 = 0;
 			out.num1 = 0;
@@ -508,10 +506,10 @@ package jiglib.geometry
 			var kDir:Vector3D = new Vector3D(rkLine.dir.dotProduct(orientationCols[0]),
 				rkLine.dir.dotProduct(orientationCols[1]),
 				rkLine.dir.dotProduct(orientationCols[2]));
-
+			
 			var kPntArr:Array = JNumber3D.toArray(kPnt);
 			var kDirArr:Array = JNumber3D.toArray(kDir);
-
+			
 			var bReflect:Vector.<Boolean> = new Vector.<Boolean>(3, true);
 			for (var i:int = 0; i < 3; i++)
 			{
@@ -529,7 +527,7 @@ package jiglib.geometry
 
 			JNumber3D.copyFromArray(kPnt, kPntArr);
 			JNumber3D.copyFromArray(kDir, kDirArr);
-
+			
 			var obj:Object = {};
 			obj.rkPnt = kPnt.clone();
 			obj.pfLParam = 0;
@@ -594,13 +592,13 @@ package jiglib.geometry
 				}
 			}
 
-			kPntArr = obj.rkPnt.toArray();
+			kPntArr = JNumber3D.toArray(obj.rkPnt);
 			for (i = 0; i < 3; i++)
 			{
 				if (bReflect[i])
 					kPntArr[i] = -kPntArr[i];
 			}
-			obj.rkPnt.copyFromArray(kPntArr);
+			JNumber3D.copyFromArray(obj.rkPnt, kPntArr);
 
 			out.num0 = obj.rkPnt.x;
 			out.num1 = obj.rkPnt.y;
@@ -611,7 +609,7 @@ package jiglib.geometry
 
 		private function sqrDistancePoint(out:Object, rkPoint:Vector3D, rkBox:JBox, boxState:PhysicsState):Number
 		{
-			var orientationVector:Vector.<Vector3D> = boxState.orientationCols;
+			var orientationVector:Vector.<Vector3D> = boxState.getOrientationCols();
 			var kDiff:Vector3D = rkPoint.subtract(boxState.position);
 			var kClosest:Vector3D = new Vector3D(kDiff.dotProduct(orientationVector[0]),
 				kDiff.dotProduct(orientationVector[1]),
@@ -697,7 +695,7 @@ package jiglib.geometry
 					rkPntArr[i1] -= (rkDirArr[i1] * rkPmEArr[i0] * fInv);
 					rkPntArr[i2] -= (rkDirArr[i2] * rkPmEArr[i0] * fInv);
 					out.pfLParam = -rkPmEArr[i0] * fInv;
-					out.rkPnt.copyFromArray(rkPntArr);
+					JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 				}
 				else
 				{
@@ -716,7 +714,7 @@ package jiglib.geometry
 						rkPntArr[i0] = boxHalfArr[i0];
 						rkPntArr[i1] = fT - boxHalfArr[i1];
 						rkPntArr[i2] = -boxHalfArr[i2];
-						out.rkPnt.copyFromArray(rkPntArr);
+						JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 					}
 					else
 					{
@@ -729,7 +727,7 @@ package jiglib.geometry
 						rkPntArr[i0] = boxHalfArr[i0];
 						rkPntArr[i1] = boxHalfArr[i1];
 						rkPntArr[i2] = -boxHalfArr[i2];
-						out.rkPnt.copyFromArray(rkPntArr);
+						JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 					}
 				}
 			}
@@ -752,7 +750,7 @@ package jiglib.geometry
 						rkPntArr[i0] = boxHalfArr[i0];
 						rkPntArr[i1] = -boxHalfArr[i1];
 						rkPntArr[i2] = fT - boxHalfArr[i2];
-						out.rkPnt.copyFromArray(rkPntArr);
+						JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 					}
 					else
 					{
@@ -765,7 +763,7 @@ package jiglib.geometry
 						rkPntArr[i0] = boxHalfArr[i0];
 						rkPntArr[i1] = -boxHalfArr[i1];
 						rkPntArr[i2] = boxHalfArr[i2];
-						out.rkPnt.copyFromArray(rkPntArr);
+						JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 					}
 				}
 				else
@@ -787,7 +785,7 @@ package jiglib.geometry
 							rkPntArr[i0] = boxHalfArr[i0];
 							rkPntArr[i1] = fT - boxHalfArr[i1];
 							rkPntArr[i2] = -boxHalfArr[i2];
-							out.rkPnt.copyFromArray(rkPntArr);
+							JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 						}
 						else
 						{
@@ -800,7 +798,7 @@ package jiglib.geometry
 							rkPntArr[i0] = boxHalfArr[i0];
 							rkPntArr[i1] = boxHalfArr[i1];
 							rkPntArr[i2] = -boxHalfArr[i2];
-							out.rkPnt.copyFromArray(rkPntArr);
+							JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 						}
 						return;
 					}
@@ -822,7 +820,7 @@ package jiglib.geometry
 							rkPntArr[i0] = boxHalfArr[i0];
 							rkPntArr[i1] = -boxHalfArr[i1];
 							rkPntArr[i2] = fT - boxHalfArr[i2];
-							out.rkPnt.copyFromArray(rkPntArr);
+							JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 						}
 						else
 						{
@@ -835,7 +833,7 @@ package jiglib.geometry
 							rkPntArr[i0] = boxHalfArr[i0];
 							rkPntArr[i1] = -boxHalfArr[i1];
 							rkPntArr[i2] = boxHalfArr[i2];
-							out.rkPnt.copyFromArray(rkPntArr);
+							JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 						}
 						return;
 					}
@@ -849,7 +847,7 @@ package jiglib.geometry
 					rkPntArr[i0] = boxHalfArr[i0];
 					rkPntArr[i1] = -boxHalfArr[i1];
 					rkPntArr[i2] = -boxHalfArr[i2];
-					out.rkPnt.copyFromArray(rkPntArr);
+					JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 				}
 			}
 		}
@@ -928,7 +926,7 @@ package jiglib.geometry
 					rkPntArr[i1] -= (fProd0 * fInv);
 					out.pfLParam = -fPmE0 * fInv;
 				}
-				out.rkPnt.copyFromArray(rkPntArr);
+				JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 			}
 			else
 			{
@@ -950,7 +948,7 @@ package jiglib.geometry
 					rkPntArr[i0] -= (fProd1 * fInv);
 					out.pfLParam = -fPmE1 * fInv;
 				}
-				out.rkPnt.copyFromArray(rkPntArr);
+				JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 			}
 
 			if (rkPntArr[i2] < -boxHalfArr[i2])
@@ -965,7 +963,7 @@ package jiglib.geometry
 				out.rfSqrDistance += (fDelta * fDelta);
 				rkPntArr[i2] = boxHalfArr[i2];
 			}
-			out.rkPnt.copyFromArray(rkPntArr);
+			JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 		}
 
 		private function case00(out:Object, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox):void
@@ -1005,7 +1003,7 @@ package jiglib.geometry
 				rkPntArr[i2] = boxHalfArr[i2];
 			}
 
-			out.rkPnt.copyFromArray(rkPntArr);
+			JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 		}
 
 		private function case000(out:Object, rkBox:JBox):void
