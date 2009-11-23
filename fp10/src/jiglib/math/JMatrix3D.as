@@ -45,16 +45,14 @@ package jiglib.math
 
 		public static function getAppendMatrix3D(a:Matrix3D, b:Matrix3D):Matrix3D
 		{
-			var matrix3D:Matrix3D = new Matrix3D();
-			matrix3D.append(a);
+			var matrix3D:Matrix3D = a.clone();
 			matrix3D.append(b);
 			return matrix3D;
 		}
 
 		public static function getPrependMatrix(a:Matrix3D, b:Matrix3D):Matrix3D
 		{
-			var matrix3D:Matrix3D = new Matrix3D();
-			matrix3D.prepend(a);
+			var matrix3D:Matrix3D = a.clone();
 			matrix3D.prepend(b);
 			return matrix3D;
 		}
@@ -63,7 +61,7 @@ package jiglib.math
 		{
 			var num:Vector.<Number> = new Vector.<Number>(16, true);
 			for (var i:int = 0; i < num.length; i++ ) {
-				num[i] = a.rawData[i] - a.rawData[i];
+				num[i] = a.rawData[i] - b.rawData[i];
 			}
 			return new Matrix3D(num);
 		}
