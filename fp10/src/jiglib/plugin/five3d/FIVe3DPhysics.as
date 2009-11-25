@@ -6,9 +6,11 @@ package jiglib.plugin.five3d {
 	import jiglib.plugin.AbstractPhysics;
 	import jiglib.plugin.ISkin3D;
 
-	import five3D.display.Sprite3D;
-	import five3D.display.Scene3D;
-	
+	//import five3D.display.Sprite3D;
+	//import five3D.display.Scene3D;
+	import net.badimon.five3D.display.Sprite3D;
+	import net.badimon.five3D.display.Scene3D;
+
 	import almostlogical.five3d.primitives.Cube;
 
 	/**
@@ -27,7 +29,7 @@ package jiglib.plugin.five3d {
 			baseScene.childrenSorted = true;
 			
 			//a tester to determine if you have the modified Sprite3D class that is needed for JigLibFlash support
-			new Sprite3D().onlyAllowMatrixModifications();//if you are getting an ERROR on this line follow the following instructions:
+			//new Sprite3D().onlyAllowMatrixModifications();//if you are getting an ERROR on this line follow the following instructions:
 			/**
 			 * 1) Modify your FIVe3D library to support Flash Player 10 or download my modified version http://blog.almostlogical.com/resources/FIVe3D_package_v2.1.2F10.zip
 			 * 2) Download the FIVe3D support files (modified version of Sprite3D and FIVe3D primitives(ex:Cube)
@@ -46,7 +48,7 @@ package jiglib.plugin.five3d {
 		public function createCubeUsingExistingCube(cube:Cube):RigidBody
 		{
 			var jbox:JBox;		
-			cube.onlyAllowMatrixModifications(); //this setups up the modified Sprite3D to support JigLibFlash matrix only modifications
+		//	cube.onlyAllowMatrixModifications(); //this setups up the modified Sprite3D to support JigLibFlash matrix only modifications
 			jbox = new JBox(new FIVe3DMesh(cube) as ISkin3D, cube.width, cube.depth, cube.height);		
 			addBody(jbox);
 			baseScene.addChild(cube);
@@ -63,20 +65,31 @@ package jiglib.plugin.five3d {
 		{
 			var jGround:JPlane;
 			var ground:Sprite3D = new Sprite3D();
-			
+			//ground.singleSided = true;
 			if (borderColor >>> 24 != 0xFF) { ground.graphics3D.lineStyle(1,borderColor);  }
 			
 			ground.graphics3D.beginFill(color);
 			ground.graphics3D.drawRect(0, 0,width,depth);
 			ground.graphics3D.endFill();
-			ground.onlyAllowMatrixModifications(); //this sets up the modified Sprite3D to support JigLibFlash matrix only modifications
+			ground.singleSided = true;
+			//ground.onlyAllowMatrixModifications(); //this sets up the modified Sprite3D to support JigLibFlash matrix only modifications
 			baseScene.addChild(ground);
 			
 			jGround = new JPlane(new FIVe3DMesh(ground) as ISkin3D);
 			jGround.movable = false;
 			
-			jGround.setOrientation(JMatrix3D.getRotationMatrixAxis(90));
+			//jGround.setOrientation(JMatrix3D.getRotationMatrixAxis(90));
+			//		
 			jGround.y = level;
+			jGround.x = -width / 2;
+			jGround.z = depth / 2;
+		//	jGround.rotationY = 190;
+	//		jGround.rotationZ = 270;
+		jGround.rotationX = 90;
+		//	jGround.rotationX = -90;
+			//jGround.rotationX = 270;
+			//ground.rotationX = ;
+			
 			addBody(jGround);
 
 			return jGround;

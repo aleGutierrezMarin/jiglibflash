@@ -1,26 +1,24 @@
-﻿// FIVe3D JigLibFlash Demo FP10 - JigLibFlash support for FIVe3D
-//		-Using FIVe3D v2.1.2 (modified to support FP10) and and AlmostLogical FIVe3D Additional Files FP10 v1
-//  Note: You will need AlmostLogical FIVe3D Additional Files FP10 v1 to run this.
-//        This package is located here: http://blog.almostlogical.com/resources/AlmostLogical_FIVe3D_Additional_Files_PackageFP10.zip
-//		  You can modify the FIVe3D v2.1.2 yourself so it supports FP10 (Flash Player 10) or download my modified version
-//		  here: http://blog.almostlogical.com/resources/FIVe3D_package_v2.1.2F10.zip (I did not write this library just made modifications)
-//		  for more information on the FIVe3D library visit: http://five3d.mathieu-badimon.com/
+﻿// FIVe3D JigLibFlash Demo FP10 - JigLibFlash support for FIVe3D - Using FIVe3D FP10 v1.0.1 and AlmostLogical FIVe3D Additional Files FP10
+//  Note: You will need AlmostLogical FIVe3D Additional Files FP10 to run this.
+//        This package is located here: http://blog.almostlogical.com/resources/AlmostLogical_FIVe3D_Additional_Files_Package_FP10.zip
 package
 {
 	import flash.display.Sprite;
-	import five3D.display.Scene3D;
-	import five3D.display.Sprite3D;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import net.badimon.five3D.typography.Typography3D;
 	
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.five3d.FIVe3DPhysics;
 	import jiglib.plugin.five3d.FIVe3DMesh;
 	
-	import almostlogical.five3d.primitives.Cube;
-	import almostlogical.five3d.display.DynamicText3DMultiline;
+	import net.badimon.five3D.typography.HelveticaBold;
+	import net.badimon.five3D.display.Sprite3D;
+	import net.badimon.five3D.display.Scene3D;
+	import net.badimon.five3D.display.DynamicText3D;
 	
-	import five3D.typography.HelveticaBold;
+	import almostlogical.five3d.primitives.Cube;
+	
 	/**
 	 * @author Devin Reimer - blog.almostlogical.com
 	 */
@@ -34,7 +32,7 @@ package
 		private var physics:FIVe3DPhysics;
 		private var isStarted:Boolean = false; //used to determine after first click
 		
-		public function FallingBoxes() 
+		public function FallingBoxes()
 		{
 			setupScene();
 			createGround();
@@ -63,12 +61,10 @@ package
 			basePhysicsScene.buttonMode = true; //when ever you mouse over an object within the scene it would show the clickable hand cursor
 		}
 			
-		
 		private function createGround():void
 		{
 			var mesh:Sprite3D;
 			var ground:RigidBody = physics.createGround(500,500, -300,0x0066FF,0x000000);
-			var message:DynamicText3DMultiline;
 			ground.x = -250;
 			ground.z = 250;
 			
@@ -81,26 +77,20 @@ package
 			mesh.addEventListener(MouseEvent.CLICK,groundClicked, false, 0, true);
 			mesh.mouseChildren = false;
 			mesh.buttonMode = true;
-			
-			message = createInstructionMessage(450);
-			message.x = 25;
-			message.y = (500 - message.textHeight) / 2;
-			
-			mesh.addChild(message);	
+			mesh.addChild(createInstructionMessage());
 		}
 		
-		private function createInstructionMessage(width:Number):DynamicText3DMultiline
+		private function createInstructionMessage():Sprite3D
 		{
-			var message:DynamicText3DMultiline = new DynamicText3DMultiline(HelveticaBold);
-			message.size = 35;
-			message.color = 0xFFFFFF;
-			message.width = width;
-			message.lineSpacing = 50;
-			message.align = DynamicText3DMultiline.CENTER;
-			message.wordWrap = true;
-			message.text = "Rapidly click the ground to generate many different sized boxes! You can click the boxes at any time to remove them!";
-			
-			return message;
+			var container:Sprite3D = new Sprite3D();
+			var messageLine1:DynamicText3D = new DynamicText3D(new HelveticaBold()); //text not as complete as FP9 version as I have yet to write new version of MultilineDynamicText3D
+			messageLine1.size = 35;
+			messageLine1.color = 0xFFFFFF;
+			messageLine1.text = "Rapidly Click The Ground!";
+			messageLine1.x = 35;
+			container.addChild(messageLine1);
+			container.y = 200;
+			return container;
 		}
 		
 		private function groundClicked(evt:Event = null):void
@@ -152,25 +142,24 @@ package
 		
 		private function getRigidBodyFromMeshAndReactivate(obj:Sprite3D):RigidBody
 		{
-			var currRigidBody:RigidBody;
+			var tempRigidBody:RigidBody;
 			var requiredRigidBody:RigidBody;
 			
 			for (var bodyStr:String in physics.engine.bodys)
 			{
-				currRigidBody = physics.engine.bodys[bodyStr];	
-				if (obj == physics.getMesh(currRigidBody))
+				tempRigidBody = physics.engine.bodys[bodyStr];	
+				if (obj == physics.getMesh(tempRigidBody))
 				{
-					requiredRigidBody = currRigidBody;
+					requiredRigidBody = tempRigidBody;
 				}
-				else if (!currRigidBody.isActive)
+				else if (!tempRigidBody.isActive)
 				{
-					currRigidBody.setActive(); //this will cause any object that could be resting on top of the removed object to fall
+					tempRigidBody.setActive(); //this will cause any object that could be resting on top of the removed object to fall
 				}
 			}
 			
 			return requiredRigidBody;
 		}
-		
 		
 		private function mainLoop(evt:Event):void
 		{
