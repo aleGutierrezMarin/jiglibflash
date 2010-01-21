@@ -72,6 +72,7 @@ package
 
 		private function init3D():void
 		{
+			JConfig.deactivationTime = 0.5;
 			JConfig.numContactIterations = 15;
 			
 			physics = new Papervision3DPhysics(scene, 8);

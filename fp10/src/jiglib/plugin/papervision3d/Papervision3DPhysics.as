@@ -1,10 +1,14 @@
 package jiglib.plugin.papervision3d {
+	import flash.display.BitmapData;
+	
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
+	import jiglib.geometry.JTerrain;
 	import jiglib.math.JMatrix3D;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;
+	import jiglib.plugin.papervision3d.pv3dTerrain;
 	
 	import org.papervision3d.core.proto.DisplayObjectContainer3D;
 	import org.papervision3d.core.proto.MaterialObject3D;
@@ -27,7 +31,11 @@ package jiglib.plugin.papervision3d {
 		}
 		
 		public function getMesh(body:RigidBody):DisplayObject3D {
-			return Pv3dMesh(body.skin).mesh;
+			if(body.skin!=null){
+				return Pv3dMesh(body.skin).mesh;
+			}else {
+				return null;
+			}
 		}
 
 		public function createSphere(material:MaterialObject3D, radius:Number=100, segmentsW:int=8, segmentsH:int = 6):RigidBody {
@@ -55,6 +63,16 @@ package jiglib.plugin.papervision3d {
 			jGround.y = level;
 			addBody(jGround);
 			return jGround;
+		}
+		
+		public function createTerrain(terrainHeightMap:BitmapData, material:MaterialObject3D = null, width:Number = 100, depth:Number = 100, maxHeight:Number = 0, segmentsW:int = 1, segmentsH:int = 1):JTerrain {
+			var terrainMap:pv3dTerrain = new pv3dTerrain(terrainHeightMap, material, width, depth, maxHeight, segmentsW, segmentsH);
+			scene.addChild(terrainMap);
+			
+			var terrain:JTerrain = new JTerrain(terrainMap);
+			addBody(terrain);
+			
+			return terrain;
 		}
 	}
 }

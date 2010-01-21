@@ -68,7 +68,7 @@ package jiglib.physics
 		{
 			if (!_currentPhysicsSystem)
 			{
-				trace("version: JigLibFlash fp10 v0.34 (2009-11-21)");
+				trace("version: JigLibFlash fp10 v0.40 (2010-1-21)");
 				_currentPhysicsSystem = new PhysicsSystem();
 			}
 			return _currentPhysicsSystem;
