@@ -42,7 +42,11 @@ package jiglib.plugin.five3d {
 		}
 		
 		public function getMesh(body:RigidBody):Sprite3D {
-			return FIVe3DMesh(body.skin).mesh;
+			if(body.skin!=null){
+				return FIVe3DMesh(body.skin).mesh;
+			}else {
+				return null;
+			}
 		}
 		
 		public function createCubeUsingExistingCube(cube:Cube):RigidBody
