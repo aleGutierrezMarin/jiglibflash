@@ -40,12 +40,11 @@ package jiglib.geometry
 
 		public function JPlane(skin:ISkin3D)
 		{
-
 			super(skin);
-			_type = "PLANE";
 			_normal = new Vector3D(0, 0, -1);
 			_distance = 0;
 			this.movable = false;
+			_type = "PLANE";
 		}
 
 		public function get normal():Vector3D

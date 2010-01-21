@@ -30,7 +30,11 @@ package jiglib.plugin.sandy3d
 		
 		public function getMesh(body:RigidBody):Shape3D 
 		{
-			return Sandy3DMesh(body.skin).mesh;
+			if(body.skin!=null){
+				return Sandy3DMesh(body.skin).mesh;
+			}else {
+				return null;
+			}
 		}
 
 		public function createSphere( name:String, appearance:Appearance, radius:Number=100, segmentsW:int=8, segmentsH:int = 6):RigidBody 

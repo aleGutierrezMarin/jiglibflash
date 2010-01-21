@@ -32,7 +32,11 @@ package jiglib.plugin.away3dlite
 
 		public function getMesh(body:RigidBody):Mesh
 		{
-			return Away3DLiteMesh(body.skin).mesh as Mesh;
+			if(body.skin!=null){
+				return Away3DLiteMesh(body.skin).mesh as Mesh;
+			}else {
+				return null;
+			}
 		}
 
 		public function createSphere(material:Material, radius:Number = 100, segmentsW:int = 8, segmentsH:int = 6):RigidBody

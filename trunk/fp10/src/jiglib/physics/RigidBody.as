@@ -636,6 +636,9 @@ package jiglib.physics
 
 		public function set movable(mov:Boolean):void
 		{
+			if (_type == "PLANE" || _type == "TERRAIN") {
+				return;
+			}
 			_movable = mov;
 			isActive = _activity = mov;
 			_origMovable = mov;

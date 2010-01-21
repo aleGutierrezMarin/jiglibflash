@@ -75,7 +75,7 @@ package jiglib.geometry{
 			//temp.normalize();
 			return state.position.add(JNumber3D.getScaleVector(temp, -_length / 2 - _radius));
 		}
-		
+		 
 		public function getEndPos(state:PhysicsState):Vector3D {
 			var temp:Vector3D = state.getOrientationCols()[1];
 			//temp.normalize();

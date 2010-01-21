@@ -48,20 +48,27 @@ package jiglib.collision
 			detectionFunctors["BOX"]["SPHERE"] = new CollDetectSphereBox();
 			detectionFunctors["BOX"]["CAPSULE"] = new CollDetectCapsuleBox();
 			detectionFunctors["BOX"]["PLANE"] = new CollDetectBoxPlane();
+			detectionFunctors["BOX"]["TERRAIN"] = new CollDetectBoxTerrain();
 			detectionFunctors["SPHERE"] = [];
 			detectionFunctors["SPHERE"]["BOX"] = new CollDetectSphereBox();
 			detectionFunctors["SPHERE"]["SPHERE"] = new CollDetectSphereSphere();
 			detectionFunctors["SPHERE"]["CAPSULE"] = new CollDetectSphereCapsule();
 			detectionFunctors["SPHERE"]["PLANE"] = new CollDetectSpherePlane();
-			detectionFunctors["PLANE"] = [];
-			detectionFunctors["PLANE"]["BOX"] = new CollDetectBoxPlane();
-			detectionFunctors["PLANE"]["SPHERE"] = new CollDetectSpherePlane();
-			detectionFunctors["PLANE"]["CAPSULE"] = new CollDetectCapsulePlane();
+			detectionFunctors["SPHERE"]["TERRAIN"] = new CollDetectSphereTerrain();
 			detectionFunctors["CAPSULE"] = [];
 			detectionFunctors["CAPSULE"]["CAPSULE"] = new CollDetectCapsuleCapsule();
 			detectionFunctors["CAPSULE"]["BOX"] = new CollDetectCapsuleBox();
 			detectionFunctors["CAPSULE"]["SPHERE"] = new CollDetectSphereCapsule();
 			detectionFunctors["CAPSULE"]["PLANE"] = new CollDetectCapsulePlane();
+			detectionFunctors["CAPSULE"]["TERRAIN"] = new CollDetectCapsuleTerrain();
+			detectionFunctors["PLANE"] = [];
+			detectionFunctors["PLANE"]["BOX"] = new CollDetectBoxPlane();
+			detectionFunctors["PLANE"]["SPHERE"] = new CollDetectSpherePlane();
+			detectionFunctors["PLANE"]["CAPSULE"] = new CollDetectCapsulePlane();
+			detectionFunctors["TERRAIN"] = [];
+			detectionFunctors["TERRAIN"]["SPHERE"] = new CollDetectSphereTerrain();
+			detectionFunctors["TERRAIN"]["BOX"] = new CollDetectBoxTerrain();
+			detectionFunctors["TERRAIN"]["CAPSULE"] = new CollDetectCapsuleTerrain();
 		}
 
 		public function addCollisionBody(body:RigidBody):void
@@ -188,7 +195,7 @@ package jiglib.collision
 			var pos:Vector3D = seg.getPoint(0.5);
 			var r:Number = seg.delta.length / 2;
 
-			if (obj.type != "PLANE")
+			if (obj.type != "PLANE" && obj.type != "TERRAIN")
 			{
 				var num1:Number = pos.subtract(obj.currentState.position).length;
 				var num2:Number = r + obj.boundingSphere;
