@@ -5,7 +5,9 @@
 	import flash.ui.Keyboard;
 	import flash.geom.Vector3D;
 	
-	import org.papervision3d.cameras.CameraType;
+	import org.papervision3d.cameras.SpringCamera3D;
+	import org.papervision3d.core.clipping.FrustumClipping;
+	import org.papervision3d.core.math.Number3D;
 	import org.papervision3d.materials.*;
 	import org.papervision3d.materials.utils.MaterialsList;
 	import org.papervision3d.materials.shadematerials.FlatShadeMaterial;
@@ -34,6 +36,7 @@
 		[Embed(source="res/hightmap2.jpg")]
         public var TERRIAN_MAP:Class;
 		
+		private var springCamera:SpringCamera3D;
 		private var mylight:PointLight3D;
 		
 		private var terrain:JTerrain;
@@ -51,7 +54,7 @@
 		
 		public function CarDriveOnTerrain() 
 		{
-			super(800, 600, true, true, CameraType.TARGET);
+			super(800, 600, true, true);
 			stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDownHandler );
 			stage.addEventListener( KeyboardEvent.KEY_UP, keyUpHandler );
 			
@@ -60,20 +63,26 @@
 		
 		private function init3D():void
 		{
-			physics = new Papervision3DPhysics(scene, 6);
+			physics = new Papervision3DPhysics(scene, 8);
+
+			renderer.clipping = new FrustumClipping(FrustumClipping.BOTTOM | FrustumClipping.NEAR);
 			viewport.containerSprite.sortMode = ViewportLayerSortMode.INDEX_SORT;
 			 
+			springCamera = new SpringCamera3D();
+			springCamera.y = 5000;
+			springCamera.mass = 10;
+			springCamera.damping = 10;
+			springCamera.stiffness = 1;
+			springCamera.positionOffset = new Number3D(0, 100, -150);
+			
 			mylight = new PointLight3D(true, true);
-			mylight.y = 500;
-			mylight.z = -600;
-			camera.y = mylight.y;
-			camera.z = mylight.z;
+			mylight.y = 5000;
 			 
 			var terrainBMD:Bitmap = new TERRIAN_MAP;
 			var shadeMateria:FlatShadeMaterial = new FlatShadeMaterial(mylight, 0x77ee77);
 			
 			//create terrain
-			terrain = physics.createTerrain(terrainBMD.bitmapData, shadeMateria, 1000, 1000, 300, 20, 15);
+			terrain = physics.createTerrain(terrainBMD.bitmapData, shadeMateria, 10000, 10000, 800, 30, 30);
 			viewport.getChildLayer(DisplayObject3D(terrain.terrainMesh)).layerIndex = 0;
 			
 			
@@ -84,6 +93,8 @@
 			carSkin = new Collada("res/car.DAE", materiaList, 0.01);
 			carSkin.addEventListener(FileLoadEvent.LOAD_COMPLETE,onCarLoaded);
 			 
+			springCamera.target = carSkin;
+			
 			var stats:StatsView = new StatsView(renderer);
 			addChild(stats);
 		}
@@ -94,16 +105,16 @@
 			 
 			//init car physics
 			carBody = new JCar(new Pv3dMesh(carSkin));
-			carBody.setCar(40,5,300);
-			carBody.chassis.moveTo(new Vector3D( 50, 50, -300));
+			carBody.setCar(40,5,600);
+			carBody.chassis.moveTo(new Vector3D( 4000, 100, -3000));
 			carBody.chassis.mass = 9;
 			carBody.chassis.sideLengths = new Vector3D(40, 20, 90);
 			physics.addBody(carBody.chassis);
 			 
-			carBody.setupWheel("WheelFL", new Vector3D( -20, -10, 25), 1.2, 1.2, 3, 10, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelFR", new Vector3D(20, -10, 25), 1.2, 1.2, 3, 10, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBL", new Vector3D( -20, -10, -25), 1.2, 1.2, 3, 10, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBR", new Vector3D(20, -10, -25), 1.2, 1.2, 3, 10, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFL", new Vector3D( -20, -10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelFR", new Vector3D(20, -10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelBL", new Vector3D( -20, -10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelBR", new Vector3D(20, -10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
 			 
 			var shadeMateria:FlatShadeMaterial = new FlatShadeMaterial(mylight, 0x777777);
 			steerFL = carSkin.getChildByName( "WheelFL", true );
@@ -123,17 +134,6 @@
 			vplCar.addDisplayObject3D(wheelBR);
 			vplCar.addDisplayObject3D(wheelBL);
 			vplCar.layerIndex = 2;
-			
-			shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
-			var materiaList:MaterialsList = new MaterialsList();
-			materiaList.addMaterial(shadeMateria, "all");
-			var boxBody:Array = new Array();
-			for (var i:int = 0; i < 2; i++)
-			{
-				boxBody[i] = physics.createCube(materiaList, 40, 40, 40);
-				boxBody[i].moveTo(new Vector3D(-80, 200 + (50 * i + 50), 200));
-				vplCar.addDisplayObject3D(boxBody[i].skin.mesh);
-			}
 			
 			startRendering();
 		}
@@ -205,7 +205,8 @@
 			//physics.step();
 			physics.engine.integrate(0.12);
 			updateWheelSkin();
-			super.onRenderTick(event);
+			
+			renderer.renderScene(scene, springCamera, viewport);
 		}
 	}
 }
