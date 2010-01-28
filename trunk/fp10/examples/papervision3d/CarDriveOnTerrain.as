@@ -65,7 +65,7 @@
 		{
 			physics = new Papervision3DPhysics(scene, 8);
 
-			renderer.clipping = new FrustumClipping(FrustumClipping.BOTTOM | FrustumClipping.NEAR);
+			renderer.clipping = new FrustumClipping(FrustumClipping.NEAR);
 			viewport.containerSprite.sortMode = ViewportLayerSortMode.INDEX_SORT;
 			 
 			springCamera = new SpringCamera3D();

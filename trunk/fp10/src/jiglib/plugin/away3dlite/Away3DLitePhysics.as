@@ -13,6 +13,7 @@ package jiglib.plugin.away3dlite
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
 	import jiglib.math.JMatrix3D;
+	import jiglib.math.JNumber3D;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;
 
@@ -28,6 +29,7 @@ package jiglib.plugin.away3dlite
 		{
 			super(speed);
 			this.scene = scene;
+			engine.setGravity(JNumber3D.getScaleVector(Vector3D.Y_AXIS, 10));
 		}
 
 		public function getMesh(body:RigidBody):Mesh
@@ -62,14 +64,9 @@ package jiglib.plugin.away3dlite
 		public function createGround(material:Material, size:Number, level:Number):RigidBody
 		{
 			var ground:Plane = new Plane(material, size, size, 1, 1);
-			ground.rotationX = 90;
-			ground.transform.matrix3D.transformVectors(ground.vertices, ground.vertices);
 			scene.addChild(ground);
 			
-			var jGround:JPlane = new JPlane(new Away3DLiteMesh(ground));
-			jGround.movable = false;
-			//jGround.setOrientation(JMatrix3D.rotationX(Math.PI / 2));
-			jGround.setOrientation(JMatrix3D.getRotationMatrixAxis(90));
+			var jGround:JPlane = new JPlane(new Away3DLiteMesh(ground), new Vector3D(0, -1, 0));
 			jGround.y = level;
 			addBody(jGround);
 			

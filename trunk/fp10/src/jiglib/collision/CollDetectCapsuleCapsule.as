@@ -60,10 +60,11 @@ package jiglib.collision
 			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
 			var cpInfo:CollPointInfo;
 
-			var oldSeg0:JSegment = new JSegment(capsule0.getBottomPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], capsule0.length));
-			var newSeg0:JSegment = new JSegment(capsule0.getBottomPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], capsule0.length));
-			var oldSeg1:JSegment = new JSegment(capsule1.getBottomPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], capsule1.length));
-			var newSeg1:JSegment = new JSegment(capsule1.getBottomPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], capsule1.length));
+			var averageNormal:Vector3D = new Vector3D();
+			var oldSeg0:JSegment = new JSegment(capsule0.getEndPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], -capsule0.length));
+			var newSeg0:JSegment = new JSegment(capsule0.getEndPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], -capsule0.length));
+			var oldSeg1:JSegment = new JSegment(capsule1.getEndPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], -capsule1.length));
+			var newSeg1:JSegment = new JSegment(capsule1.getEndPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], -capsule1.length));
 
 			var radSum:Number = capsule0.radius + capsule1.radius;
 
@@ -87,11 +88,12 @@ package jiglib.collision
 				}
 				else
 				{
-					delta = JNumber3D.UP;
+					delta = Vector3D.Y_AXIS;
 					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), delta);
 				}
 
 				var worldPos:Vector3D = pos1.add(JNumber3D.getScaleVector(delta, capsule1.radius - 0.5 * depth));
+				averageNormal = averageNormal.add(delta);
 
 				cpInfo = new CollPointInfo();
 				cpInfo.r0 = worldPos.subtract(capsule0.oldState.position);
@@ -100,10 +102,10 @@ package jiglib.collision
 				collPts.push(cpInfo);
 			}
 
-			oldSeg0 = new JSegment(capsule0.getEndPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], capsule0.length));
-			newSeg0 = new JSegment(capsule0.getEndPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], capsule0.length));
-			oldSeg1 = new JSegment(capsule1.getEndPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], capsule1.length));
-			newSeg1 = new JSegment(capsule1.getEndPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], capsule1.length));
+			oldSeg0 = new JSegment(capsule0.getBottomPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], capsule0.length));
+			newSeg0 = new JSegment(capsule0.getBottomPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], capsule0.length));
+			oldSeg1 = new JSegment(capsule1.getBottomPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], capsule1.length));
+			newSeg1 = new JSegment(capsule1.getBottomPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], capsule1.length));
 
 			oldObj = {};
 			oldDistSq = oldSeg0.segmentSegmentDistanceSq(oldObj, oldSeg1);
@@ -125,11 +127,12 @@ package jiglib.collision
 				}
 				else
 				{
-					delta = JNumber3D.UP;
+					delta = Vector3D.Y_AXIS;
 					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), delta);
 				}
 
 				worldPos = pos1.add(JNumber3D.getScaleVector(delta, capsule1.radius - 0.5 * depth));
+				averageNormal = averageNormal.add(delta);
 
 				cpInfo = new CollPointInfo();
 				cpInfo.r0 = worldPos.subtract(capsule0.oldState.position);
@@ -141,9 +144,10 @@ package jiglib.collision
 
 			if (collPts.length > 0)
 			{
+				averageNormal.normalize();
 				var collInfo:CollisionInfo = new CollisionInfo();
 				collInfo.objInfo = info;
-				collInfo.dirToBody = delta;
+				collInfo.dirToBody = averageNormal;
 				collInfo.pointInfo = collPts;
 
 				var mat:MaterialProperties = new MaterialProperties();

@@ -1,68 +1,68 @@
-package jiglib.plugin.away3d
-{
-	import away3d.core.base.Mesh;
-	import away3d.core.math.MatrixAway3D;
-	
+package jiglib.plugin.away3d {
 	import flash.geom.Matrix3D;
 	
 	import jiglib.plugin.ISkin3D;
+	import away3d.core.base.Mesh;
+	import away3d.core.math.MatrixAway3D;
+	
+	public class Away3dMesh implements ISkin3D {
+		
+		private var _mesh:Mesh;
 
-	/**
-	 * @author katopz
-	 */
-	public class Away3dMesh implements ISkin3D
-	{
-
-		public function Away3dMesh(do3d:Mesh)
-		{
+		public function Away3dMesh(do3d:Mesh) {
 			this._mesh = do3d;
 		}
 
-		private var _mesh:Mesh;
-
-		public function get mesh():Mesh
-		{
-			return _mesh;
+		public function get transform():Matrix3D {
+			var tr:Matrix3D = new Matrix3D();
+			tr.rawData[0] = _mesh.transform.sxx; 
+			tr.rawData[4] = _mesh.transform.sxy; 
+			tr.rawData[8] = _mesh.transform.sxz; 
+			tr.rawData[12] = _mesh.transform.tx;
+			tr.rawData[1] = _mesh.transform.syx; 
+			tr.rawData[5] = _mesh.transform.syy; 
+			tr.rawData[9] = _mesh.transform.syz; 
+			tr.rawData[13] = _mesh.transform.ty;
+			tr.rawData[2] = _mesh.transform.szx; 
+			tr.rawData[6] = _mesh.transform.szy; 
+			tr.rawData[10] = _mesh.transform.szz; 
+			tr.rawData[14] = _mesh.transform.tz;
+			tr.rawData[3] = _mesh.transform.swx; 
+			tr.rawData[7] = _mesh.transform.swy; 
+			tr.rawData[11] = _mesh.transform.swz; 
+			tr.rawData[15] = _mesh.transform.tw;
+			
+			return tr;
 		}
-
-		public function get transform():Matrix3D
-		{
-			var _transform:MatrixAway3D = _mesh.transform;
-			return new Matrix3D(Vector.<Number>([
-				_transform.sxx, _transform.syx, _transform.szx, _transform.swx,
-				_transform.sxy, _transform.syy, _transform.szy, _transform.swy,
-				_transform.sxz, _transform.syz, _transform.szz, _transform.swz,
-				_transform.tx,  _transform.ty,  _transform.tz,  _transform.tw
-			]));
-		}
-
-		public function set transform(m:Matrix3D):void
-		{
-			var _rawData:Vector.<Number> = m.rawData;
-
+		
+		public function set transform(m:Matrix3D):void {
 			var tr:MatrixAway3D = new MatrixAway3D();
-			tr.sxx = _rawData[0];
-			tr.sxy = _rawData[4];
-			tr.sxz = _rawData[8];
-			tr.tx = _rawData[12];
-			tr.syx = _rawData[1];
-			tr.syy = _rawData[5];
-			tr.syz = _rawData[9];
-			tr.ty = _rawData[13];
-			tr.szx = _rawData[2];
-			tr.szy = _rawData[6];
-			tr.szz = _rawData[10];
-			tr.tz = _rawData[14];
-			tr.swx = _rawData[3];
-			tr.swy = _rawData[7];
-			tr.swz = _rawData[11];
-			tr.tw = _rawData[15];
+			tr.sxx = m.rawData[0]; 
+			tr.sxy = m.rawData[4]; 
+			tr.sxz = m.rawData[8]; 
+			tr.tx = m.rawData[12];
+			tr.syx = m.rawData[1]; 
+			tr.syy = m.rawData[5]; 
+			tr.syz = m.rawData[9]; 
+			tr.ty = m.rawData[13];
+			tr.szx = m.rawData[2]; 
+			tr.szy = m.rawData[6]; 
+			tr.szz = m.rawData[10]; 
+			tr.tz = m.rawData[14];
+			tr.swx = m.rawData[3]; 
+			tr.swy = m.rawData[7]; 
+			tr.swz = m.rawData[11]; 
+			tr.tw = m.rawData[15];
 			
 			var scale:MatrixAway3D = new MatrixAway3D();
 			scale.scaleMatrix(_mesh.scaleX, _mesh.scaleY, _mesh.scaleZ);
 			tr.multiply(tr, scale);
 			
 			_mesh.transform = tr;
+		}
+		
+		public function get mesh():Mesh {
+			return _mesh;
 		}
 	}
 }

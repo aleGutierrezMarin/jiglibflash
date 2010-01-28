@@ -69,14 +69,14 @@ package
 					ball = physics.createSphere(new WireframeMaterial(), 25);
 				}
 				ball.mass = 5;
-				ball.moveTo(new Vector3D(-100, 500 + (100 * i + 100), -100));
+				ball.moveTo(new Vector3D(-100, -500 - (100 * i + 100), -100));
 			}
 			
 			boxBody = [];
 			for (i = 0; i < 10; i++)
 			{
 				boxBody[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				boxBody[i].moveTo(new Vector3D(500*Math.random()-500*Math.random(), 500+500*Math.random(), 500*Math.random()-500*Math.random()));
+				boxBody[i].moveTo(new Vector3D(500*Math.random()-500*Math.random(), -500-500*Math.random(), 500*Math.random()-500*Math.random()));
 			}
 			
 			layer.addEventListener(MouseEvent.MOUSE_DOWN, handleMousePress);

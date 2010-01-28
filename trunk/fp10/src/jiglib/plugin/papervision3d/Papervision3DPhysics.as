@@ -57,8 +57,8 @@ package jiglib.plugin.papervision3d {
 		public function createGround(material:MaterialObject3D, size:Number, level:Number):RigidBody {
 			var ground:Plane = new Plane(material, size, size);
 			scene.addChild(ground);
+			
 			var jGround:JPlane = new JPlane(new Pv3dMesh(ground));
-			jGround.movable = false;
 			jGround.setOrientation(JMatrix3D.getRotationMatrixAxis(90));
 			jGround.y = level;
 			addBody(jGround);

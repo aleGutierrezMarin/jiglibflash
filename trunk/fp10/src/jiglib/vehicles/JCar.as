@@ -75,7 +75,7 @@ package jiglib.vehicles
 		{
 			var mass:Number = _chassis.mass;
 			var mass4:Number = mass / _steerRate;
-			var axis:Vector3D = JNumber3D.UP;
+			var axis:Vector3D = Vector3D.Y_AXIS;
 			var gravity:Number = PhysicsSystem.getInstance().gravity.length;
 			var spring:Number = mass4 * gravity / (wheelRestingFrac * wheelTravel);
 			var inertia:Number = 0.5 * wheelRadius * wheelRadius * mass;

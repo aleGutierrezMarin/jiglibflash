@@ -66,8 +66,8 @@ package jiglib.collision
 				return;
 			}
 
-			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], capsule.length));
-			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length));
+			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], capsule.length + 2 * capsule.radius));
+			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length + 2 * capsule.radius));
 			var radSum:Number = sphere.radius + capsule.radius;
 
 			var oldObj:Object = {};
@@ -89,7 +89,7 @@ package jiglib.collision
 				}
 				else
 				{
-					delta = JNumber3D.UP;
+					delta = Vector3D.Y_AXIS;
 					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), delta);
 				}
 

@@ -73,12 +73,12 @@ package
 				
 				sphere.mass = 5;
 				sphere.currentState.position.x = -i*50;
-				sphere.currentState.position.y = 300;
+				sphere.currentState.position.y = -300;
 				
 				if(i != 0)
 				{
-					var pos1:Vector3D = JNumber3D.getScaleVector(JNumber3D.UP, -prevSphere.boundingSphere);
-					var pos2:Vector3D = JNumber3D.getScaleVector(JNumber3D.UP, sphere.boundingSphere);
+					var pos1:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, -prevSphere.boundingSphere);
+					var pos2:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, sphere.boundingSphere);
 					var constraint:JConstraintPoint = new JConstraintPoint(prevSphere, pos1, sphere, pos2, 1, 1);
 				}
 				
@@ -89,7 +89,7 @@ package
 			for (i = 0; i < 10; i++)
 			{
 				boxBody[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				boxBody[i].moveTo(new Vector3D(500*Math.random()-500*Math.random(), 500+500*Math.random(), 500*Math.random()-500*Math.random()));
+				boxBody[i].moveTo(new Vector3D(500*Math.random()-500*Math.random(), -500-500*Math.random(), 500*Math.random()-500*Math.random()));
 			}
 			
 			layer.addEventListener(MouseEvent.MOUSE_DOWN, handleMousePress);

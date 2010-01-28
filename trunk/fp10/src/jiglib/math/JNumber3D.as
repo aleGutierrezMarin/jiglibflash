@@ -10,9 +10,9 @@
 		public static const NUM_TINY:Number = 0.00001;
 		public static const NUM_HUGE:Number = 100000;
 
-		public static const UP:Vector3D = Vector3D.Y_AXIS;
-		public static const LOOK:Vector3D = Vector3D.Z_AXIS;
-		public static const RIGHT:Vector3D = Vector3D.X_AXIS;
+		//public static const UP:Vector3D = Vector3D.Y_AXIS;
+		//public static const LOOK:Vector3D = Vector3D.Z_AXIS;
+		//public static const RIGHT:Vector3D = Vector3D.X_AXIS;
 
 		public static function toArray(v:Vector3D):Array
 		{

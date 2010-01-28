@@ -37,7 +37,7 @@ package
 			for (var i:int = 0; i < 16; i++)
 			{
 				var box:RigidBody = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				box.moveTo(new Vector3D(0, 500 + (100 * i + 100), 0));
+				box.moveTo(new Vector3D(0, -500 - (100 * i + 100), 0));
 			}
 			
 			for (i=0; i < 4; i++)
@@ -51,8 +51,8 @@ package
 					sphere = physics.createSphere(new WireframeMaterial(), 25);
 				}
 				
-				sphere.mass = 5;
-				sphere.moveTo(new Vector3D(-100, 500 + (100 * i + 100), -100));
+				sphere.mass = 3;
+				sphere.moveTo(new Vector3D(-100, -500 - (100 * i + 100), -100));
 			}
 		}
 
