@@ -50,7 +50,7 @@
 			var dy:Number = (j1 - j0) * _terrain.dh;
 			if (i0 == i1) dx = 1;
 			if (j0 == j1) dy = 1;
-			if (i0 == i1 && j0 == j1) return JNumber3D.UP;
+			if (i0 == i1 && j0 == j1) return Vector3D.Y_AXIS;
 			
 			var hFwd:Number = _terrain.heights[i1][j];
 			var hBack:Number = _terrain.heights[i0][j];

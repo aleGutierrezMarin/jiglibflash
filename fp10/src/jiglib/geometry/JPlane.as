@@ -35,13 +35,21 @@ package jiglib.geometry
 	public class JPlane extends RigidBody
 	{
 
+		private var _initNormal:Vector3D;
 		private var _normal:Vector3D;
 		private var _distance:Number;
 
-		public function JPlane(skin:ISkin3D)
+		public function JPlane(skin:ISkin3D, initNormal:Vector3D = null)
 		{
 			super(skin);
-			_normal = new Vector3D(0, 0, -1);
+			if (initNormal == null) {
+				_initNormal = new Vector3D(0, 0, -1);
+				_normal = _initNormal.clone();
+			}else {
+				_initNormal = initNormal.clone();
+				_normal = _initNormal.clone();
+			}
+			
 			_distance = 0;
 			this.movable = false;
 			_type = "PLANE";
@@ -100,7 +108,7 @@ package jiglib.geometry
 		override protected function updateState():void
 		{
 			super.updateState();
-			_normal = new Vector3D(0, 0, -1);
+			_normal = _initNormal.clone();
 			JMatrix3D.multiplyVector(_currState.orientation, _normal);
 			//_normal = _currState.orientation.transformVector(new Vector3D(0, 0, -1));
 			_distance = _currState.position.dotProduct(_normal);

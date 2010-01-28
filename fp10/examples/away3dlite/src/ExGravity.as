@@ -39,7 +39,7 @@ package
 				cubes[i] = cube;
 			}
 			
-			physics.createSphere(new BitmapFileMaterial("assets/earth.jpg"), 50).moveTo(new Vector3D(0, 50, 0));
+			physics.createSphere(new BitmapFileMaterial("assets/earth.jpg"), 50).moveTo(new Vector3D(0, -50, 0));
 			
 			//reset
 			reset();
@@ -51,7 +51,7 @@ package
 			for each (var cube:RigidBody in cubes)
 			{
 				cube.x = Math.random() * 500 - Math.random() * 500;
-				cube.y = 500 + Math.random() * 1000;
+				cube.y = -500 - Math.random() * 1000;
 				cube.z = Math.random() * 500 - Math.random() * 500;
 				cube.rotationX = 360 * Math.random();
 				cube.rotationY = 360 * Math.random();

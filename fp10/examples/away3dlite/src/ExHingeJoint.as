@@ -48,7 +48,6 @@ package
 			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 
-			JConfig.limitLinVelocities = 200;
 			JConfig.numContactIterations = 8;
 		}
 
@@ -76,13 +75,14 @@ package
 				{
 					sphere = physics.createSphere(new WireframeMaterial(), 20, 3, 2);
 				}
-
-				sphere.moveTo(new Vector3D(0, 130 + (25 * i + 25), 0));
+				sphere.maxLinVelocities = 200;
+				sphere.maxRotVelocities = 10;
+				sphere.moveTo(new Vector3D(0, -130 - (25 * i + 25), 0));
 
 				if (i != 0)
 				{
-					var pos1:Vector3D = JNumber3D.getScaleVector(JNumber3D.UP, -prevSphere.boundingSphere);
-					var pos2:Vector3D = JNumber3D.getScaleVector(JNumber3D.UP, sphere.boundingSphere);
+					var pos1:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, -prevSphere.boundingSphere);
+					var pos2:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, sphere.boundingSphere);
 
 					//set up the hinge joints.
 					chain[i] = new HingeJoint(prevSphere, sphere, Vector3D.X_AXIS, new Vector3D(0, 15, 0), 10, 30, 30, 0.1, 0.5);
@@ -98,7 +98,7 @@ package
 			for (i = 0; i < 10; i++)
 			{
 				boxBody[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				boxBody[i].moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), 500 + 500 * Math.random(), 500 * Math.random() - 500 * Math.random()));
+				boxBody[i].moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - 500 * Math.random(), 500 * Math.random() - 500 * Math.random()));
 			}
 
 			layer.addEventListener(MouseEvent.MOUSE_DOWN, handleMousePress);

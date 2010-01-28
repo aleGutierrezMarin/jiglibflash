@@ -56,7 +56,7 @@ package
 			for (var i:int = 0; i < 10; i++)
 			{
 				var box:RigidBody = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				box.moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), 500 + (100 * i + 100), 500 * Math.random() - 500 * Math.random()));
+				box.moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - (100 * i + 100), 500 * Math.random() - 500 * Math.random()));
 			}
 
 			//player
@@ -80,16 +80,16 @@ package
 
 			carBody = new JCar(new Away3DLiteMesh(carSkin));
 			carBody.setCar(40, 5, 500);
-			carBody.chassis.moveTo(new Vector3D(0, 100, 0));
+			carBody.chassis.moveTo(new Vector3D(0, -100, 0));
 			carBody.chassis.rotationY = 90;
 			carBody.chassis.mass = 9;
 			carBody.chassis.sideLengths = new Vector3D(40, 20, 90);
 			physics.addBody(carBody.chassis);
 
-			carBody.setupWheel("WheelFL", new Vector3D(-20, -10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelFR", new Vector3D(20, -10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBL", new Vector3D(-20, -10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBR", new Vector3D(20, -10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFL", new Vector3D(-20, 10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFR", new Vector3D(20, 10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelBL", new Vector3D(-20, 10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelBR", new Vector3D(20, 10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
 
 			steerFL = carSkin.getChildByName("WheelFL") as ObjectContainer3D;
 			steerFR = carSkin.getChildByName("WheelFR") as ObjectContainer3D;

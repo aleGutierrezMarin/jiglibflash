@@ -86,7 +86,7 @@ package jiglib.physics
 
 			if (hingeFwdAngle <= MAX_HINGE_ANGLE_LIMIT)
 			{
-				var perpDir:Vector3D = JNumber3D.UP;
+				var perpDir:Vector3D = Vector3D.Y_AXIS;
 				if (perpDir.dotProduct(_hingeAxis) > 0.1)
 				{
 					perpDir.x = 1;

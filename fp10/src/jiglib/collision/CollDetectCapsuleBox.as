@@ -69,6 +69,7 @@ package jiglib.collision
 			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
 			var cpInfo:CollPointInfo;
 
+			var averageNormal:Vector3D = new Vector3D();
 			var oldSeg:JSegment = new JSegment(capsule.getEndPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], -capsule.length));
 			var newSeg:JSegment = new JSegment(capsule.getEndPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], -capsule.length));
 			var radius:Number = capsule.radius;
@@ -103,9 +104,10 @@ package jiglib.collision
 				}
 				else
 				{
-					dir = JNumber3D.UP;
+					dir = Vector3D.Y_AXIS;
 					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), dir);
 				}
+				averageNormal = averageNormal.add(dir);
 
 				cpInfo = new CollPointInfo();
 				cpInfo.r0 = boxPos.subtract(capsule.oldState.position);
@@ -146,9 +148,10 @@ package jiglib.collision
 				}
 				else
 				{
-					dir = JNumber3D.UP;
+					dir = Vector3D.Y_AXIS;
 					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), dir);
 				}
+				averageNormal = averageNormal.add(dir);
 
 				cpInfo = new CollPointInfo();
 				cpInfo.r0 = boxPos.subtract(capsule.oldState.position);
@@ -159,9 +162,10 @@ package jiglib.collision
 
 			if (collPts.length > 0)
 			{
+				averageNormal.normalize();
 				var collInfo:CollisionInfo = new CollisionInfo();
 				collInfo.objInfo = info;
-				collInfo.dirToBody = dir;
+				collInfo.dirToBody = averageNormal;
 				collInfo.pointInfo = collPts;
 
 				var mat:MaterialProperties = new MaterialProperties();

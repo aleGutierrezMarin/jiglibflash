@@ -87,7 +87,7 @@ package jiglib.physics
 			_cachedContacts = new Vector.<ContactData>();
 			_collisionSystem = new CollisionSystem();
 
-			setGravity(JNumber3D.getScaleVector(JNumber3D.UP, -10));
+			setGravity(JNumber3D.getScaleVector(Vector3D.Y_AXIS, -10));
 		}
 
 		private function getAllExternalForces(dt:Number):void

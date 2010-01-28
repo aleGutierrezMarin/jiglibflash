@@ -1,4 +1,6 @@
 package jiglib.plugin.away3d {
+	import flash.geom.Vector3D;
+	
 	import away3d.containers.View3D;
 	import away3d.core.base.Mesh;
 	import away3d.primitives.Cube;
@@ -8,13 +10,9 @@ package jiglib.plugin.away3d {
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
-	import jiglib.math.JMatrix3D;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;	
 
-	/**
-	 * @author bartekd
-	 */
 	public class Away3DPhysics extends AbstractPhysics {
 		
 		private var view:View3D;
@@ -25,7 +23,11 @@ package jiglib.plugin.away3d {
 		}
 		
 		public function getMesh(body:RigidBody):Mesh {
-			return Away3dMesh(body.skin).mesh;
+			if(body.skin!=null){
+				return Away3dMesh(body.skin).mesh;
+			}else {
+				return null;
+			}
 		}
 		
 		/**
@@ -46,7 +48,9 @@ package jiglib.plugin.away3d {
 		 *  {width:100, height:100, depth:100}
 		 */
 		public function createCube(initObject:Object):RigidBody {
-			var w:Number = initObject["width"];			var d:Number = initObject["depth"];			var h:Number = initObject["height"];
+			var w:Number = initObject["width"];
+			var d:Number = initObject["depth"];
+			var h:Number = initObject["height"];
 			var cube:Cube = new Cube(initObject);
 			view.scene.addChild(cube);
 			var jbox:JBox = new JBox(new Away3dMesh(cube), w, d, h);
@@ -57,15 +61,11 @@ package jiglib.plugin.away3d {
 		/**
 		 * {width:100, height:100}
 		 */
-		public function createGround(initObject:Object, level:Number):RigidBody {
+		public function createGround(initObject:Object, level:Number = 0):RigidBody {
 			var ground:Plane = new Plane(initObject);
-			// Away3D plane
-			ground.rotationX = -90;
-			ground.applyRotations();
 			view.scene.addChild(ground);
-			var jGround:JPlane = new JPlane(new Away3dMesh(ground));
-			jGround.movable = false;
-			jGround.setOrientation(JMatrix3D.getRotationMatrixAxis(90));
+			
+			var jGround:JPlane = new JPlane(new Away3dMesh(ground), new Vector3D(0, 1, 0));
 			jGround.y = level;
 			addBody(jGround);
 			return jGround;
