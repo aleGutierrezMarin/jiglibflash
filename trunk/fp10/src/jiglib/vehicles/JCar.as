@@ -73,11 +73,14 @@ package jiglib.vehicles
 			wheelRestingFrac:Number = 0.5, wheelDampingFrac:Number = 0.5,
 			wheelNumRays:int = 1):void
 		{
+			var gravity:Vector3D = PhysicsSystem.getInstance().gravity.clone();
 			var mass:Number = _chassis.mass;
 			var mass4:Number = mass / _steerRate;
-			var axis:Vector3D = Vector3D.Y_AXIS;
-			var gravity:Number = PhysicsSystem.getInstance().gravity.length;
-			var spring:Number = mass4 * gravity / (wheelRestingFrac * wheelTravel);
+			var gravityLen:Number = PhysicsSystem.getInstance().gravity.length;
+			
+			gravity.normalize();
+			var axis:Vector3D =JNumber3D.getScaleVector(gravity,-1);
+			var spring:Number = mass4 * gravityLen / (wheelRestingFrac * wheelTravel);
 			var inertia:Number = 0.5 * wheelRadius * wheelRadius * mass;
 			var damping:Number = 2 * Math.sqrt(spring * mass);
 			damping /= _steerRate;
