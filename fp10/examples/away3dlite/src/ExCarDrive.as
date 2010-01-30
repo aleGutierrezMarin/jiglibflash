@@ -18,7 +18,7 @@ package
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import jiglib.vehicles.JCar;
 
-	[SWF(backgroundColor="#666666",frameRate="30",quality="MEDIUM",width="800",height="600")]
+	[SWF(backgroundColor="#666666",frameRate="60",quality="MEDIUM",width="800",height="600")]
 	/**
 	 * Example : Car Drive (didn't work yet)
 	 *
@@ -61,6 +61,9 @@ package
 
 			//player
 			initCar();
+			
+			stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDownHandler );
+			stage.addEventListener( KeyboardEvent.KEY_UP, keyUpHandler );
 		}
 
 		private function initCar():void
@@ -86,10 +89,10 @@ package
 			carBody.chassis.sideLengths = new Vector3D(40, 20, 90);
 			physics.addBody(carBody.chassis);
 
-			carBody.setupWheel("WheelFL", new Vector3D(-20, 10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelFR", new Vector3D(20, 10, 25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBL", new Vector3D(-20, 10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
-			carBody.setupWheel("WheelBR", new Vector3D(20, 10, -25), 1.2, 1.5, 3, 8, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFL", new Vector3D(-20, 10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelFR", new Vector3D(20, 10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelBL", new Vector3D(-20, 10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelBR", new Vector3D(20, 10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
 
 			steerFL = carSkin.getChildByName("WheelFL") as ObjectContainer3D;
 			steerFR = carSkin.getChildByName("WheelFR") as ObjectContainer3D;
@@ -104,29 +107,51 @@ package
 			wheelBR = carSkin.getChildByName("WheelBR") as Mesh;
 			wheelBR.material = new WireframeMaterial();
 		}
-
-		private function checkKey():void
+		
+		private function keyDownHandler(event :KeyboardEvent):void
 		{
-			var power:int = (Keyboard3D.keyType == KeyboardEvent.KEY_DOWN) ? 1 : 0;
-			title = String(Keyboard3D.keyType + ", " + Keyboard3D.keyCode + ", " + power);
-
-			switch (Keyboard3D.keyCode)
+			switch(event.keyCode)
 			{
 				case Keyboard.UP:
-					carBody.setAccelerate(1 * power);
+					carBody.setAccelerate(1);
 					break;
 				case Keyboard.DOWN:
-					carBody.setAccelerate(-1 * power);
+					carBody.setAccelerate(-1);
 					break;
 				case Keyboard.LEFT:
-					carBody.setSteer(["WheelFL", "WheelFR"], -1 * power);
+					carBody.setSteer(["WheelFL", "WheelFR"], 1);
 					break;
 				case Keyboard.RIGHT:
-					carBody.setSteer(["WheelFL", "WheelFR"], 1 * power);
+					carBody.setSteer(["WheelFL", "WheelFR"], -1);
 					break;
 				case Keyboard.SPACE:
-					carBody.setHBrake(power);
+					carBody.setHBrake(1);
 					break;
+			}
+		}
+
+
+		private function keyUpHandler(event:KeyboardEvent):void
+		{
+			switch(event.keyCode)
+			{
+				case Keyboard.UP:
+					carBody.setAccelerate(0);
+					break;
+					
+				case Keyboard.DOWN:
+					carBody.setAccelerate(0);
+					break;
+					
+				case Keyboard.LEFT:
+					carBody.setSteer(["WheelFL", "WheelFR"], 0);
+					break;
+					
+				case Keyboard.RIGHT:
+					carBody.setSteer(["WheelFL", "WheelFR"], 0);
+					break;
+				case Keyboard.SPACE:
+				   carBody.setHBrake(0);
 			}
 		}
 
@@ -135,39 +160,42 @@ package
 			if (!carBody)
 				return;
 
-			steerFL.rotationY = carBody.wheels["WheelFL"].getSteerAngle();
-			steerFR.rotationY = carBody.wheels["WheelFR"].getSteerAngle();
+			steerFL.rotationY = -carBody.wheels["WheelFL"].getSteerAngle();
+			steerFR.rotationY = -carBody.wheels["WheelFR"].getSteerAngle();
 
 			/*
 			wheelFL.pitch(carBody.wheels["WheelFL"].getRollAngle());
 			wheelFR.pitch(carBody.wheels["WheelFR"].getRollAngle());
 			 */
-			wheelFL.rotationX = carBody.wheels["WheelFL"].getRollAngle();
-			wheelFR.rotationX = carBody.wheels["WheelFR"].getRollAngle();
+			wheelFL.rotationX -= carBody.wheels["WheelFL"].getRollAngle();
+			wheelFR.rotationX -= carBody.wheels["WheelFR"].getRollAngle();
 
 			/*
 			wheelBL.roll(carBody.wheels["WheelBL"].getRollAngle());
 			wheelBR.roll(carBody.wheels["WheelBR"].getRollAngle());
 			*/
-			wheelFL.rotationX = carBody.wheels["WheelBL"].getRollAngle();
-			wheelFR.rotationX = carBody.wheels["WheelBR"].getRollAngle();
 			
-			steerFL.y = -carBody.wheels["WheelFL"].getActualPos().y;
-			steerFR.y = -carBody.wheels["WheelFR"].getActualPos().y;
-			wheelBL.y = -carBody.wheels["WheelBL"].getActualPos().y;
-			wheelBR.y = -carBody.wheels["WheelBR"].getActualPos().y;
+			//the model's axis have some issue, so can't use this to rotate back wheel.
+			/*
+			wheelBL.rotationX -= carBody.wheels["WheelBL"].getRollAngle();
+			wheelBR.rotationX -= carBody.wheels["WheelBR"].getRollAngle();
+			*/
+			
+			steerFL.y = carBody.wheels["WheelFL"].getActualPos().y;
+			steerFR.y = carBody.wheels["WheelFR"].getActualPos().y;
+			wheelBL.y = carBody.wheels["WheelBL"].getActualPos().y;
+			wheelBR.y = carBody.wheels["WheelBR"].getActualPos().y;
 		}
 
 		override protected function onPreRender():void
 		{
-			//move
-			checkKey();
 
 			//update
-			updateWheelSkin()
+			updateWheelSkin();
 
 			//run
-			physics.step();
+			//physics.step();
+			physics.engine.integrate(0.12);
 
 			//system
 			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position, new Vector3D(0, -1, 0));
