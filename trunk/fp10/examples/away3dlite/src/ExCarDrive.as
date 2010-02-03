@@ -69,6 +69,7 @@ package
 		private function initCar():void
 		{
 			var collada:Collada = new Collada();
+			collada.useIDAsName = false;
 			//collada.scaling = 2;
 
 			var loader:Loader3D = new Loader3D();
