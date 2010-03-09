@@ -5,6 +5,9 @@ package jiglib.plugin.away3d {
 	import away3d.core.base.Mesh;
 	import away3d.core.math.MatrixAway3D;
 	
+	/**
+	 * @author bartekd
+	 */
 	public class Away3dMesh implements ISkin3D {
 		
 		private var _mesh:Mesh;
