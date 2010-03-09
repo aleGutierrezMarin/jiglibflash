@@ -1,5 +1,6 @@
 package jiglib.plugin.away3d {
 	import flash.geom.Vector3D;
+	import flash.display.BitmapData;
 	
 	import away3d.containers.View3D;
 	import away3d.core.base.Mesh;
@@ -10,9 +11,14 @@ package jiglib.plugin.away3d {
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
+	import jiglib.geometry.JTerrain;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;	
+	import jiglib.plugin.away3d.Away3DTerrain;
 
+	/**
+	 * @author bartekd
+	 */
 	public class Away3DPhysics extends AbstractPhysics {
 		
 		private var view:View3D;
@@ -69,6 +75,16 @@ package jiglib.plugin.away3d {
 			jGround.y = level;
 			addBody(jGround);
 			return jGround;
+		}
+		
+		public function createTerrain(terrainHeightMap:BitmapData, initObject:Object):JTerrain {
+			var terrainMap:Away3DTerrain = new Away3DTerrain(terrainHeightMap, initObject);
+			view.scene.addChild(terrainMap);
+			
+			var terrain:JTerrain = new JTerrain(terrainMap);
+			addBody(terrain);
+			
+			return terrain;
 		}
 	}
 }

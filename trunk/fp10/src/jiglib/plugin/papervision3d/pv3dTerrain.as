@@ -15,8 +15,6 @@ package jiglib.plugin.papervision3d {
 	import org.papervision3d.core.proto.*;	
 	
 	import jiglib.plugin.ITerrain;
-	import jiglib.math.JNumber3D;
-	import jiglib.data.PlaneData;
 
 	/**
 	* Terrain Class

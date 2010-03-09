@@ -7,7 +7,7 @@ package jiglib.plugin.papervision3d {
 	import org.papervision3d.objects.DisplayObject3D;	
 
 	/**
-	 * @author muzer
+	 * @author bartekd
 	 */
 	public class Pv3dMesh implements ISkin3D{
 		
