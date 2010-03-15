@@ -22,7 +22,7 @@ package
 	/**
 	 * Example : Car Drive
 	 *
-	 * @see http://away3d.googlecode.com/svn/trunk/fp10/Away3DLite/src
+	 * @see http://away3d.googlecode.com/svn/branches/lite/libs
 	 * @see http://jiglibflash.googlecode.com/svn/trunk/fp10/src
 	 *
 	 * @author katopz
