@@ -152,6 +152,28 @@ package jiglib.physics
 		{
 			return deg * Math.PI / 180;
 		}
+		
+		//update rotation values (rotationX, rotationY, rotationZ) to the actual current values, 
+		// these values are not updated based on real-time physics changes 
+		// This is currently not done in real-time for performance reasons
+		// Useful once you have a physics objects that is no longer in the physics system but you want to manipulate it's rotation.
+		// Only needs to be called once after disabling from physics system
+		public function updateRotationValues():void
+		{
+			var rotationVector:Vector3D = _currState.orientation.decompose()[1];
+			_rotationX = formatRotation(radiansToDegrees(rotationVector.x));
+			_rotationY = formatRotation(radiansToDegrees(rotationVector.y));
+			_rotationZ = formatRotation(radiansToDegrees(rotationVector.z));	
+		}
+		
+		//from FIVe3D library - InternalUtils (MIT License)
+		protected static function formatRotation(angle:Number):Number {
+			if (angle >= -180 && angle <= 180) return angle;
+			var angle2:Number = angle % 360;
+			if (angle2 < -180) return angle2 + 360;
+			if (angle2 > 180) return angle2 - 360;
+			return angle2;
+		}
 
 		public function get rotationX():Number
 		{
