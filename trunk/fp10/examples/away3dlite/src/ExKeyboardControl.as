@@ -2,7 +2,7 @@ package
 {
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
-	import away3dlite.templates.ui.Keyboard3D;
+	import away3dlite.ui.Keyboard3D;
 	
 	import flash.geom.Vector3D;
 	
