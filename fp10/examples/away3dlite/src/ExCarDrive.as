@@ -9,16 +9,16 @@ package
 	import away3dlite.materials.WireColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
-	
+
 	import flash.events.KeyboardEvent;
 	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
-	
+
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import jiglib.vehicles.JCar;
 
-	[SWF(backgroundColor="#666666", frameRate="60", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
 	/**
 	 * Example : Car Drive
 	 *
@@ -52,7 +52,7 @@ package
 				var box:RigidBody = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
 				box.moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - (100 * i + 100), 500 * Math.random() - 500 * Math.random()));
 			}
-			
+
 			//player
 			initCar();
 
@@ -75,12 +75,12 @@ package
 		private function onSuccess(event:Loader3DEvent):void
 		{
 			var carSkin:ObjectContainer3D = event.loader.handle as ObjectContainer3D;
-			
-            // wheel
-            carSkin.materialLibrary.getMaterial("ColorMaterial_06860600").material = new WireColorMaterial();
-            // body
-            carSkin.materialLibrary.getMaterial("ColorMaterial_E3989800").material = new WireColorMaterial();
-            
+
+			// wheel
+			carSkin.materialLibrary.getMaterial("ColorMaterial_06860600").material = new WireColorMaterial();
+			// body
+			carSkin.materialLibrary.getMaterial("ColorMaterial_E3989800").material = new WireColorMaterial();
+
 			carBody = new JCar(new Away3DLiteMesh(carSkin));
 			carBody.setCar(40, 5, 500);
 			carBody.chassis.moveTo(new Vector3D(0, -100, 0));
@@ -99,7 +99,7 @@ package
 
 			wheelFL = carSkin.getChildByName("WheelFL_PIVOT") as Mesh;
 			wheelFL.material = new WireframeMaterial();
-			
+
 			wheelFR = carSkin.getChildByName("WheelFR_PIVOT") as Mesh;
 			wheelFR.material = new WireframeMaterial();
 
@@ -184,7 +184,7 @@ package
 			physics.engine.integrate(0.12);
 
 			//system
-			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position, new Vector3D(0, -1, 0));
+			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position);
 		}
 	}
 }

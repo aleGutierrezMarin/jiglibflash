@@ -4,23 +4,23 @@ package
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
-	
+
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.math.*;
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 
-	[SWF(backgroundColor="#666666",frameRate="30",quality="MEDIUM",width="800",height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
 	/**
 	 * Example : Physics Constraint
-	 * 
- 	 * @see http://away3d.googlecode.com/svn/trunk/fp10/Away3DLite/src
+	 *
+	 * @see http://away3d.googlecode.com/svn/trunk/fp10/Away3DLite/src
 	 * @see http://jiglibflash.googlecode.com/svn/trunk/fp10/src
-	 * 
+	 *
 	 * @author katopz
 	 */
 	public class ExConstraint extends PhysicsTemplate
@@ -32,7 +32,7 @@ package
 		private var currDragBody:RigidBody;
 		private var dragConstraint:JConstraintWorldPoint;
 		private var planeToDragOn:Vector3D;
-		
+
 		private var startMousePos:Vector3D;
 
 		override protected function build():void
@@ -40,61 +40,61 @@ package
 			title += " | Constraint : Use mouse to drag red ball | ";
 
 			camera.y = -1000;
-			
-			view.renderer = new FastRenderer();
-			
+
 			init3D();
-			
+
 			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 		}
-		
+
 		private function init3D():void
 		{
 			// TODO: use object hit instead of layer
 			var layer:Sprite = new Sprite();
 			view.addChild(layer);
-			
+
 			var sphere:RigidBody;
 			var prevSphere:RigidBody;
-			
-			for(var i:int = 0; i<4; i++)
+
+			for (var i:int = 0; i < 4; i++)
 			{
-				if(i==0)
+				if (i == 0)
 				{
-					sphere = physics.createSphere(new ColorMaterial(0xFF0000), 25, 6 , 6);
-					
+					sphere = physics.createSphere(new ColorMaterial(0xFF0000), 25, 6, 6);
+
 					// draggable
 					currDragBody = sphere;
 					Away3DLiteMesh(sphere.skin).mesh.layer = layer;
-				}else{
+				}
+				else
+				{
 					sphere = physics.createSphere(new WireframeMaterial(), 25);
 				}
-				
+
 				sphere.mass = 5;
-				sphere.currentState.position.x = -i*50;
+				sphere.currentState.position.x = -i * 50;
 				sphere.currentState.position.y = -300;
-				
-				if(i != 0)
+
+				if (i != 0)
 				{
 					var pos1:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, -prevSphere.boundingSphere);
 					var pos2:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, sphere.boundingSphere);
 					var constraint:JConstraintPoint = new JConstraintPoint(prevSphere, pos1, sphere, pos2, 1, 1);
 				}
-				
+
 				prevSphere = sphere;
 			}
-			
+
 			boxBody = [];
 			for (i = 0; i < 10; i++)
 			{
 				boxBody[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				boxBody[i].moveTo(new Vector3D(500*Math.random()-500*Math.random(), -500-500*Math.random(), 500*Math.random()-500*Math.random()));
+				boxBody[i].moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - 500 * Math.random(), 500 * Math.random() - 500 * Math.random()));
 			}
-			
+
 			layer.addEventListener(MouseEvent.MOUSE_DOWN, handleMousePress);
 		}
-		
+
 		private function handleMousePress(event:MouseEvent):void
 		{
 			onDraging = true;
@@ -113,13 +113,13 @@ package
 			dragConstraint = new JConstraintWorldPoint(currDragBody, a, b);
 			physics.engine.addConstraint(dragConstraint);
 		}
-		
+
 		// TODO:clean up/by pass
 		private function handleMouseMove(event:MouseEvent):void
 		{
 			if (onDraging)
 			{
-				var ray:Vector3D = JMath3D.unproject(camera.transform.matrix3D, camera.focus , camera.zoom, view.mouseX, -view.mouseY);
+				var ray:Vector3D = JMath3D.unproject(camera.transform.matrix3D, camera.focus, camera.zoom, view.mouseX, -view.mouseY);
 				ray.add(new Vector3D(view.camera.x, view.camera.y, view.camera.z));
 
 				var cameraVector3D:Vector3D = new Vector3D(view.camera.x, view.camera.y, view.camera.z);
@@ -146,7 +146,7 @@ package
 			physics.step();
 
 			//system
-			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position, new Vector3D(0, -1, 0));
+			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position);
 		}
 	}
 }

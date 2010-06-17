@@ -2,15 +2,15 @@ package
 {
 	import away3dlite.materials.BitmapFileMaterial;
 	import away3dlite.materials.WireframeMaterial;
-	
+
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import away3dlite.templates.PhysicsTemplate;
 
-	[SWF(backgroundColor="#666666",frameRate="30",quality="MEDIUM",width="800",height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
 	/**
 	 * Example : Gravity
 	 *
@@ -38,9 +38,9 @@ package
 				cube.material.restitution = .1;
 				cubes[i] = cube;
 			}
-			
-			physics.createSphere(new BitmapFileMaterial("assets/earth.jpg"), 50).moveTo(new Vector3D(0, -50, 0));
-			
+
+			physics.createSphere(new BitmapFileMaterial("assets/earth.jpg"), 50).moveTo(new Vector3D(0, -100, 0));
+
 			//reset
 			reset();
 			stage.addEventListener(MouseEvent.CLICK, reset);
@@ -66,7 +66,7 @@ package
 			physics.step();
 
 			//system
-			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position, new Vector3D(0, -1, 0));
+			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position);
 		}
 	}
 }
