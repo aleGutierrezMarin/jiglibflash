@@ -96,7 +96,7 @@ package jiglib.plugin.papervision3d {
 		*/
 		public function pv3dTerrain( terrainHeightMap:BitmapData, material:MaterialObject3D = null, width:Number = 0, depth:Number = 0, maxHeight:Number = 0, segmentsW:int = 0, segmentsH:int = 0 )
 		{
-			super( material, new Array(), new Array(), null );
+			super( material, [], [], null );
 	
 			this.segmentsW = segmentsW || DEFAULT_SEGMENTS; // Defaults to 1
 			this.segmentsH = segmentsH || this.segmentsW;   // Defaults to segmentsW
@@ -142,11 +142,11 @@ package jiglib.plugin.papervision3d {
 			_dw = width / gridX;
 			_dh = depth / gridY;
 	
-			_heights = new Array();
+			_heights = [];
 			// Vertices
 			for( var ix:int = 0; ix < gridX1; ix++ )
 			{
-				_heights[ix] = new Array();
+				_heights[ix] = [];
 				for( var iy:int = 0; iy < gridY1; iy++ )
 				{
 					var x :Number = ix * _dw - textureX;
