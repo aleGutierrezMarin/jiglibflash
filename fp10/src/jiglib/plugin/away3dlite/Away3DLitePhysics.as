@@ -22,29 +22,27 @@ package jiglib.plugin.away3dlite
 	 */
 	public class Away3DLitePhysics extends AbstractPhysics
 	{
-		private var scene:Scene3D;
+		private var _scene:Scene3D;
 
 		public function Away3DLitePhysics(scene:Scene3D, speed:Number = 1)
 		{
 			super(speed);
-			this.scene = scene;
+			
+			_scene = scene;
+			
 			engine.setGravity(JNumber3D.getScaleVector(Vector3D.Y_AXIS, 10));
 		}
 
 		public function getMesh(body:RigidBody):Mesh
 		{
-			if(body.skin!=null){
-				return Away3DLiteMesh(body.skin).mesh as Mesh;
-			}else {
-				return null;
-			}
+			return body.skin ? Away3DLiteMesh(body.skin).mesh as Mesh : null;
 		}
 
 		public function createSphere(material:Material, radius:Number = 100, segmentsW:int = 8, segmentsH:int = 6):RigidBody
 		{
 			var sphere:Sphere = new Sphere(material, radius, segmentsW, segmentsH);
-			scene.addChild(sphere);
-			
+			_scene.addChild(sphere);
+
 			var jsphere:JSphere = new JSphere(new Away3DLiteMesh(sphere), radius);
 			addBody(jsphere);
 			return jsphere;
@@ -53,24 +51,24 @@ package jiglib.plugin.away3dlite
 		public function createCube(material:Material, width:Number = 100, depth:Number = 100, height:Number = 100):RigidBody
 		{
 			var cube:Cube6 = new Cube6(material, width, height, depth);
-			scene.addChild(cube);
-			
+			_scene.addChild(cube);
+
 			var jbox:JBox = new JBox(new Away3DLiteMesh(cube), width, depth, height);
 			addBody(jbox);
 			return jbox;
 		}
-
+		
 		public function createGround(material:Material, size:Number, level:Number):RigidBody
 		{
 			var ground:Plane = new Plane(material, size, size, 1, 1);
-			scene.addChild(ground);
-			
+			_scene.addChild(ground);
+
 			var jGround:JPlane = new JPlane(new Away3DLiteMesh(ground), new Vector3D(0, -1, 0));
 			jGround.y = level;
 			addBody(jGround);
-			
+
 			jGround.updateObject3D();
-			
+
 			return jGround;
 		}
 	}
