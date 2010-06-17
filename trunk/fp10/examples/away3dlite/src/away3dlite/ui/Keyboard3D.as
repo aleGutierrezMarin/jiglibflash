@@ -87,14 +87,14 @@ package away3dlite.ui
 			if (_yUp)
 			{
 				position.x = _dx;
-				position.y = -_dy;
+				position.y = _dy;
 				position.z = _dz;
 				position.w = _dw;
 			}
 			else
 			{
 				position.x = _dx;
-				position.y = _dy;
+				position.y = -_dy;
 				position.z = _dz;
 				position.w = _dw;
 			}

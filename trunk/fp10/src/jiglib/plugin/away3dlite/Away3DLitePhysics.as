@@ -12,7 +12,6 @@ package jiglib.plugin.away3dlite
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
-	import jiglib.math.JMatrix3D;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;

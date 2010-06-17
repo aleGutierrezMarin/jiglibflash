@@ -2,11 +2,11 @@ package
 {
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
-	
+
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.cof.JConfig;
 	import jiglib.math.*;
 	import jiglib.physics.*;
@@ -14,7 +14,7 @@ package
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import away3dlite.templates.PhysicsTemplate;
 
-	[SWF(backgroundColor="#666666",frameRate="30",quality="MEDIUM",width="800",height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
 	/**
 	 * Example : Physics HingeJoint
 	 *
@@ -128,7 +128,7 @@ package
 		{
 			if (onDraging)
 			{
-				var ray:Vector3D = JMath3D.unproject(camera.transform.matrix3D, camera.focus , camera.zoom, view.mouseX, -view.mouseY);
+				var ray:Vector3D = JMath3D.unproject(camera.transform.matrix3D, camera.focus, camera.zoom, view.mouseX, -view.mouseY);
 				ray.add(new Vector3D(view.camera.x, view.camera.y, view.camera.z));
 
 				var cameraVector3D:Vector3D = new Vector3D(view.camera.x, view.camera.y, view.camera.z);
@@ -148,14 +148,14 @@ package
 				currDragBody.setActive();
 			}
 		}
-		
+
 		override protected function onPreRender():void
 		{
 			//run
 			physics.step();
 
 			//system
-			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position, new Vector3D(0, -1, 0));
+			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position);
 		}
 	}
 }
