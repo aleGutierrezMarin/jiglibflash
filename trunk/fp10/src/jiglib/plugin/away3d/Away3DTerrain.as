@@ -51,11 +51,11 @@
 			_dw = width / segmentsW;
 			_dh = height / segmentsH;
 			
-			_heights = new Array();
+			_heights = [];
 			
 			for ( var ix:int = 0; ix < gridX; ix++ )
 			{
-				_heights[ix] = new Array();
+				_heights[ix] = [];
 				for ( var iy:int = 0; iy < gridY; iy++ )
 				{
 					_heights[ix][iy] = (terrainHeightMap.getPixel((ix / gridX) * terrainHeightMap.width, (iy / gridY) * terrainHeightMap.height) & 0xFF);
