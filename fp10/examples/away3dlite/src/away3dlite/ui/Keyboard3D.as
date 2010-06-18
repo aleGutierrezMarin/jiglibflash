@@ -1,7 +1,7 @@
 package away3dlite.ui
 {
 	import away3dlite.events.Keyboard3DEvent;
-
+	
 	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -35,18 +35,26 @@ package away3dlite.ui
 		public static var position:Vector3D;
 
 		private var _target:InteractiveObject;
-		private var _yUp:Boolean = true;
+		public var yUp:Boolean = true;
+		public var _eventHandler:Function;
 
 		private var _numKeyPress:int = 0;
 
-		public function Keyboard3D(target:InteractiveObject, yUp:Boolean = true)
+		public function Keyboard3D(target:InteractiveObject, eventHandler:Function = null)
 		{
-			this._target = target;
-			this._yUp = yUp;
+			_target = target;
+			_eventHandler = eventHandler;
+
+			_target.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
+			_target.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
+
+			if(_eventHandler is Function)
+			{
+				_target.addEventListener(KeyboardEvent.KEY_DOWN, _eventHandler);
+				_target.addEventListener(KeyboardEvent.KEY_UP, _eventHandler);
+			}
 
 			position = new Vector3D();
-			target.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
-			target.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
 		}
 
 		public function destroy():void
@@ -54,6 +62,12 @@ package away3dlite.ui
 			_target.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
 			_target.removeEventListener(KeyboardEvent.KEY_UP, keyHandler);
 			_target.removeEventListener(Event.ENTER_FRAME, onKey);
+
+			if(_eventHandler is Function)
+			{
+				_target.removeEventListener(KeyboardEvent.KEY_DOWN, _eventHandler);
+				_target.removeEventListener(KeyboardEvent.KEY_UP, _eventHandler);
+			}
 		}
 
 		private function onKey(event:Event):void
@@ -84,21 +98,11 @@ package away3dlite.ui
 			else if (isKeyPeekRight)
 				_dw = 1;
 
-			if (_yUp)
-			{
-				position.x = _dx;
-				position.y = _dy;
-				position.z = _dz;
-				position.w = _dw;
-			}
-			else
-			{
-				position.x = _dx;
-				position.y = -_dy;
-				position.z = _dz;
-				position.w = _dw;
-			}
-
+			position.x = _dx;
+			position.y = yUp?_dy:-_dy;
+			position.z = _dz;
+			position.w = _dw;
+			
 			dispatchEvent(new Keyboard3DEvent(Keyboard3DEvent.KEY_PRESS, position));
 		}
 
