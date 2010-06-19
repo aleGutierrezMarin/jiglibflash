@@ -16,8 +16,6 @@ package
 	/**
 	 * Example : First Person Control
 	 * 
-	 * TODO : replace strafe left/right with move left/right
-	 *
 	 * @see http://away3d.googlecode.com/svn/trunk/fp10/Away3DLite/src
 	 * @see http://jiglibflash.googlecode.com/svn/trunk/fp10/src
 	 *
@@ -25,7 +23,7 @@ package
 	 */
 	public class ExFirstPersonControl extends PhysicsTemplate
 	{
-		private var _camearaRigidBody:RigidBody;
+		private var _cameraRigidBody:RigidBody;
 
 		private var _isDrag:Boolean;
 		private var _startDragPoint:Point;
@@ -49,10 +47,10 @@ package
 			}
 
 			//camera instance
-			_camearaRigidBody = physics.createCube(new WireframeMaterial, 50, 50, 50);
-			Away3DLiteMesh(_camearaRigidBody.skin).mesh.visible = false;
-			_camearaRigidBody.moveTo(new Vector3D(0, -50, 0));
-			_camearaRigidBody.mass = 3;
+			_cameraRigidBody = physics.createCube(new WireframeMaterial, 50, 50, 50);
+			Away3DLiteMesh(_cameraRigidBody.skin).mesh.visible = false;
+			_cameraRigidBody.moveTo(new Vector3D(0, -50, 0));
+			_cameraRigidBody.mass = 3;
 
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouse);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onMouse);
@@ -75,7 +73,7 @@ package
 		override protected function onPreRender():void
 		{
 			// current state
-			var _matrix3D:Matrix3D = _camearaRigidBody.getTransform();
+			var _matrix3D:Matrix3D = _cameraRigidBody.getTransform();
 			var _p:Vector3D = Keyboard3D.position.clone();
 			
 			// look
@@ -84,8 +82,8 @@ package
 				var _currentPoint:Point = new Point(view.mouseX, view.mouseY);
 				_startDragPoint = _currentPoint.subtract(_startDragPoint);
 				
-				_camearaRigidBody.rotationY += _startDragPoint.x / 20;
-				_camearaRigidBody.rotationX -= _startDragPoint.y / 20;
+				_cameraRigidBody.rotationY += _startDragPoint.x / 20;
+				_cameraRigidBody.rotationX -= _startDragPoint.y / 20;
 				
 				_startDragPoint = _currentPoint.clone();
 			}
@@ -96,14 +94,14 @@ package
 				var _force:Vector3D = _p.clone();
 				_force.scaleBy(20);
 				
-				_camearaRigidBody.addBodyForce(_force, _p);
+				_cameraRigidBody.addBodyForce(_force, _p);
 			}
 
 			// run
 			physics.step();
 			
 			// move camera
-			camera.transform.matrix3D = _camearaRigidBody.getTransform().clone();
+			camera.transform.matrix3D = _cameraRigidBody.getTransform().clone();
 		}
 	}
 }
