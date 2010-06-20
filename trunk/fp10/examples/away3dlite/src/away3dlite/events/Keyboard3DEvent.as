@@ -7,7 +7,7 @@ package away3dlite.events
 	 */
 	public class Keyboard3DEvent extends Event
 	{
-		public static const KEY_PRESS:String = "lite-key-press";
+		public static const KEY_PRESS:String = "key-press-3d";
 
 		public var data:Object;
 
@@ -24,7 +24,7 @@ package away3dlite.events
 
 		public override function toString():String
 		{
-			return formatToString("LiteKeyboardEvent", "type", "bubbles", "cancelable", "eventPhase", "data");
+			return formatToString("Keyboard3DEvent", "type", "bubbles", "cancelable", "eventPhase", "data");
 		}
 	}
 }

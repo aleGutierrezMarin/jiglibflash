@@ -1,7 +1,7 @@
 package away3dlite.ui
 {
 	import away3dlite.events.Keyboard3DEvent;
-	
+
 	import flash.display.InteractiveObject;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -38,7 +38,7 @@ package away3dlite.ui
 		public var yUp:Boolean = true;
 		public var _eventHandler:Function;
 
-		private var _numKeyPress:int = 0;
+		private var _keys:Array = [];
 
 		public function Keyboard3D(target:InteractiveObject, eventHandler:Function = null)
 		{
@@ -48,26 +48,13 @@ package away3dlite.ui
 			_target.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
 			_target.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
 
-			if(_eventHandler is Function)
+			if (_eventHandler is Function)
 			{
 				_target.addEventListener(KeyboardEvent.KEY_DOWN, _eventHandler);
 				_target.addEventListener(KeyboardEvent.KEY_UP, _eventHandler);
 			}
 
 			position = new Vector3D();
-		}
-
-		public function destroy():void
-		{
-			_target.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
-			_target.removeEventListener(KeyboardEvent.KEY_UP, keyHandler);
-			_target.removeEventListener(Event.ENTER_FRAME, onKey);
-
-			if(_eventHandler is Function)
-			{
-				_target.removeEventListener(KeyboardEvent.KEY_DOWN, _eventHandler);
-				_target.removeEventListener(KeyboardEvent.KEY_UP, _eventHandler);
-			}
 		}
 
 		private function onKey(event:Event):void
@@ -99,11 +86,24 @@ package away3dlite.ui
 				_dw = 1;
 
 			position.x = _dx;
-			position.y = yUp?_dy:-_dy;
+			position.y = yUp ? _dy : -_dy;
 			position.z = _dz;
 			position.w = _dw;
-			
+
 			dispatchEvent(new Keyboard3DEvent(Keyboard3DEvent.KEY_PRESS, position));
+		}
+
+		private function addKey(keyCode:int):void
+		{
+			if (_keys.indexOf(keyCode) == -1)
+				_keys.push(keyCode);
+		}
+
+		private function removeKey(keyCode:int):void
+		{
+			var i:int = _keys.indexOf(keyCode);
+			if (i != -1)
+				_keys.splice(i, 1);
 		}
 
 		private function keyHandler(event:KeyboardEvent):void
@@ -119,132 +119,154 @@ package away3dlite.ui
 				case KeyboardEvent.KEY_DOWN:
 					keyCode = event.keyCode;
 					isSPACE = (event.keyCode == Keyboard.SPACE);
+
 					switch (event.keyCode)
 					{
 						case "W".charCodeAt():
 						case Keyboard.UP:
 							isKeyForward = true;
 							isKeyBackward = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "S".charCodeAt():
 						case Keyboard.DOWN:
 							isKeyBackward = true;
 							isKeyForward = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "A".charCodeAt():
 						case Keyboard.LEFT:
 							isKeyLeft = true;
 							isKeyRight = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "D".charCodeAt():
 						case Keyboard.RIGHT:
 							isKeyRight = true;
 							isKeyLeft = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "C".charCodeAt():
 						case Keyboard.PAGE_UP:
 							isKeyDown = true;
 							isKeyUp = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "V".charCodeAt():
 						case Keyboard.PAGE_DOWN:
 							isKeyUp = true;
 							isKeyDown = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "Q".charCodeAt():
 						case "[".charCodeAt():
 							isKeyPeekLeft = true;
 							isKeyPeekRight = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 
 						case "E".charCodeAt():
 						case "]".charCodeAt():
 							isKeyPeekRight = true;
 							isKeyPeekLeft = false;
-							_numKeyPress++;
+							addKey(event.keyCode);
 							break;
 					}
-					if ((_numKeyPress > 0) && !_target.hasEventListener(Event.ENTER_FRAME))
+
+					if (_keys.length > 0 && !_target.hasEventListener(Event.ENTER_FRAME))
 						_target.addEventListener(Event.ENTER_FRAME, onKey, false, 0, true);
 					break;
 				case KeyboardEvent.KEY_UP:
-					keyCode = 0;
+
 					if (event.keyCode == Keyboard.SPACE)
-					{
 						isSPACE = false;
-					}
+
 					switch (event.keyCode)
 					{
 						case "W".charCodeAt():
 						case Keyboard.UP:
 							isKeyForward = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "S".charCodeAt():
 						case Keyboard.DOWN:
 							isKeyBackward = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "A".charCodeAt():
 						case Keyboard.LEFT:
 							isKeyLeft = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "D".charCodeAt():
 						case Keyboard.RIGHT:
 							isKeyRight = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "C".charCodeAt():
 						case Keyboard.PAGE_UP:
 							isKeyDown = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "V".charCodeAt():
 						case Keyboard.PAGE_DOWN:
 							isKeyUp = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "Q".charCodeAt():
 						case "[".charCodeAt():
 							isKeyPeekLeft = false;
 							isKeyPeekRight = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 
 						case "E".charCodeAt():
 						case "]".charCodeAt():
 							isKeyPeekRight = false;
 							isKeyPeekLeft = false;
-							--_numKeyPress;
+							removeKey(event.keyCode);
+							;
 							break;
 					}
-					if (_numKeyPress <= 0)
+					if (_keys.length == 0)
 					{
 						_target.removeEventListener(Event.ENTER_FRAME, onKey);
+						keyCode = 0;
 						position = new Vector3D();
-						_numKeyPress = 0;
 					}
 					break;
+			}
+		}
+
+		public function destroy():void
+		{
+			_target.removeEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
+			_target.removeEventListener(KeyboardEvent.KEY_UP, keyHandler);
+			_target.removeEventListener(Event.ENTER_FRAME, onKey);
+
+			if (_eventHandler is Function)
+			{
+				_target.removeEventListener(KeyboardEvent.KEY_DOWN, _eventHandler);
+				_target.removeEventListener(KeyboardEvent.KEY_UP, _eventHandler);
 			}
 		}
 	}
