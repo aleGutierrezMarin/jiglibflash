@@ -128,11 +128,11 @@ package
 		{
 			if (onDraging)
 			{
-				var ray:Vector3D = JMath3D.unproject(camera.transform.matrix3D, camera.focus, camera.zoom, view.mouseX, -view.mouseY);
-				ray.add(new Vector3D(view.camera.x, view.camera.y, view.camera.z));
+				var _ray:Vector3D = camera.lens.unProject(view.mouseX, view.mouseY, camera.screenMatrix3D.position.z);
+				_ray = camera.transform.matrix3D.transformVector(_ray);
 
 				var cameraVector3D:Vector3D = new Vector3D(view.camera.x, view.camera.y, view.camera.z);
-				var rayVector3D:Vector3D = new Vector3D(ray.x, ray.y, ray.z);
+				var rayVector3D:Vector3D = new Vector3D(_ray.x, _ray.y, _ray.z);
 				var intersectPoint:Vector3D = JMath3D.getIntersectionLine(planeToDragOn, cameraVector3D, rayVector3D);
 
 				dragConstraint.worldPosition = new Vector3D(intersectPoint.x, intersectPoint.y, intersectPoint.z);

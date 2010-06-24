@@ -2,16 +2,16 @@ package
 {
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
-
+	import away3dlite.templates.PhysicsTemplate;
+	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.math.*;
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
-	import away3dlite.templates.PhysicsTemplate;
 
 	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
 	/**
@@ -24,15 +24,15 @@ package
 	 */
 	public class ExMouseControl extends PhysicsTemplate
 	{
-		private var boxBody:Array;
+		private var _boxBodies:Array;
 
-		private var onDraging:Boolean = false;
+		private var _isDrag:Boolean = false;
 
-		private var currDragBody:RigidBody;
-		private var dragConstraint:JConstraintWorldPoint;
-		private var planeToDragOn:Vector3D;
+		private var _currDragBody:RigidBody;
+		private var _dragConstraint:JConstraintWorldPoint;
+		private var _planeToDragOn:Vector3D;
 
-		private var startMousePos:Vector3D;
+		private var _startMousePos:Vector3D;
 
 		override protected function build():void
 		{
@@ -63,7 +63,7 @@ package
 					ball = physics.createSphere(new ColorMaterial(0xFF0000), 25);
 
 					// draggable
-					currDragBody = ball;
+					_currDragBody = ball;
 					Away3DLiteMesh(ball.skin).mesh.layer = layer;
 				}
 				else
@@ -74,11 +74,11 @@ package
 				ball.moveTo(new Vector3D(-100, -500 - (100 * i + 100), -100));
 			}
 
-			boxBody = [];
+			_boxBodies = [];
 			for (i = 0; i < 10; i++)
 			{
-				boxBody[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				boxBody[i].moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - 500 * Math.random(), 500 * Math.random() - 500 * Math.random()));
+				_boxBodies[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
+				_boxBodies[i].moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - 500 * Math.random(), 500 * Math.random() - 500 * Math.random()));
 			}
 
 			layer.addEventListener(MouseEvent.MOUSE_DOWN, handleMousePress);
@@ -86,46 +86,34 @@ package
 
 		private function handleMousePress(event:MouseEvent):void
 		{
-			onDraging = true;
-			var layer:Sprite = event.target as Sprite;
+			_isDrag = true;
 
-			startMousePos = new Vector3D(currDragBody.x, currDragBody.y, currDragBody.z);
+			_startMousePos = _currDragBody.getTransform().position;
+			_planeToDragOn = JMath3D.fromNormalAndPoint(Vector3D.Y_AXIS, new Vector3D(0, 0, -_startMousePos.z));
+			var bodyPoint:Vector3D = _startMousePos.subtract(_currDragBody.currentState.position);
 
-			planeToDragOn = JMath3D.fromNormalAndPoint(new Vector3D(0, 1, 0), new Vector3D(0, 0, -startMousePos.z));
+			_dragConstraint = new JConstraintWorldPoint(_currDragBody, bodyPoint, _startMousePos);
 
-			var p:Vector3D = currDragBody.currentState.position;
-			var bodyPoint:Vector3D = startMousePos.subtract(new Vector3D(p.x, p.y, p.z));
-
-			var a:Vector3D = new Vector3D(bodyPoint.x, bodyPoint.y, bodyPoint.z);
-			var b:Vector3D = new Vector3D(startMousePos.x, startMousePos.y, startMousePos.z);
-
-			dragConstraint = new JConstraintWorldPoint(currDragBody, a, b);
-			physics.engine.addConstraint(dragConstraint);
+			physics.engine.addConstraint(_dragConstraint);
 		}
 
-		// TODO:clean up/by pass
 		private function handleMouseMove(event:MouseEvent):void
 		{
-			if (onDraging)
+			if (_isDrag)
 			{
-				var ray:Vector3D = JMath3D.unproject(camera.transform.matrix3D, camera.focus, camera.zoom, view.mouseX, -view.mouseY);
-				ray.add(new Vector3D(view.camera.x, view.camera.y, view.camera.z));
-
-				var cameraVector3D:Vector3D = new Vector3D(view.camera.x, view.camera.y, view.camera.z);
-				var rayVector3D:Vector3D = new Vector3D(ray.x, ray.y, ray.z);
-				var intersectPoint:Vector3D = JMath3D.getIntersectionLine(planeToDragOn, cameraVector3D, rayVector3D);
-
-				dragConstraint.worldPosition = new Vector3D(intersectPoint.x, intersectPoint.y, intersectPoint.z);
+				var _ray:Vector3D = camera.lens.unProject(view.mouseX, view.mouseY, camera.screenMatrix3D.position.z);
+				_ray = camera.transform.matrix3D.transformVector(_ray);
+				_dragConstraint.worldPosition = JMath3D.getIntersectionLine(_planeToDragOn, camera.position, _ray);
 			}
 		}
 
 		private function handleMouseRelease(event:MouseEvent):void
 		{
-			if (onDraging)
+			if (_isDrag)
 			{
-				onDraging = false;
-				physics.engine.removeConstraint(dragConstraint);
-				currDragBody.setActive();
+				_isDrag = false;
+				physics.engine.removeConstraint(_dragConstraint);
+				_currDragBody.setActive();
 			}
 		}
 

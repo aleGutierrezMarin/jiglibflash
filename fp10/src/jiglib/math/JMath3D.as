@@ -26,12 +26,5 @@ package jiglib.math
 				v1.y + (v0.y - v1.y) * m,
 				v1.z + (v0.z - v1.z) * m);
 		}
-
-		public static function unproject(matrix3D:Matrix3D, focus:Number, zoom:Number, mX:Number, mY:Number):Vector3D
-		{
-			var persp:Number = (focus * zoom) / focus;
-			var vector:Vector3D = new Vector3D(mX / persp, -mY / persp, focus);
-			return matrix3D.transformVector(vector);
-		}
 	}
 }
