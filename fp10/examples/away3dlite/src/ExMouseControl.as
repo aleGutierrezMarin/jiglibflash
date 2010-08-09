@@ -41,9 +41,6 @@ package
 			camera.y = -1000;
 
 			init3D();
-
-			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 		}
 
 		private function init3D():void
@@ -95,6 +92,9 @@ package
 			_dragConstraint = new JConstraintWorldPoint(_currDragBody, bodyPoint, _startMousePos);
 
 			physics.engine.addConstraint(_dragConstraint);
+			
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
+			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
 
 		private function handleMouseMove(event:MouseEvent):void
@@ -115,6 +115,9 @@ package
 				physics.engine.removeConstraint(_dragConstraint);
 				_currDragBody.setActive();
 			}
+			
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
 
 		override protected function onPreRender():void
