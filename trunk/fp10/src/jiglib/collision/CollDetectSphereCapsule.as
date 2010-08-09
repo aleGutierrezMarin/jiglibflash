@@ -70,14 +70,14 @@ package jiglib.collision
 			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length + 2 * capsule.radius));
 			var radSum:Number = sphere.radius + capsule.radius;
 
-			var oldObj:Object = {};
+			var oldObj:Vector.<Number> = new Vector.<Number>(1, true);
 			var oldDistSq:Number = oldSeg.pointSegmentDistanceSq(oldObj, sphere.oldState.position);
-			var newObj:Object = {};
+			var newObj:Vector.<Number> = new Vector.<Number>(1, true);
 			var newDistSq:Number = newSeg.pointSegmentDistanceSq(newObj, sphere.currentState.position);
 
 			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2))
 			{
-				var segPos:Vector3D = oldSeg.getPoint(oldObj.t);
+				var segPos:Vector3D = oldSeg.getPoint(oldObj[0]);
 				var delta:Vector3D = sphere.oldState.position.subtract(segPos);
 
 				var dist:Number = Math.sqrt(oldDistSq);

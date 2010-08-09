@@ -27,7 +27,7 @@ package jiglib.collision
 {
 
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
@@ -68,15 +68,15 @@ package jiglib.collision
 
 			var radSum:Number = capsule0.radius + capsule1.radius;
 
-			var oldObj:Object = {};
+			var oldObj:Vector.<Number> = new Vector.<Number>(2, true);
 			var oldDistSq:Number = oldSeg0.segmentSegmentDistanceSq(oldObj, oldSeg1);
-			var newObj:Object = {};
+			var newObj:Vector.<Number> = new Vector.<Number>(2, true);
 			var newDistSq:Number = newSeg0.segmentSegmentDistanceSq(oldObj, newSeg1);
 
 			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2))
 			{
-				var pos0:Vector3D = oldSeg0.getPoint(oldObj.t0);
-				var pos1:Vector3D = oldSeg1.getPoint(oldObj.t1);
+				var pos0:Vector3D = oldSeg0.getPoint(oldObj[0]);
+				var pos1:Vector3D = oldSeg1.getPoint(oldObj[1]);
 
 				var delta:Vector3D = pos0.subtract(pos1);
 				var dist:Number = Math.sqrt(oldDistSq);
@@ -107,15 +107,15 @@ package jiglib.collision
 			oldSeg1 = new JSegment(capsule1.getBottomPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], capsule1.length));
 			newSeg1 = new JSegment(capsule1.getBottomPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], capsule1.length));
 
-			oldObj = {};
+			oldObj = new Vector.<Number>(2, true);
 			oldDistSq = oldSeg0.segmentSegmentDistanceSq(oldObj, oldSeg1);
-			newObj = {};
+			newObj = new Vector.<Number>(2, true);
 			newDistSq = newSeg0.segmentSegmentDistanceSq(oldObj, newSeg1);
 
 			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2))
 			{
-				pos0 = oldSeg0.getPoint(oldObj.t0);
-				pos1 = oldSeg1.getPoint(oldObj.t1);
+				pos0 = oldSeg0.getPoint(oldObj[0]);
+				pos1 = oldSeg1.getPoint(oldObj[1]);
 
 				delta = pos0.subtract(pos1);
 				dist = Math.sqrt(oldDistSq);
