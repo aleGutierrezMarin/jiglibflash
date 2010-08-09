@@ -74,19 +74,19 @@ package jiglib.collision
 			var newSeg:JSegment = new JSegment(capsule.getEndPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], -capsule.length));
 			var radius:Number = capsule.radius;
 
-			var oldObj:Object = {};
+			var oldObj:Vector.<Number> = new Vector.<Number>(4, true);
 			var oldDistSq:Number = oldSeg.segmentBoxDistanceSq(oldObj, box, box.oldState);
-			var newObj:Object = {};
+			var newObj:Vector.<Number> = new Vector.<Number>(4, true);
 			var newDistSq:Number = newSeg.segmentBoxDistanceSq(newObj, box, box.currentState);
 			var arr:Vector.<Vector3D> = box.oldState.getOrientationCols();
 
 			if (Math.min(oldDistSq, newDistSq) < Math.pow(radius + JConfig.collToll, 2))
 			{
-				var segPos:Vector3D = oldSeg.getPoint(Number(oldObj.pfLParam));
+				var segPos:Vector3D = oldSeg.getPoint(Number(oldObj[3]));
 				var boxPos:Vector3D = box.oldState.position.clone();
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[0], oldObj.pfLParam0));
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[1], oldObj.pfLParam1));
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[2], oldObj.pfLParam2));
+				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[0], oldObj[0]));
+				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[1], oldObj[1]));
+				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[2], oldObj[2]));
 
 				var dist:Number = Math.sqrt(oldDistSq);
 				var depth:Number = radius - dist;
@@ -120,18 +120,18 @@ package jiglib.collision
 			oldSeg = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], capsule.length));
 			newSeg = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length));
 
-			oldObj = {};
+			oldObj = new Vector.<Number>(4, true);
 			oldDistSq = oldSeg.segmentBoxDistanceSq(oldObj, box, box.oldState);
-			newObj = {};
+			newObj = new Vector.<Number>(4, true);
 			newDistSq = newSeg.segmentBoxDistanceSq(newObj, box, box.currentState);
 
 			if (Math.min(oldDistSq, newDistSq) < Math.pow(radius + JConfig.collToll, 2))
 			{
-				segPos = oldSeg.getPoint(Number(oldObj.pfLParam));
+				segPos = oldSeg.getPoint(Number(oldObj[3]));
 				boxPos = box.oldState.position.clone();
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[0], oldObj.pfLParam0));
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[1], oldObj.pfLParam1));
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[2], oldObj.pfLParam2));
+				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[0], oldObj[0]));
+				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[1], oldObj[1]));
+				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[2], oldObj[2]));
 
 				dist = Math.sqrt(oldDistSq);
 				depth = radius - dist;

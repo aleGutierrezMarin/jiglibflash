@@ -452,12 +452,12 @@ package jiglib.geometry
 			return kDiff.lengthSquared;
 		}
 
-		public function segmentBoxDistanceSq(out:Object, rkBox:JBox, boxState:PhysicsState):Number
+		public function segmentBoxDistanceSq(out:Vector.<Number>, rkBox:JBox, boxState:PhysicsState):Number
 		{
-			out.pfLParam = 0;
-			out.pfLParam0 = 0;
-			out.pfLParam1 = 0;
-			out.pfLParam2 = 0;
+			out[3] = 0;
+			out[0] = 0;
+			out[1] = 0;
+			out[2] = 0;
 
 			var obj:Object = {};
 			var kRay:JRay = new JRay(_origin, _delta);
@@ -466,23 +466,23 @@ package jiglib.geometry
 			{
 				if (obj.num <= 1)
 				{
-					out.pfLParam = obj.num;
-					out.pfLParam0 = obj.num0;
-					out.pfLParam1 = obj.num1;
-					out.pfLParam2 = obj.num2;
+					out[3] = obj.num;
+					out[0] = obj.num0;
+					out[1] = obj.num1;
+					out[2] = obj.num2;
 					return Math.max(fSqrDistance, 0);
 				}
 				else
 				{
 					fSqrDistance = sqrDistancePoint(out, _origin.add(_delta), rkBox, boxState);
-					out.pfLParam = 1;
+					out[3] = 1;
 					return Math.max(fSqrDistance, 0);
 				}
 			}
 			else
 			{
 				fSqrDistance = sqrDistancePoint(out, _origin, rkBox, boxState);
-				out.pfLParam = 0;
+				out[3] = 0;
 				return Math.max(fSqrDistance, 0);
 			}
 		}
@@ -655,9 +655,9 @@ package jiglib.geometry
 				kClosest.z = boxHalfSide.z;
 			}
 
-			out.pfLParam0 = kClosest.x;
-			out.pfLParam1 = kClosest.y;
-			out.pfLParam2 = kClosest.z;
+			out[0] = kClosest.x;
+			out[1] = kClosest.y;
+			out[2] = kClosest.z;
 
 			return Math.max(fSqrDistance, 0);
 		}
