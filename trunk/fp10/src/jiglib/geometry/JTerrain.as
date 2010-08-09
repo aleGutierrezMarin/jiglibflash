@@ -7,18 +7,21 @@
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.ITerrain;
+
 	/**
 	 * ...
 	 * @author Muzer
 	 */
 	public class JTerrain extends RigidBody
 	{
-		
 		private var _terrain:ITerrain;
+		private var _yUp:Boolean;
 		
-		public function JTerrain(tr:ITerrain)
+		public function JTerrain(tr:ITerrain, yUp:Boolean = true)
 		{
 			super(null);
+			_yUp = yUp;
+			
 			_terrain = tr;
 			this.movable = false;
 			_type = "TERRAIN";
@@ -99,6 +102,8 @@
 			if (iFrac < jFrac || i0==i1 || j0 == j1)
 			{
 				obj.normal = new Vector3D(0, h11 - h10, _terrain.dh).crossProduct(new Vector3D(_terrain.dw, h11 - h01, 0));
+				if(!_yUp)
+					obj.normal.y = - obj.normal.y;
 				obj.normal.normalize();
 				
 				plane = new PlaneData(new Vector3D((i1 * _terrain.dw + _terrain.minW), h11, (j1 * _terrain.dh + _terrain.minH)), obj.normal);
@@ -107,11 +112,14 @@
 			else
 			{
 				obj.normal = new Vector3D(0, h01 - h00, _terrain.dh).crossProduct(new Vector3D(_terrain.dw, h10 - h00, 0));
+				if(!_yUp)
+					obj.normal.y = - obj.normal.y;
 				obj.normal.normalize();
 				
 				plane = new PlaneData(new Vector3D((i0 * _terrain.dw + _terrain.minW), h00, (j0 * _terrain.dh + _terrain.minH)), obj.normal);
 				obj.height = plane.pointPlaneDistance(point);
 			}
+			
 			return obj;
 		}
 		
@@ -173,5 +181,4 @@
 			return n;
 		}
 	}
-
 }

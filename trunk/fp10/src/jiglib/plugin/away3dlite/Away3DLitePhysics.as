@@ -7,11 +7,13 @@ package jiglib.plugin.away3dlite
 	import away3dlite.primitives.Plane;
 	import away3dlite.primitives.Sphere;
 	
+	import flash.display.BitmapData;
 	import flash.geom.Vector3D;
 	
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
+	import jiglib.geometry.JTerrain;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;
@@ -27,9 +29,9 @@ package jiglib.plugin.away3dlite
 		public function Away3DLitePhysics(scene:Scene3D, speed:Number = 1)
 		{
 			super(speed);
-			
+
 			_scene = scene;
-			
+
 			engine.setGravity(JNumber3D.getScaleVector(Vector3D.Y_AXIS, 10));
 		}
 
@@ -57,7 +59,7 @@ package jiglib.plugin.away3dlite
 			addBody(jbox);
 			return jbox;
 		}
-		
+
 		public function createGround(material:Material, size:Number, level:Number):RigidBody
 		{
 			var ground:Plane = new Plane(material, size, size, 1, 1);
@@ -70,6 +72,17 @@ package jiglib.plugin.away3dlite
 			jGround.updateObject3D();
 
 			return jGround;
+		}
+
+		public function createTerrain(terrainData:TerrainData, material:Material, width:Number = 100, depth:Number = 100, segmentsW:int = 10, segmentsH:int = 10):JTerrain
+		{
+			var terrainMap:Away3DLiteTerrain = new Away3DLiteTerrain(terrainData, material, width, depth, segmentsW, segmentsH);
+			_scene.addChild(terrainMap);
+
+			var jTerrain:JTerrain = new JTerrain(terrainMap, false);
+			addBody(jTerrain);
+			
+			return jTerrain;
 		}
 	}
 }
