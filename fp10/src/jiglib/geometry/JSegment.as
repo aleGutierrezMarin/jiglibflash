@@ -459,17 +459,17 @@ package jiglib.geometry
 			out[1] = 0;
 			out[2] = 0;
 
-			var obj:Object = {};
+			var obj:Vector.<Number> = Vector.<Number>(4, true);
 			var kRay:JRay = new JRay(_origin, _delta);
 			var fSqrDistance:Number = sqrDistanceLine(obj, kRay, rkBox, boxState);
-			if (obj.num >= 0)
+			if (obj[3] >= 0)
 			{
-				if (obj.num <= 1)
+				if (obj[3] <= 1)
 				{
-					out[3] = obj.num;
-					out[0] = obj.num0;
-					out[1] = obj.num1;
-					out[2] = obj.num2;
+					out[3] = obj[3];
+					out[0] = obj[0];
+					out[1] = obj[1];
+					out[2] = obj[2];
 					return Math.max(fSqrDistance, 0);
 				}
 				else
@@ -487,13 +487,13 @@ package jiglib.geometry
 			}
 		}
 
-		private function sqrDistanceLine(out:Object, rkLine:JRay, rkBox:JBox, boxState:PhysicsState):Number
+		private function sqrDistanceLine(out:Vector.<Number>, rkLine:JRay, rkBox:JBox, boxState:PhysicsState):Number
 		{
 			var orientationCols:Vector.<Vector3D> = boxState.getOrientationCols();
-			out.num = 0;
-			out.num0 = 0;
-			out.num1 = 0;
-			out.num2 = 0;
+			out[3] = 0;
+			out[0] = 0;
+			out[1] = 0;
+			out[2] = 0;
 
 			var kDiff:Vector3D = rkLine.origin.subtract(boxState.position);
 			var kPnt:Vector3D = new Vector3D(kDiff.dotProduct(orientationCols[0]),
@@ -525,10 +525,7 @@ package jiglib.geometry
 			JNumber3D.copyFromArray(kPnt, kPntArr);
 			JNumber3D.copyFromArray(kDir, kDirArr);
 
-			var obj:Object = {};
-			obj.rkPnt = kPnt.clone();
-			obj.pfLParam = 0;
-			obj.rfSqrDistance = 0;
+			var obj:SegmentInfo = new SegmentInfo(kPnt.clone(), 0, 0);
 
 			if (kDir.x > 0)
 			{
@@ -537,12 +534,12 @@ package jiglib.geometry
 					if (kDir.z > 0)
 					{
 						caseNoZeros(obj, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 					else
 					{
 						case0(obj, 0, 1, 2, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 				}
 				else
@@ -550,12 +547,12 @@ package jiglib.geometry
 					if (kDir.z > 0)
 					{
 						case0(obj, 0, 2, 1, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 					else
 					{
 						case00(obj, 0, 1, 2, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 				}
 			}
@@ -566,12 +563,12 @@ package jiglib.geometry
 					if (kDir.z > 0)
 					{
 						case0(obj, 1, 2, 0, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 					else
 					{
 						case00(obj, 1, 0, 2, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 				}
 				else
@@ -579,12 +576,12 @@ package jiglib.geometry
 					if (kDir.z > 0)
 					{
 						case00(obj, 2, 0, 1, kDir, rkBox);
-						out.num = obj.pfLParam;
+						out[3] = obj.pfLParam;
 					}
 					else
 					{
 						case000(obj, rkBox);
-						out.num = 0;
+						out[3] = 0;
 					}
 				}
 			}
@@ -597,9 +594,9 @@ package jiglib.geometry
 			}
 			JNumber3D.copyFromArray(obj.rkPnt, kPntArr);
 
-			out.num0 = obj.rkPnt.x;
-			out.num1 = obj.rkPnt.y;
-			out.num2 = obj.rkPnt.z;
+			out[0] = obj.rkPnt.x;
+			out[1] = obj.rkPnt.y;
+			out[2] = obj.rkPnt.z;
 
 			return Math.max(obj.rfSqrDistance, 0);
 		}
@@ -1048,5 +1045,19 @@ package jiglib.geometry
 			}
 		}
 	}
-
+}
+	
+import flash.geom.Vector3D;
+internal class SegmentInfo
+{
+	public var rkPnt:Vector3D;
+	public var pfLParam:Number;
+	public var rfSqrDistance:Number;
+	
+	public function SegmentInfo(rkPnt:Vector3D = null, pfLParam:Number = 0, rfSqrDistance:Number = 0)
+	{
+		this.rkPnt = rkPnt?rkPnt:new Vector3D;
+		this.pfLParam = isNaN(pfLParam)?0:pfLParam;
+		this.rfSqrDistance = isNaN(rfSqrDistance)?0:rfSqrDistance;
+	}
 }
