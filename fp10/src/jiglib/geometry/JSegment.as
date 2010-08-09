@@ -26,7 +26,7 @@
 package jiglib.geometry
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsState;
 
@@ -78,10 +78,8 @@ package jiglib.geometry
 			return new JSegment(_origin, _delta);
 		}
 
-		public function segmentSegmentDistanceSq(out:Object, seg:JSegment):Number {
-			out.t0 = 0;
-			out.t1 = 0;
-
+		public function segmentSegmentDistanceSq(out:Vector.<Number>, seg:JSegment):Number
+		{
 			var kDiff:Vector3D = _origin.subtract(seg.origin);
 			var fA00:Number = _delta.lengthSquared;
 			var fA01:Number = -_delta.dotProduct(seg.delta);
@@ -95,7 +93,8 @@ package jiglib.geometry
 			var fSqrDist:Number;
 			var fTmp:Number;
 
-			if (fDet >= JNumber3D.NUM_TINY){
+			if (fDet >= JNumber3D.NUM_TINY)
+			{
 				fB1 = -kDiff.dotProduct(seg.delta);
 				fS = fA01 * fB1 - fA11 * fB0;
 				fT = fA01 * fB0 - fA00 * fB1;
@@ -420,16 +419,14 @@ package jiglib.geometry
 				}
 			}
 
-			out.t0 = fS;
-			out.t1 = fT;
+			out[0] = fS;
+			out[1] = fT;
 			return Math.abs(fSqrDist);
 		}
 
-		public function pointSegmentDistanceSq(out:Object, pt:Vector3D):Number
+		public function pointSegmentDistanceSq(out:Vector.<Number>, pt:Vector3D):Number
 		{
-			out.t = 0;
-
-			var kDiff:Vector3D = pt.subtract( _origin);
+			var kDiff:Vector3D = pt.subtract(_origin);
 			var fT:Number = kDiff.dotProduct(_delta);
 
 			if (fT <= 0)
@@ -451,7 +448,7 @@ package jiglib.geometry
 				}
 			}
 
-			out.t = fT;
+			out[0] = fT;
 			return kDiff.lengthSquared;
 		}
 
@@ -509,7 +506,7 @@ package jiglib.geometry
 			
 			var kPntArr:Array = JNumber3D.toArray(kPnt);
 			var kDirArr:Array = JNumber3D.toArray(kDir);
-			
+
 			var bReflect:Vector.<Boolean> = new Vector.<Boolean>(3, true);
 			for (var i:int = 0; i < 3; i++)
 			{
@@ -527,7 +524,7 @@ package jiglib.geometry
 
 			JNumber3D.copyFromArray(kPnt, kPntArr);
 			JNumber3D.copyFromArray(kDir, kDirArr);
-			
+
 			var obj:Object = {};
 			obj.rkPnt = kPnt.clone();
 			obj.pfLParam = 0;
