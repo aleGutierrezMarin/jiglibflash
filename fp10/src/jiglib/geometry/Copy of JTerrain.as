@@ -3,6 +3,7 @@
 	import flash.geom.Vector3D;
 	
 	import jiglib.data.PlaneData;
+	import jiglib.math.JMatrix3D;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
@@ -15,14 +16,19 @@
 	public class JTerrain extends RigidBody
 	{
 		private var _terrain:ITerrain;
-		private var _yUp:Boolean;
+		private var _initNormal:Vector3D;
+		private var _normal:Vector3D;
 		
-		public function JTerrain(tr:ITerrain, yUp:Boolean = true)
+		public function JTerrain(tr:ITerrain,  initNormal:Vector3D = null)
 		{
 			super(null);
-			
-			// yUp for lite
-			_yUp = yUp;
+			if (initNormal == null) {
+				_initNormal = new Vector3D(0, 0, -1);
+				_normal = _initNormal.clone();
+			}else {
+				_initNormal = initNormal.clone();
+				_normal = _initNormal.clone();
+			}
 			
 			_terrain = tr;
 			this.movable = false;
@@ -91,12 +97,11 @@
 			var jFrac:Number = (h - (j0 * _terrain.dh + _terrain.minH)) / _terrain.dh;
 			iFrac = JNumber3D.getLimiteNumber(iFrac, 0, 1);
 			jFrac = JNumber3D.getLimiteNumber(jFrac, 0, 1);
-
-			// yUp for lite
-			var h00:Number = _yUp ? _terrain.heights[i0][j0] : -_terrain.heights[i0][j0];
-			var h01:Number = _yUp ? _terrain.heights[i0][j1] : -_terrain.heights[i0][j1];
-			var h10:Number = _yUp ? _terrain.heights[i1][j0] : -_terrain.heights[i1][j0];
-			var h11:Number = _yUp ? _terrain.heights[i1][j1] : -_terrain.heights[i1][j1];
+			
+			var h00:Number = _terrain.heights[i0][j0];
+			var h01:Number = _terrain.heights[i0][j1];
+			var h10:Number = _terrain.heights[i1][j0];
+			var h11:Number = _terrain.heights[i1][j1];
 			
 			var obj:Object = { };
 			obj.height = 0;
@@ -105,9 +110,6 @@
 			if (iFrac < jFrac || i0==i1 || j0 == j1)
 			{
 				obj.normal = new Vector3D(0, h11 - h10, _terrain.dh).crossProduct(new Vector3D(_terrain.dw, h11 - h01, 0));
-				// yUp for lite
-				if(!_yUp)
-					obj.normal.negate();
 				obj.normal.normalize();
 				
 				plane = new PlaneData(new Vector3D((i1 * _terrain.dw + _terrain.minW), h11, (j1 * _terrain.dh + _terrain.minH)), obj.normal);
@@ -116,9 +118,6 @@
 			else
 			{
 				obj.normal = new Vector3D(0, h01 - h00, _terrain.dh).crossProduct(new Vector3D(_terrain.dw, h10 - h00, 0));
-				// yUp for lite
-				if(!_yUp)
-					obj.normal.negate();
 				obj.normal.normalize();
 				
 				plane = new PlaneData(new Vector3D((i0 * _terrain.dw + _terrain.minW), h00, (j0 * _terrain.dh + _terrain.minH)), obj.normal);
@@ -157,7 +156,7 @@
 				return false;
 			}
 			
-			var depthEnd:Number = -obj2.height;
+			var depthEnd:Number = obj2.height;
 			var weightStart:Number = 1 / (JNumber3D.NUM_TINY + obj1.height);
 			var weightEnd:Number = 1 / (JNumber3D.NUM_TINY + obj2.height);
 			

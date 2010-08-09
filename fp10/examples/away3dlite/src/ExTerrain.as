@@ -2,12 +2,12 @@ package
 {
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
-	
+
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.geometry.JTerrain;
 	import jiglib.math.*;
 	import jiglib.physics.*;
@@ -25,7 +25,7 @@ package
 	 */
 	public class ExTerrain extends PhysicsTemplate
 	{
-		[Embed(source="assets/hightmap2.jpg")]
+		[Embed(source="assets/heightmap_invert.png")]
 		private var TERRIAN_MAP:Class;
 		private var terrainBMD:Bitmap = new TERRIAN_MAP;
 
@@ -41,8 +41,7 @@ package
 
 			// terrain
 			var _terrainData:TerrainData = new TerrainData(terrainBMD.bitmapData, 256);
-			terrain = physics.createTerrain(_terrainData, new WireframeMaterial, 3200, 3200, 32, 32);
-			terrain.movable = false;
+			terrain = physics.createTerrain(_terrainData, new WireframeMaterial, 1000, 1000, 32, 32);
 
 			camera.y = -1000;
 
@@ -57,10 +56,18 @@ package
 			view.addChild(layer);
 
 			_boxBodies = [];
-			for (var i:int = 0; i < 20; i++)
+			var totalBox:int = 8;
+			var i:int;
+			for (i = 0; i < totalBox; i++)
 			{
 				_boxBodies[i] = physics.createCube(new WireframeMaterial(0xFFFFFF * Math.random()), 25, 25, 25);
-				_boxBodies[i].moveTo(new Vector3D(500 * Math.random() - 500 * Math.random(), -500 - 500 * Math.random(), 500 * Math.random() - 500 * Math.random()));
+				_boxBodies[i].moveTo(new Vector3D(100 * Math.cos(i * 2 * Math.PI / totalBox), -320, 100 * Math.sin(i * 2 * Math.PI / totalBox)));
+			}
+
+			for (i = 0; i < totalBox; i++)
+			{
+				var temp:* = physics.createSphere(new WireframeMaterial(0xFFFFFF * Math.random()), 25);
+				temp.moveTo(new Vector3D(200 * Math.cos(i * 2 * Math.PI / totalBox), -320, 200 * Math.sin(i * 2 * Math.PI / totalBox)));
 			}
 
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, handleMousePress);
@@ -69,7 +76,7 @@ package
 		private function handleMousePress(event:MouseEvent):void
 		{
 			for each (var box:RigidBody in _boxBodies)
-				box.addWorldForce(new Vector3D(100*Math.random()-100*Math.random(), -100, 100*Math.random()-100*Math.random()), box.currentState.position);
+				box.addWorldForce(new Vector3D(100 * Math.random() - 100 * Math.random(), -100, 100 * Math.random() - 100 * Math.random()), box.currentState.position);
 		}
 
 		override protected function onPreRender():void
