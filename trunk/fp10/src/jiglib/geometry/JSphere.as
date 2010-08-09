@@ -28,6 +28,7 @@ package jiglib.geometry
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import jiglib.collision.CollOutInfo;
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
@@ -64,7 +65,7 @@ package jiglib.geometry
 			return _radius;
 		}
 
-		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean
+		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
 		{
 			out.fracOut = 0;
 			out.posOut = new Vector3D();

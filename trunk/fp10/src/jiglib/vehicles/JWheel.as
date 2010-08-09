@@ -27,6 +27,7 @@ package jiglib.vehicles
 {
 	import flash.geom.Vector3D;
 	
+	import jiglib.collision.CollOutInfo;
 	import jiglib.collision.CollisionSystem;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
@@ -217,8 +218,8 @@ package jiglib.vehicles
 			var maxNumRays:int = 10;
 			var numRays:int = Math.min(_numRays, maxNumRays);
 
-			var objArr:Array = [];
-			var segments:Array = [];
+			var objArr:Vector.<CollOutInfo> = new Vector.<CollOutInfo>(numRays, true);
+			var segments:Vector.<JSegment> = new Vector.<JSegment>(numRays, true);
 
 			var deltaFwd:Number = (2 * _radius) / (numRays + 1);
 			var deltaFwdStart:Number = deltaFwd;
@@ -231,7 +232,7 @@ package jiglib.vehicles
 			var iRay:int = 0;
 			for (iRay = 0; iRay < numRays; iRay++)
 			{
-				objArr[iRay] = {};
+				objArr[iRay] = new CollOutInfo();
 				distFwd = (deltaFwdStart + iRay * deltaFwd) - _radius;
 				yOffset = _radius * (1 - Math.cos(90 * (distFwd / _radius) * Math.PI / 180));
 				segments[iRay] = wheelRay.clone();

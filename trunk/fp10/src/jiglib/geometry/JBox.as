@@ -3,6 +3,7 @@ package jiglib.geometry
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import jiglib.collision.CollOutInfo;
 	import jiglib.data.EdgeData;
 	import jiglib.data.SpanData;
 	import jiglib.math.*;
@@ -24,10 +25,10 @@ package jiglib.geometry
 			new EdgeData( 6, 7 ), new EdgeData( 4, 6 ), new EdgeData( 7, 1 ),
 			new EdgeData( 5, 3 ), new EdgeData( 4, 2 ), new EdgeData( 6, 0 )]);
 
-		private var _face:Vector.<Object> = Vector.<Object>([
-			[6, 7, 1, 0], [5, 4, 2, 3],
-			[3, 1, 7, 5], [4, 6, 0, 2],
-			[1, 3, 2, 0], [7, 6, 4, 5]]);
+		private var _face:Vector.<Vector.<Number>> = Vector.<Vector.<Number>>([
+			Vector.<Number>([6, 7, 1, 0]), Vector.<Number>([5, 4, 2, 3]),
+			Vector.<Number>([3, 1, 7, 5]), Vector.<Number>([4, 6, 0, 2]),
+			Vector.<Number>([1, 3, 2, 0]), Vector.<Number>([7, 6, 4, 5])]);
 
 		public function JBox(skin:ISkin3D, width:Number, depth:Number, height:Number)
 		{
@@ -128,61 +129,61 @@ package jiglib.geometry
 			return arr;
 		}
 		
-		public function getSqDistanceToPoint(state:PhysicsState, closestBoxPoint:Object, point:Vector3D):Number
+		public function getSqDistanceToPoint(state:PhysicsState, closestBoxPoint:Vector.<Vector3D>, point:Vector3D):Number
 		{
-			closestBoxPoint.pos = point.subtract(state.position);
-			JMatrix3D.multiplyVector(JMatrix3D.getTransposeMatrix(state.orientation), closestBoxPoint.pos);
+			var _closestBoxPoint:Vector3D = point.subtract(state.position);
+			JMatrix3D.multiplyVector(JMatrix3D.getTransposeMatrix(state.orientation), _closestBoxPoint);
 
 			var delta:Number = 0;
 			var sqDistance:Number = 0;
 			var halfSideLengths:Vector3D = getHalfSideLengths();
 
-			if (closestBoxPoint.pos.x < -halfSideLengths.x)
+			if (_closestBoxPoint.x < -halfSideLengths.x)
 			{
-				delta = closestBoxPoint.pos.x + halfSideLengths.x;
+				delta = _closestBoxPoint.x + halfSideLengths.x;
 				sqDistance += (delta * delta);
-				closestBoxPoint.pos.x = -halfSideLengths.x;
+				_closestBoxPoint.x = -halfSideLengths.x;
 			}
-			else if (closestBoxPoint.pos.x > halfSideLengths.x)
+			else if (_closestBoxPoint.x > halfSideLengths.x)
 			{
-				delta = closestBoxPoint.pos.x - halfSideLengths.x;
+				delta = _closestBoxPoint.x - halfSideLengths.x;
 				sqDistance += (delta * delta);
-				closestBoxPoint.pos.x = halfSideLengths.x;
-			}
-
-			if (closestBoxPoint.pos.y < -halfSideLengths.y)
-			{
-				delta = closestBoxPoint.pos.y + halfSideLengths.y;
-				sqDistance += (delta * delta);
-				closestBoxPoint.pos.y = -halfSideLengths.y;
-			}
-			else if (closestBoxPoint.pos.y > halfSideLengths.y)
-			{
-				delta = closestBoxPoint.pos.y - halfSideLengths.y;
-				sqDistance += (delta * delta);
-				closestBoxPoint.pos.y = halfSideLengths.y;
+				_closestBoxPoint.x = halfSideLengths.x;
 			}
 
-			if (closestBoxPoint.pos.z < -halfSideLengths.z)
+			if (_closestBoxPoint.y < -halfSideLengths.y)
 			{
-				delta = closestBoxPoint.pos.z + halfSideLengths.z;
+				delta = _closestBoxPoint.y + halfSideLengths.y;
 				sqDistance += (delta * delta);
-				closestBoxPoint.pos.z = -halfSideLengths.z;
+				_closestBoxPoint.y = -halfSideLengths.y;
 			}
-			else if (closestBoxPoint.pos.z > halfSideLengths.z)
+			else if (_closestBoxPoint.y > halfSideLengths.y)
 			{
-				delta = (closestBoxPoint.pos.z - halfSideLengths.z);
+				delta = _closestBoxPoint.y - halfSideLengths.y;
 				sqDistance += (delta * delta);
-				closestBoxPoint.pos.z = halfSideLengths.z;
+				_closestBoxPoint.y = halfSideLengths.y;
 			}
-			JMatrix3D.multiplyVector(state.orientation, closestBoxPoint.pos);
-			closestBoxPoint.pos = state.position.add(closestBoxPoint.pos);
+
+			if (_closestBoxPoint.z < -halfSideLengths.z)
+			{
+				delta = _closestBoxPoint.z + halfSideLengths.z;
+				sqDistance += (delta * delta);
+				_closestBoxPoint.z = -halfSideLengths.z;
+			}
+			else if (_closestBoxPoint.z > halfSideLengths.z)
+			{
+				delta = (_closestBoxPoint.z - halfSideLengths.z);
+				sqDistance += (delta * delta);
+				_closestBoxPoint.z = halfSideLengths.z;
+			}
+			JMatrix3D.multiplyVector(state.orientation, _closestBoxPoint);
+			closestBoxPoint[0] = state.position.add(_closestBoxPoint);
 			return sqDistance;
 		}
 
 		// Returns the distance from the point to the box, (-ve if the
 		// point is inside the box), and optionally the closest point on the box.
-		public function getDistanceToPoint(state:PhysicsState, closestBoxPoint:Object, point:Vector3D):Number
+		public function getDistanceToPoint(state:PhysicsState, closestBoxPoint:Vector.<Vector3D>, point:Vector3D):Number
 		{
 			return Math.sqrt(getSqDistanceToPoint(state, closestBoxPoint, point));
 		}
@@ -262,7 +263,7 @@ package jiglib.geometry
 			return vertices;
 		}
 
-		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean
+		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
 		{
 			out.fracOut = 0;
 			out.posOut = new Vector3D();
