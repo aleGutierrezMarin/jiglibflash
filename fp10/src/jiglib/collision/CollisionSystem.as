@@ -28,7 +28,7 @@ package jiglib.collision
 
 
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
@@ -151,13 +151,13 @@ package jiglib.collision
 			}
 		}
 
-		public function segmentIntersect(out:Object, seg:JSegment, ownerBody:RigidBody):Boolean
+		public function segmentIntersect(out:CollOutInfo, seg:JSegment, ownerBody:RigidBody):Boolean
 		{
 			out.fracOut = JNumber3D.NUM_HUGE;
 			out.posOut = new Vector3D();
 			out.normalOut = new Vector3D();
 
-			var obj:Object = {};
+			var obj:CollOutInfo = new CollOutInfo();
 			for each (var _collBody:RigidBody in collBody)
 			{
 				if (_collBody != ownerBody && segmentBounding(seg, _collBody))

@@ -28,6 +28,7 @@ package jiglib.geometry{
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
+	import jiglib.collision.CollOutInfo;
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
@@ -81,32 +82,35 @@ package jiglib.geometry{
 			//temp.normalize();
 			return state.position.add(JNumber3D.getScaleVector(temp, _length / 2 + _radius));
 		}
-		 
-		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
+
+		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		{
 			out.fracOut = 0;
 			out.posOut = new Vector3D();
 			out.normalOut = new Vector3D();
-			
+
 			var Ks:Vector3D = seg.delta;
 			var kss:Number = Ks.dotProduct(Ks);
 			var radiusSq:Number = _radius * _radius;
-			
+
 			var cols:Vector.<Vector3D> = state.getOrientationCols();
 			var cylinderAxis:JSegment = new JSegment(getBottomPos(state), cols[1]);
 			var Ke:Vector3D = cylinderAxis.delta;
 			var Kg:Vector3D = cylinderAxis.origin.subtract(seg.origin);
 			var kee:Number = Ke.dotProduct(Ke);
-			if (Math.abs(kee) < JNumber3D.NUM_TINY) {
+			if (Math.abs(kee) < JNumber3D.NUM_TINY)
+			{
 				return false;
 			}
-			
+
 			var kes:Number = Ke.dotProduct(Ks);
 			var kgs:Number = Kg.dotProduct(Ks);
 			var keg:Number = Ke.dotProduct(Kg);
 			var kgg:Number = Kg.dotProduct(Kg);
-			
+
 			var distSq:Number = Kg.subtract(JNumber3D.getDivideVector(JNumber3D.getScaleVector(Ke, keg), kee)).lengthSquared;
-			if (distSq < radiusSq) {
+			if (distSq < radiusSq)
+			{
 				out.fracOut = 0;
 				out.posOut = seg.origin.clone();
 				out.normalOut = out.posOut.subtract(getBottomPos(state));
@@ -114,19 +118,22 @@ package jiglib.geometry{
 				out.normalOut.normalize();
 				return true;
 			}
-			
+
 			var a:Number = kee * kss - (kes * kes);
-			if (Math.abs(a) < JNumber3D.NUM_TINY) {
+			if (Math.abs(a) < JNumber3D.NUM_TINY)
+			{
 				return false;
 			}
 			var b:Number = 2 * (keg * kes - kee * kgs);
 			var c:Number = kee * (kgg - radiusSq) - (keg * keg);
 			var blah:Number = (b * b) - 4 * a * c;
-			if (blah < 0) {
+			if (blah < 0)
+			{
 				return false;
 			}
-			var t:Number = ( -b - Math.sqrt(blah)) / (2 * a);
-			if (t < 0 || t > 1) {
+			var t:Number = (-b - Math.sqrt(blah)) / (2 * a);
+			if (t < 0 || t > 1)
+			{
 				return false;
 			}
 			out.fracOut = t;

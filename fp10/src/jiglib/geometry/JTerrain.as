@@ -2,6 +2,7 @@
 {
 	import flash.geom.Vector3D;
 	
+	import jiglib.collision.CollOutInfo;
 	import jiglib.data.PlaneData;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsState;
@@ -139,36 +140,40 @@
 		public function getSurfacePosByPoint(point:Vector3D):Vector3D {
 			return new Vector3D(point.x, getHeightAndNormalByPoint(point).height, point.z);
 		}
-		
-		override public function segmentIntersect(out:Object, seg:JSegment, state:PhysicsState):Boolean {
+
+		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		{
 			out.fracOut = 0;
 			out.posOut = new Vector3D();
 			out.normalOut = new Vector3D();
-			
-			if (seg.delta.y > -JNumber3D.NUM_TINY) {
+
+			if (seg.delta.y > -JNumber3D.NUM_TINY)
+			{
 				return false;
 			}
 			var obj1:Object = getHeightAndNormalByPoint(seg.origin);
-			if (obj1.height < 0) {
+			if (obj1.height < 0)
+			{
 				return false;
 			}
 			var obj2:Object = getHeightAndNormalByPoint(seg.getEnd());
-			if (obj2.height > 0) {
+			if (obj2.height > 0)
+			{
 				return false;
 			}
-			
+
 			var depthEnd:Number = -obj2.height;
 			var weightStart:Number = 1 / (JNumber3D.NUM_TINY + obj1.height);
 			var weightEnd:Number = 1 / (JNumber3D.NUM_TINY + obj2.height);
-			
+
 			obj1.normal.scaleBy(weightStart);
 			obj2.normal.scaleBy(weightEnd);
 			out.normalOut = obj1.normal.add(obj2.normal);
 			out.normalOut.scaleBy(1 / (weightStart + weightEnd));
-			
+
 			out.fracOut = obj1.height / (obj1.height + depthEnd + JNumber3D.NUM_TINY);
 			out.posOut = seg.getPoint(out.fracOut);
-			
+
 			return true;
 		}
 		
