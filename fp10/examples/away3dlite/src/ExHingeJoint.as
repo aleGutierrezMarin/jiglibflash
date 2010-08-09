@@ -45,9 +45,6 @@ package
 
 			init3D();
 
-			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
-
 			JConfig.numContactIterations = 8;
 		}
 
@@ -121,6 +118,9 @@ package
 
 			dragConstraint = new JConstraintWorldPoint(currDragBody, a, b);
 			physics.engine.addConstraint(dragConstraint);
+			
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
+			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
 
 		// TODO:clean up/by pass
@@ -147,6 +147,9 @@ package
 				physics.engine.removeConstraint(dragConstraint);
 				currDragBody.setActive();
 			}
+			
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
 
 		override protected function onPreRender():void
