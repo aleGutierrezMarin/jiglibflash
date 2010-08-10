@@ -28,7 +28,7 @@ package jiglib.geometry
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import jiglib.collision.CollOutInfo;
+	import jiglib.data.CollOutData;
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
@@ -65,11 +65,11 @@ package jiglib.geometry
 			return _radius;
 		}
 
-		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		override public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean
 		{
-			out.fracOut = 0;
-			out.posOut = new Vector3D();
-			out.normalOut = new Vector3D();
+			out.frac = 0;
+			out.position = new Vector3D();
+			out.normal = new Vector3D();
 
 			var frac:Number = 0;
 			var r:Vector3D = seg.delta;
@@ -79,10 +79,10 @@ package jiglib.geometry
 			var rSq:Number = r.lengthSquared;
 			if (rSq < radiusSq)
 			{
-				out.fracOut = 0;
-				out.posOut = seg.origin.clone();
-				out.normalOut = out.posOut.subtract(state.position);
-				out.normalOut.normalize();
+				out.frac = 0;
+				out.position = seg.origin.clone();
+				out.normal = out.position.subtract(state.position);
+				out.normal.normalize();
 				return true;
 			}
 
@@ -101,10 +101,10 @@ package jiglib.geometry
 				return false;
 			}
 			frac = Math.max(lambda1, 0);
-			out.fracOut = frac;
-			out.posOut = seg.getPoint(frac);
-			out.normalOut = out.posOut.subtract(state.position);
-			out.normalOut.normalize();
+			out.frac = frac;
+			out.position = seg.getPoint(frac);
+			out.normal = out.position.subtract(state.position);
+			out.normal.normalize();
 			return true;
 		}
 

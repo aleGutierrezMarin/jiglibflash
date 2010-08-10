@@ -42,15 +42,15 @@
 		private var _terrainHeightMap:BitmapData;
 		private var _maxHeight:Number;
 
-		public function Away3DLiteTerrain(terrainData:TerrainData, material:Material = null, width:Number = 100, height:Number = 100, segmentsW:int = 1, segmentsH:int = 1)
+		public function Away3DLiteTerrain(heightMapData:HeightMapData, material:Material = null, width:Number = 100, height:Number = 100, segmentsW:int = 1, segmentsH:int = 1)
 		{
 			super(material, width, height, segmentsW, segmentsH);
 			
 			type = "Terrain";
 			url = "primitive";
 
-			_terrainHeightMap = terrainData.heightMap;
-			_maxHeight = terrainData.maxHeight;
+			_terrainHeightMap = heightMapData.bitmapData;
+			_maxHeight = heightMapData.maxHeight;
 
 			updatePrimitive();
 		}

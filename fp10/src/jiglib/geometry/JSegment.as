@@ -27,6 +27,7 @@ package jiglib.geometry
 {
 	import flash.geom.Vector3D;
 	
+	import jiglib.data.CollOutData;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsState;
 
@@ -601,7 +602,7 @@ package jiglib.geometry
 			return Math.max(obj.rfSqrDistance, 0);
 		}
 
-		private function sqrDistancePoint(out:Object, rkPoint:Vector3D, rkBox:JBox, boxState:PhysicsState):Number
+		private function sqrDistancePoint(out:Vector.<Number>, rkPoint:Vector3D, rkBox:JBox, boxState:PhysicsState):Number
 		{
 			var orientationVector:Vector.<Vector3D> = boxState.getOrientationCols();
 			var kDiff:Vector3D = rkPoint.subtract(boxState.position);
@@ -659,7 +660,7 @@ package jiglib.geometry
 			return Math.max(fSqrDistance, 0);
 		}
 
-		private function face(out:Object, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox, rkPmE:Vector3D):void
+		private function face(out:SegmentInfo, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox, rkPmE:Vector3D):void
 		{
 			var kPpE:Vector3D = new Vector3D();
 			var fLSqr:Number;
@@ -846,7 +847,7 @@ package jiglib.geometry
 			}
 		}
 
-		private function caseNoZeros(out:Object, rkDir:Vector3D, rkBox:JBox):void
+		private function caseNoZeros(out:SegmentInfo, rkDir:Vector3D, rkBox:JBox):void
 		{
 			var boxHalfSide:Vector3D = rkBox.getHalfSideLengths();
 			var kPmE:Vector3D = new Vector3D(out.rkPnt.x - boxHalfSide.x, out.rkPnt.y - boxHalfSide.y, out.rkPnt.z - boxHalfSide.z);
@@ -886,7 +887,7 @@ package jiglib.geometry
 			}
 		}
 
-		private function case0(out:Object, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox):void
+		private function case0(out:SegmentInfo, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox):void
 		{
 			var boxHalfSide:Vector3D = rkBox.getHalfSideLengths();
 			var boxHalfArr:Array = JNumber3D.toArray(boxHalfSide);
@@ -960,7 +961,7 @@ package jiglib.geometry
 			JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 		}
 
-		private function case00(out:Object, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox):void
+		private function case00(out:SegmentInfo, i0:int, i1:int, i2:int, rkDir:Vector3D, rkBox:JBox):void
 		{
 			var fDelta:Number = 0;
 			var boxHalfSide:Vector3D = rkBox.getHalfSideLengths();
@@ -1000,7 +1001,7 @@ package jiglib.geometry
 			JNumber3D.copyFromArray(out.rkPnt, rkPntArr);
 		}
 
-		private function case000(out:Object, rkBox:JBox):void
+		private function case000(out:SegmentInfo, rkBox:JBox):void
 		{
 			var fDelta:Number = 0;
 			var boxHalfSide:Vector3D = rkBox.getHalfSideLengths();

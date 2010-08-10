@@ -35,6 +35,7 @@ package jiglib.collision
 	import jiglib.math.*;
 	import jiglib.physics.MaterialProperties;
 	import jiglib.physics.PhysicsState;
+	import jiglib.data.CollOutData;
 
 	public class CollDetectBoxBox extends CollDetectFunctor
 	{
@@ -102,14 +103,14 @@ package jiglib.collision
 			var box1State:PhysicsState = (newState) ? box1.currentState : box1.oldState;
 			var boxPts:Vector.<Vector3D> = box1.getCornerPoints(box1State);
 			var boxEdges:Vector.<EdgeData> = box1.edges;
-			var outObj:CollOutInfo;
+			var outObj:CollOutData;
 			for each (var boxEdge:EdgeData in boxEdges)
 			{
-				outObj = new CollOutInfo();
+				outObj = new CollOutData();
 				seg = new JSegment(boxPts[boxEdge.ind0], boxPts[boxEdge.ind1].subtract(boxPts[boxEdge.ind0]));
 				if (box0.segmentIntersect(outObj, seg, box0State))
 				{
-					if (addPoint(contactPoint, outObj.posOut, combinationDist))
+					if (addPoint(contactPoint, outObj.position, combinationDist))
 					{
 						num += 1;
 					}

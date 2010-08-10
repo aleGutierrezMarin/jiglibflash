@@ -27,7 +27,7 @@ package jiglib.geometry
 {
 	import flash.geom.Vector3D;
 	
-	import jiglib.collision.CollOutInfo;
+	import jiglib.data.CollOutData;
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
@@ -71,11 +71,11 @@ package jiglib.geometry
 			return _normal.dotProduct(pt) - _distance;
 		}
 
-		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		override public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean
 		{
-			out.fracOut = 0;
-			out.posOut = new Vector3D();
-			out.normalOut = new Vector3D();
+			out.frac = 0;
+			out.position = new Vector3D();
+			out.normal = new Vector3D();
 
 			var frac:Number = 0;
 
@@ -93,10 +93,10 @@ package jiglib.geometry
 				else
 				{
 					frac = t;
-					out.fracOut = frac;
-					out.posOut = seg.getPoint(frac);
-					out.normalOut = _normal.clone();
-					out.normalOut.normalize();
+					out.frac = frac;
+					out.position = seg.getPoint(frac);
+					out.normal = _normal.clone();
+					out.normal.normalize();
 					return true;
 				}
 			}

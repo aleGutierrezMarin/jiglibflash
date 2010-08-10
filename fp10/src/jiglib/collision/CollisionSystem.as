@@ -29,6 +29,8 @@ package jiglib.collision
 
 	import flash.geom.Vector3D;
 	
+	import jiglib.data.CollOutBodyData;
+	import jiglib.data.CollOutData;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
@@ -151,41 +153,41 @@ package jiglib.collision
 			}
 		}
 
-		public function segmentIntersect(out:CollOutInfo, seg:JSegment, ownerBody:RigidBody):Boolean
+		public function segmentIntersect(out:CollOutBodyData, seg:JSegment, ownerBody:RigidBody):Boolean
 		{
-			out.fracOut = JNumber3D.NUM_HUGE;
-			out.posOut = new Vector3D();
-			out.normalOut = new Vector3D();
+			out.frac = JNumber3D.NUM_HUGE;
+			out.position = new Vector3D();
+			out.normal = new Vector3D();
 
-			var obj:CollOutInfo = new CollOutInfo();
+			var obj:CollOutBodyData = new CollOutBodyData();
 			for each (var _collBody:RigidBody in collBody)
 			{
 				if (_collBody != ownerBody && segmentBounding(seg, _collBody))
 				{
 					if (_collBody.segmentIntersect(obj, seg, _collBody.currentState))
 					{
-						if (obj.fracOut < out.fracOut)
+						if (obj.frac < out.frac)
 						{
-							out.posOut = obj.posOut;
-							out.normalOut = obj.normalOut;
-							out.fracOut = obj.fracOut;
-							out.bodyOut = _collBody;
+							out.position = obj.position;
+							out.normal = obj.normal;
+							out.frac = obj.frac;
+							out.rigidBody = _collBody;
 						}
 					}
 				}
 			}
 
-			if (out.fracOut > 1)
+			if (out.frac > 1)
 			{
 				return false;
 			}
-			if (out.fracOut < 0)
+			if (out.frac < 0)
 			{
-				out.fracOut = 0;
+				out.frac = 0;
 			}
-			else if (out.fracOut > 1)
+			else if (out.frac > 1)
 			{
-				out.fracOut = 1;
+				out.frac = 1;
 			}
 			return true;
 		}

@@ -28,7 +28,7 @@ package jiglib.geometry{
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import jiglib.collision.CollOutInfo;
+	import jiglib.data.CollOutData;
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
@@ -83,11 +83,11 @@ package jiglib.geometry{
 			return state.position.add(JNumber3D.getScaleVector(temp, _length / 2 + _radius));
 		}
 
-		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		override public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean
 		{
-			out.fracOut = 0;
-			out.posOut = new Vector3D();
-			out.normalOut = new Vector3D();
+			out.frac = 0;
+			out.position = new Vector3D();
+			out.normal = new Vector3D();
 
 			var Ks:Vector3D = seg.delta;
 			var kss:Number = Ks.dotProduct(Ks);
@@ -111,11 +111,11 @@ package jiglib.geometry{
 			var distSq:Number = Kg.subtract(JNumber3D.getDivideVector(JNumber3D.getScaleVector(Ke, keg), kee)).lengthSquared;
 			if (distSq < radiusSq)
 			{
-				out.fracOut = 0;
-				out.posOut = seg.origin.clone();
-				out.normalOut = out.posOut.subtract(getBottomPos(state));
-				out.normalOut = out.normalOut.subtract(JNumber3D.getScaleVector(cols[1], out.normalOut.dotProduct(cols[1])));
-				out.normalOut.normalize();
+				out.frac = 0;
+				out.position = seg.origin.clone();
+				out.normal = out.position.subtract(getBottomPos(state));
+				out.normal = out.normal.subtract(JNumber3D.getScaleVector(cols[1], out.normal.dotProduct(cols[1])));
+				out.normal.normalize();
 				return true;
 			}
 
@@ -136,11 +136,11 @@ package jiglib.geometry{
 			{
 				return false;
 			}
-			out.fracOut = t;
-			out.posOut = seg.getPoint(t);
-			out.normalOut = out.posOut.subtract(getBottomPos(state));
-			out.normalOut = out.normalOut.subtract(JNumber3D.getScaleVector(cols[1], out.normalOut.dotProduct(cols[1])));
-			out.normalOut.normalize();
+			out.frac = t;
+			out.position = seg.getPoint(t);
+			out.normal = out.position.subtract(getBottomPos(state));
+			out.normal = out.normal.subtract(JNumber3D.getScaleVector(cols[1], out.normal.dotProduct(cols[1])));
+			out.normal.normalize();
 			return true;
 		}
 		
