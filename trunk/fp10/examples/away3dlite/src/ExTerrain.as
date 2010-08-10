@@ -15,7 +15,7 @@ package
 	import jiglib.physics.*;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import jiglib.plugin.away3dlite.Away3DLitePhysics;
-	import jiglib.plugin.away3dlite.TerrainData;
+	import jiglib.plugin.away3dlite.HeightMapData;
 
 	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
 	/**
@@ -43,12 +43,11 @@ package
 			physics = new Away3DLitePhysics(scene, 10);
 
 			// terrain
-			var _terrainData:TerrainData = new TerrainData(terrainBMD.bitmapData, 256);
-			terrain = physics.createTerrain(_terrainData, new WireframeMaterial(0x000000), 1000, 1000, 32, 32);
+			var _heightMapData:HeightMapData = new HeightMapData(terrainBMD.bitmapData, 256);
+			terrain = physics.createTerrain(_heightMapData, new WireframeMaterial(0x000000), 1000, 1000, 32, 32);
 
 			camera.y = -1000;
 
-			//player
 			init3D();
 		}
 
