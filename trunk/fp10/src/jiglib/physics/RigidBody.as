@@ -29,7 +29,7 @@ package jiglib.physics
 	import flash.geom.Vector3D;
 	
 	import jiglib.cof.JConfig;
-	import jiglib.collision.CollOutInfo;
+	import jiglib.data.CollOutData;
 	import jiglib.collision.CollisionInfo;
 	import jiglib.geometry.JAABox;
 	import jiglib.geometry.JSegment;
@@ -809,7 +809,7 @@ package jiglib.physics
 			}
 		}
 
-		public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean
 		{
 			return false;
 		}

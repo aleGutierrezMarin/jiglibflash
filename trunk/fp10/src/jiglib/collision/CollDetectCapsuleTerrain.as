@@ -26,8 +26,9 @@
 package jiglib.collision
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
+	import jiglib.data.TerrainData;
 	import jiglib.geometry.JCapsule;
 	import jiglib.geometry.JTerrain;
 	import jiglib.math.JNumber3D;
@@ -63,8 +64,8 @@ package jiglib.collision
 			var averageNormal:Vector3D = new Vector3D();
 			var pos1:Vector3D = capsule.getBottomPos(capsule.oldState);
 			var pos2:Vector3D = capsule.getBottomPos(capsule.currentState);
-			var obj1:Object = terrain.getHeightAndNormalByPoint(pos1);
-			var obj2:Object = terrain.getHeightAndNormalByPoint(pos2);
+			var obj1:TerrainData = terrain.getHeightAndNormalByPoint(pos1);
+			var obj2:TerrainData = terrain.getHeightAndNormalByPoint(pos2);
 			if (Math.min(obj1.height, obj2.height) < JConfig.collToll + capsule.radius) {
 				var oldDepth:Number = capsule.radius - obj1.height;
 				var worldPos:Vector3D = pos1.subtract(JNumber3D.getScaleVector(obj2.normal, capsule.radius));

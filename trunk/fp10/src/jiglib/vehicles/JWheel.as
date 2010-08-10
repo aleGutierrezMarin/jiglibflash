@@ -27,8 +27,8 @@ package jiglib.vehicles
 {
 	import flash.geom.Vector3D;
 	
-	import jiglib.collision.CollOutInfo;
 	import jiglib.collision.CollisionSystem;
+	import jiglib.data.CollOutBodyData;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.PhysicsSystem;
@@ -215,7 +215,7 @@ package jiglib.vehicles
 			var maxNumRays:int = 10;
 			var numRays:int = Math.min(_numRays, maxNumRays);
 
-			var objArr:Vector.<CollOutInfo> = new Vector.<CollOutInfo>(numRays, true);
+			var objArr:Vector.<CollOutBodyData> = new Vector.<CollOutBodyData>(numRays, true);
 			var segments:Vector.<JSegment> = new Vector.<JSegment>(numRays, true);
 
 			var deltaFwd:Number = (2 * _radius) / (numRays + 1);
@@ -229,7 +229,7 @@ package jiglib.vehicles
 			var iRay:int = 0;
 			for (iRay = 0; iRay < numRays; iRay++)
 			{
-				objArr[iRay] = new CollOutInfo();
+				objArr[iRay] = new CollOutBodyData();
 				distFwd = (deltaFwdStart + iRay * deltaFwd) - _radius;
 				yOffset = _radius * (1 - Math.cos(90 * (distFwd / _radius) * Math.PI / 180));
 				segments[iRay] = wheelRay.clone();
@@ -237,7 +237,7 @@ package jiglib.vehicles
 				if (collSystem.segmentIntersect(objArr[iRay], segments[iRay], carBody))
 				{
 					_lastOnFloor = true;
-					if (objArr[iRay].fracOut < objArr[bestIRay].fracOut)
+					if (objArr[iRay].frac < objArr[bestIRay].frac)
 					{
 						bestIRay = iRay;
 					}
@@ -249,25 +249,25 @@ package jiglib.vehicles
 				return false;
 			}
 
-			var frac:Number = objArr[bestIRay].fracOut;
-			var groundPos:Vector3D = objArr[bestIRay].posOut;
-			var otherBody:RigidBody = objArr[bestIRay].bodyOut;
+			var frac:Number = objArr[bestIRay].frac;
+			var groundPos:Vector3D = objArr[bestIRay].position;
+			var otherBody:RigidBody = objArr[bestIRay].rigidBody;
 
 			var groundNormal:Vector3D = worldAxis.clone();
 			if (numRays > 1)
 			{
 				for (iRay = 0; iRay < numRays; iRay++)
 				{
-					if (objArr[iRay].fracOut <= 1)
+					if (objArr[iRay].frac <= 1)
 					{
-						groundNormal = groundNormal.add(JNumber3D.getScaleVector(worldPos.subtract(segments[iRay].getEnd()), 1 - objArr[iRay].fracOut));
+						groundNormal = groundNormal.add(JNumber3D.getScaleVector(worldPos.subtract(segments[iRay].getEnd()), 1 - objArr[iRay].frac));
 					}
 				}
 				groundNormal.normalize();
 			}
 			else
 			{
-				groundNormal = objArr[bestIRay].normalOut;
+				groundNormal = objArr[bestIRay].normal;
 			}
 
 			_displacement = rayLen * (1 - frac);

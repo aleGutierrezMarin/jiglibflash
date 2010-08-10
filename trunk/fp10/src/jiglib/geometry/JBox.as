@@ -3,7 +3,7 @@ package jiglib.geometry
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
-	import jiglib.collision.CollOutInfo;
+	import jiglib.data.CollOutData;
 	import jiglib.data.EdgeData;
 	import jiglib.data.SpanData;
 	import jiglib.math.*;
@@ -263,11 +263,11 @@ package jiglib.geometry
 			return vertices;
 		}
 
-		override public function segmentIntersect(out:CollOutInfo, seg:JSegment, state:PhysicsState):Boolean
+		override public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean
 		{
-			out.fracOut = 0;
-			out.posOut = new Vector3D();
-			out.normalOut = new Vector3D();
+			out.frac = 0;
+			out.position = new Vector3D();
+			out.normal = new Vector3D();
 
 			var frac:Number = JNumber3D.NUM_HUGE;
 			var min:Number = -JNumber3D.NUM_HUGE;
@@ -342,15 +342,15 @@ package jiglib.geometry
 			{
 				return false;
 			}
-			out.fracOut = frac;
-			out.posOut = seg.getPoint(frac);
+			out.frac = frac;
+			out.position = seg.getPoint(frac);
 			if (orientationCol[dir].dotProduct(seg.delta) < 0)
 			{
-				out.normalOut = JNumber3D.getScaleVector(orientationCol[dir], -1);
+				out.normal = JNumber3D.getScaleVector(orientationCol[dir], -1);
 			}
 			else
 			{
-				out.normalOut = orientationCol[dir];
+				out.normal = orientationCol[dir];
 			}
 			return true;
 		}

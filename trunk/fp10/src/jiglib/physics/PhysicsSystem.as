@@ -762,7 +762,7 @@ package jiglib.physics
 			_cachedContacts = new Vector.<ContactData>();
 			var ptInfo:CollPointInfo;
 			var fricImpulse:Vector3D;
-			var contact:Object;
+			var contact:ContactData;
 			for each (var collInfo:CollisionInfo in _collisions)
 			{
 				for (var j:String in collInfo.pointInfo)

@@ -26,8 +26,9 @@
 package jiglib.collision
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
+	import jiglib.data.TerrainData;
 	import jiglib.geometry.JSphere;
 	import jiglib.geometry.JTerrain;
 	import jiglib.math.JNumber3D;
@@ -57,7 +58,7 @@ package jiglib.collision
 			var sphere:JSphere = info.body0 as JSphere;
 			var terrain:JTerrain = info.body1 as JTerrain;
 			
-			var obj:Object = terrain.getHeightAndNormalByPoint(sphere.currentState.position);
+			var obj:TerrainData = terrain.getHeightAndNormalByPoint(sphere.currentState.position);
 			if (obj.height < JConfig.collToll + sphere.radius) {
 				var dist:Number = terrain.getHeightByPoint(sphere.oldState.position);
 				var depth:Number = sphere.radius - dist;

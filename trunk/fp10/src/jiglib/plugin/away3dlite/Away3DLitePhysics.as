@@ -74,9 +74,9 @@ package jiglib.plugin.away3dlite
 			return jGround;
 		}
 
-		public function createTerrain(terrainData:TerrainData, material:Material, width:Number = 100, depth:Number = 100, segmentsW:int = 10, segmentsH:int = 10):JTerrain
+		public function createTerrain(heightMapData:HeightMapData, material:Material, width:Number = 100, depth:Number = 100, segmentsW:int = 10, segmentsH:int = 10):JTerrain
 		{
-			var terrainMap:Away3DLiteTerrain = new Away3DLiteTerrain(terrainData, material, width, depth, segmentsW, segmentsH);
+			var terrainMap:Away3DLiteTerrain = new Away3DLiteTerrain(heightMapData, material, width, depth, segmentsW, segmentsH);
 			_scene.addChild(terrainMap);
 
 			var jTerrain:JTerrain = new JTerrain(terrainMap, false);

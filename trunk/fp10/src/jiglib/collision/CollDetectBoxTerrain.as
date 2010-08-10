@@ -26,8 +26,9 @@
 package jiglib.collision
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
+	import jiglib.data.TerrainData;
 	import jiglib.geometry.JBox;
 	import jiglib.geometry.JTerrain;
 	import jiglib.math.JNumber3D;
@@ -61,7 +62,7 @@ package jiglib.collision
 			var newPts:Vector.<Vector3D> = box.getCornerPoints(box.currentState);
 			var collNormal:Vector3D = new Vector3D();
 			
-			var obj:Object;
+			var obj:TerrainData;
 			var dist:Number;
 			var newPt:Vector3D;
 			var oldPt:Vector3D;
