@@ -104,8 +104,7 @@ package jiglib.collision
 				}
 				else
 				{
-					dir = Vector3D.Y_AXIS;
-					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), dir);
+					dir = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
 				}
 				averageNormal = averageNormal.add(dir);
 
@@ -148,8 +147,7 @@ package jiglib.collision
 				}
 				else
 				{
-					dir = Vector3D.Y_AXIS;
-					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), dir);
+					dir = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
 				}
 				averageNormal = averageNormal.add(dir);
 

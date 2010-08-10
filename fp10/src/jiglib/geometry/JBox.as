@@ -113,26 +113,26 @@ package jiglib.geometry
 		public function getCornerPoints(state:PhysicsState):Vector.<Vector3D>
 		{
 			var vertex:Vector3D;
-			var arr:Vector.<Vector3D> = new Vector.<Vector3D>();
-			
+			var _points_length:int = _points.length;
+			var arr:Vector.<Vector3D> = new Vector.<Vector3D>(_points_length, true);
+
 			var transform:Matrix3D = JMatrix3D.getTranslationMatrix(state.position.x, state.position.y, state.position.z);
 			transform = JMatrix3D.getAppendMatrix3D(state.orientation, transform);
-			
-			for each (var _point:Vector3D in _points) {
-				vertex = new Vector3D(_point.x, _point.y, _point.z);
-				JMatrix3D.multiplyVector(transform, vertex);
-				arr.push(vertex);
-				//arr.push(transform.transformVector(new Vector3D(_point.x, _point.y, _point.z)));
+
+			var i:int = 0;
+			while (i < _points_length)
+			{
+				arr[i] = transform.transformVector(_points[i]);
+				i = int(i + 1);
 			}
 
-			arr.fixed = true;
 			return arr;
 		}
 		
 		public function getSqDistanceToPoint(state:PhysicsState, closestBoxPoint:Vector.<Vector3D>, point:Vector3D):Number
 		{
 			var _closestBoxPoint:Vector3D = point.subtract(state.position);
-			JMatrix3D.multiplyVector(JMatrix3D.getTransposeMatrix(state.orientation), _closestBoxPoint);
+			_closestBoxPoint = JMatrix3D.getTransposeMatrix(state.orientation).transformVector(_closestBoxPoint);
 
 			var delta:Number = 0;
 			var sqDistance:Number = 0;
@@ -176,7 +176,7 @@ package jiglib.geometry
 				sqDistance += (delta * delta);
 				_closestBoxPoint.z = halfSideLengths.z;
 			}
-			JMatrix3D.multiplyVector(state.orientation, _closestBoxPoint);
+			_closestBoxPoint = state.orientation.transformVector(_closestBoxPoint);
 			closestBoxPoint[0] = state.position.add(_closestBoxPoint);
 			return sqDistance;
 		}

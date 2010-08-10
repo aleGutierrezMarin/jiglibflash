@@ -88,8 +88,7 @@ package jiglib.collision
 				}
 				else
 				{
-					delta = Vector3D.Y_AXIS;
-					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), delta);
+					delta = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
 				}
 
 				var worldPos:Vector3D = pos1.add(JNumber3D.getScaleVector(delta, capsule1.radius - 0.5 * depth));
@@ -127,8 +126,7 @@ package jiglib.collision
 				}
 				else
 				{
-					delta = Vector3D.Y_AXIS;
-					JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()), delta);
+					delta = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
 				}
 
 				worldPos = pos1.add(JNumber3D.getScaleVector(delta, capsule1.radius - 0.5 * depth));

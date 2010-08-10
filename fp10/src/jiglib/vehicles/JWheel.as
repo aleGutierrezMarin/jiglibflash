@@ -197,14 +197,11 @@ package jiglib.vehicles
 			_displacement = 0;
 
 			var carBody:JChassis = _car.chassis;
-			worldPos = _pos.clone();
-			JMatrix3D.multiplyVector(carBody.currentState.orientation, worldPos);
+			worldPos = carBody.currentState.orientation.transformVector(_pos);
 			worldPos = carBody.currentState.position.add(worldPos);
-			worldAxis = _axisUp.clone();
-			JMatrix3D.multiplyVector(carBody.currentState.orientation, worldAxis);
+			worldAxis = carBody.currentState.orientation.transformVector(_axisUp);
 
-			wheelFwd = carBody.currentState.getOrientationCols()[2].clone();
-			JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(worldAxis.x, worldAxis.y, worldAxis.z, _steerAngle), wheelFwd);
+			wheelFwd = JMatrix3D.getRotationMatrix(worldAxis.x, worldAxis.y, worldAxis.z, _steerAngle).transformVector(carBody.currentState.getOrientationCols()[2]);
 			wheelUp = worldAxis;
 			wheelLeft = wheelUp.crossProduct(wheelFwd);
 			wheelLeft.normalize();
@@ -300,8 +297,7 @@ package jiglib.vehicles
 			groundLeft.normalize();
 			groundFwd = groundLeft.crossProduct(groundUp);
 
-			var tempv:Vector3D = _pos.clone();
-			JMatrix3D.multiplyVector(carBody.currentState.orientation, tempv);
+			var tempv:Vector3D = carBody.currentState.orientation.transformVector(_pos);
 			wheelPointVel = carBody.currentState.linVelocity.add(carBody.currentState.rotVelocity.crossProduct(tempv));
 
 			rimVel = JNumber3D.getScaleVector(wheelLeft.crossProduct(groundPos.subtract(worldPos)), _angVel);

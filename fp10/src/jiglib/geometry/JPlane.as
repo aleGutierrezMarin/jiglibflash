@@ -109,9 +109,7 @@ package jiglib.geometry
 		override protected function updateState():void
 		{
 			super.updateState();
-			_normal = _initNormal.clone();
-			JMatrix3D.multiplyVector(_currState.orientation, _normal);
-			//_normal = _currState.orientation.transformVector(new Vector3D(0, 0, -1));
+			_normal = _currState.orientation.transformVector(_initNormal);
 			_distance = _currState.position.dotProduct(_normal);
 		}
 	}
