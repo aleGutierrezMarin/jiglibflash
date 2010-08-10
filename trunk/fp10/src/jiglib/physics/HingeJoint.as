@@ -100,8 +100,7 @@ package jiglib.physics
 				var len:Number = 10 * hingeHalfWidth;
 				var hingeRelAnchorPos0:Vector3D = JNumber3D.getScaleVector(perpDir, len);
 				var angleToMiddle:Number = 0.5 * (hingeFwdAngle - hingeBckAngle);
-				var hingeRelAnchorPos1:Vector3D = hingeRelAnchorPos0.clone();
-				JMatrix3D.multiplyVector(JMatrix3D.getRotationMatrix(_hingeAxis.x, _hingeAxis.y, _hingeAxis.z, -angleToMiddle), hingeRelAnchorPos1);
+				var hingeRelAnchorPos1:Vector3D = JMatrix3D.getRotationMatrix(_hingeAxis.x, _hingeAxis.y, _hingeAxis.z, -angleToMiddle).transformVector(hingeRelAnchorPos0);
 
 				var hingeHalfAngle:Number = 0.5 * (hingeFwdAngle + hingeBckAngle);
 				var allowedDistance:Number = len * 2 * Math.sin(0.5 * hingeHalfAngle * Math.PI / 180);
@@ -229,8 +228,7 @@ package jiglib.physics
 
 			if (_extraTorque != 0)
 			{
-				var torque1:Vector3D = _hingeAxis.clone();
-				JMatrix3D.multiplyVector(_body0.currentState.orientation, torque1);
+				var torque1:Vector3D = _body0.currentState.orientation.transformVector(_hingeAxis);
 				torque1 = JNumber3D.getScaleVector(torque1, _extraTorque);
 
 				_body0.addWorldTorque(torque1);

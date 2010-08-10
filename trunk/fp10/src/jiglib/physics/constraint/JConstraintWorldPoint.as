@@ -62,8 +62,7 @@ package jiglib.physics.constraint {
 		override public function apply(dt:Number):Boolean {
 			this.satisfied = true;
 
-			var worldPos:Vector3D = _pointOnBody.clone();
-			JMatrix3D.multiplyVector(_body.currentState.orientation, worldPos);
+			var worldPos:Vector3D = _body.currentState.orientation.transformVector(_pointOnBody);
 			worldPos = worldPos.add( _body.currentState.position);
 			var R:Vector3D = worldPos.subtract(_body.currentState.position);
 			var currentVel:Vector3D = _body.currentState.linVelocity.add(_body.currentState.rotVelocity.crossProduct(R));
@@ -87,7 +86,7 @@ package jiglib.physics.constraint {
 			N = JNumber3D.getDivideVector(N, normalVel);
 			
 			var tempV:Vector3D = R.crossProduct(N);
-			JMatrix3D.multiplyVector(_body.worldInvInertia, tempV);
+			tempV = _body.worldInvInertia.transformVector(tempV);
 			var denominator:Number = _body.invMass + N.dotProduct(tempV.crossProduct(R));
 			 
 			if (denominator < JNumber3D.NUM_TINY) {

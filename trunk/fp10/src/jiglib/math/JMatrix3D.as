@@ -76,7 +76,7 @@ package jiglib.math
 		public static function getCols(matrix3D:Matrix3D):Vector.<Vector3D>
 		{
 			var _rawData:Vector.<Number> =  matrix3D.rawData;
-			var cols:Vector.<Vector3D> = new Vector.<Vector3D>();
+			var cols:Vector.<Vector3D> = new Vector.<Vector3D>(3, true);
 			
 			cols[0] = new Vector3D(_rawData[0], _rawData[1], _rawData[2]);
 			cols[1] = new Vector3D(_rawData[4], _rawData[5], _rawData[6]);
@@ -87,6 +87,9 @@ package jiglib.math
 
 		public static function multiplyVector(matrix3D:Matrix3D, v:Vector3D):void
 		{
+			v = matrix3D.transformVector(v);
+			
+			/*
 			var vx:Number = v.x;
 			var vy:Number = v.y;
 			var vz:Number = v.z;
@@ -98,9 +101,7 @@ package jiglib.math
 			v.x = vx * _rawData[0] + vy * _rawData[4] + vz * _rawData[8]  + _rawData[12];
 			v.y = vx * _rawData[1] + vy * _rawData[5] + vz * _rawData[9]  + _rawData[13];
 			v.z = vx * _rawData[2] + vy * _rawData[6] + vz * _rawData[10] + _rawData[14];
-		
-			//v = matrix3D.transformVector(v);
-			
+			*/
 		}
 	}
 }
