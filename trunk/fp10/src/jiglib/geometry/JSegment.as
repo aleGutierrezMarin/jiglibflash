@@ -459,7 +459,7 @@ package jiglib.geometry
 			out[1] = 0;
 			out[2] = 0;
 
-			var obj:Vector.<Number> = Vector.<Number>(4, true);
+			var obj:Vector.<Number> = new Vector.<Number>(4, true);
 			var kRay:JRay = new JRay(_origin, _delta);
 			var fSqrDistance:Number = sqrDistanceLine(obj, kRay, rkBox, boxState);
 			if (obj[3] >= 0)
