@@ -210,14 +210,12 @@ package jiglib.collision
 			if (body0.nonCollidables.length == 0 && body1.nonCollidables.length == 0)
 				return true;
 
-			for each (var _body0:RigidBody in body0.nonCollidables)
-				if (body1 == _body0)
-					return false;
-
-			for each (var _body1:RigidBody in body1.nonCollidables)
-				if (body0 == _body1)
-					return false;
-
+			if(body0.nonCollidables.indexOf(body1) > -1)
+				return false;
+			
+			if(body1.nonCollidables.indexOf(body0) > -1)
+				return false;
+				
 			return true;
 		}
 	}
