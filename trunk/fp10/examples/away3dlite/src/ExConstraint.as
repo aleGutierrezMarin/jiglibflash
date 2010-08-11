@@ -4,11 +4,11 @@ package
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
-
+	
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.math.*;
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
@@ -71,14 +71,13 @@ package
 					sphere = physics.createSphere(new WireframeMaterial(), 25);
 				}
 
-				sphere.mass = 5;
-				sphere.currentState.position.x = -i * 50;
-				sphere.currentState.position.y = -300;
+				sphere.mass = 10;
+				sphere.moveTo(new Vector3D(-i * 50, -100, 0));
 
 				if (i != 0)
 				{
-					var pos1:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, -prevSphere.boundingSphere);
-					var pos2:Vector3D = JNumber3D.getScaleVector(Vector3D.Y_AXIS, sphere.boundingSphere);
+					var pos1:Vector3D = JNumber3D.getScaleVector(Vector3D.X_AXIS, -prevSphere.boundingSphere);
+					var pos2:Vector3D = JNumber3D.getScaleVector(Vector3D.X_AXIS, sphere.boundingSphere);
 					var constraint:JConstraintPoint = new JConstraintPoint(prevSphere, pos1, sphere, pos2, 1, 1);
 				}
 
