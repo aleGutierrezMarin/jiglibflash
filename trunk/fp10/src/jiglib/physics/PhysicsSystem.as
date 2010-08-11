@@ -227,17 +227,17 @@ package jiglib.physics
 
 		private function findBody(body:RigidBody):Boolean
 		{
-			return _bodies.indexOf(body)>-1;
+			return _bodies.indexOf(body) > -1;
 		}
 
 		private function findConstraint(constraint:JConstraint):Boolean
 		{
-			return _constraints.indexOf(constraint)>-1;
+			return _constraints.indexOf(constraint) > -1;
 		}
 
 		private function findController(controller:PhysicsController):Boolean
 		{
-			return _controllers.indexOf(controller)>-1;
+			return _controllers.indexOf(controller) > -1;
 		}
 
 		// fast-but-inaccurate pre-processor
@@ -729,15 +729,13 @@ package jiglib.physics
 		{
 			_cachedContacts = new Vector.<ContactData>();
 
-			var ptInfo:CollPointInfo;
 			var fricImpulse:Vector3D;
 			var contact:ContactData;
+			var i:int = 0;
 
 			for each (var collInfo:CollisionInfo in _collisions)
-			{
-				for (var j:String in collInfo.pointInfo)
+				for each (var ptInfo:CollPointInfo in collInfo.pointInfo)
 				{
-					ptInfo = collInfo.pointInfo[j];
 					fricImpulse = (collInfo.objInfo.body0.id > collInfo.objInfo.body1.id) ? ptInfo.accumulatedFrictionImpulse : JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, -1);
 
 					contact = new ContactData();
@@ -746,12 +744,10 @@ package jiglib.physics
 
 					_cachedContacts.push(contact);
 				}
-			}
 		}
 
 		private function handleAllConstraints(dt:Number, iter:int, forceInelastic:Boolean):void
 		{
-			var origNumCollisions:int = _collisions.length;
 			var collInfo:CollisionInfo;
 			var _constraint:JConstraint;
 
@@ -784,18 +780,14 @@ package jiglib.physics
 					if (!collInfo.satisfied)
 					{
 						if (forceInelastic)
-						{
 							flag = processContactFn(collInfo, dt);
-							gotOne = gotOne || flag;
-						}
 						else
-						{
 							flag = processCollisionFn(collInfo, dt);
-							gotOne = gotOne || flag;
-						}
+	
+						gotOne = gotOne || flag;
 					}
 				}
-
+	
 				for each (_constraint in _constraints)
 				{
 					if (!_constraint.satisfied)
@@ -804,29 +796,24 @@ package jiglib.physics
 						gotOne = gotOne || flag;
 					}
 				}
-				
+	
 				tryToActivateAllFrozenObjects();
-
+	
 				if (forceInelastic)
 				{
-					len = _collisions.length;
-					for (var j:int = origNumCollisions; j < len; j++)
+					for each(collInfo in _collisions)
 					{
-						_collisions[j].mat.restitution = 0;
-						_collisions[j].satisfied = false;
-						preProcessContactFn(_collisions[j], dt);
+						collInfo.mat.restitution = 0;
+						collInfo.satisfied = false;
+						preProcessContactFn(collInfo, dt);
 					}
 				}
 				else
 				{
-					len = _collisions.length;
-					for (j = origNumCollisions; j < len; j++)
-					{
-						preProcessCollisionFn(_collisions[j], dt);
-					}
+					for each(collInfo in _collisions)
+						preProcessCollisionFn(collInfo, dt);
 				}
-				origNumCollisions = _collisions.length;
-
+				
 				if (!gotOne)
 					break;
 			}
