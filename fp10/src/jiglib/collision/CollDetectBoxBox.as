@@ -25,23 +25,22 @@
 
 package jiglib.collision
 {
-	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.cof.JConfig;
+	import jiglib.data.CollOutData;
 	import jiglib.data.EdgeData;
 	import jiglib.data.SpanData;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
 	import jiglib.physics.MaterialProperties;
 	import jiglib.physics.PhysicsState;
-	import jiglib.data.CollOutData;
 
 	public class CollDetectBoxBox extends CollDetectFunctor
 	{
 		private const MAX_SUPPORT_VERTS:Number = 10;
 		private var combinationDist:Number;
-		
+
 		public function CollDetectBoxBox()
 		{
 			name = "BoxBox";
@@ -58,7 +57,7 @@ package jiglib.collision
 			var obj0Max:Number = obj0.max;
 			var obj1Min:Number = obj1.min;
 			var obj1Max:Number = obj1.max;
-			
+
 			if (obj0Min > (obj1Max + JConfig.collToll + JNumber3D.NUM_TINY) || obj1Min > (obj0Max + JConfig.collToll + JNumber3D.NUM_TINY))
 			{
 				out.flag = true;
@@ -125,8 +124,6 @@ package jiglib.collision
 			getBox2BoxEdgesIntersectionPoints(contactPoint, box1, box0, newState);
 			return contactPoint.length;
 		}
-
-
 
 		/*
 		 * Original Author: Olivier renault
@@ -297,19 +294,20 @@ package jiglib.collision
 			{
 				return;
 			}
-			
-			if (JConfig.aabbDetection && !box0.boundingBox.overlapTest(box1.boundingBox)) {
+
+			if (JConfig.aabbDetection && !box0.boundingBox.overlapTest(box1.boundingBox))
+			{
 				return;
 			}
 
 			var numTiny:Number = JNumber3D.NUM_TINY;
 			var numHuge:Number = JNumber3D.NUM_HUGE;
-			
+
 			var dirs0Arr:Vector.<Vector3D> = box0.currentState.getOrientationCols();
 			var dirs1Arr:Vector.<Vector3D> = box1.currentState.getOrientationCols();
-			
+
 			// the 15 potential separating axes
-			 var axes:Vector.<Vector3D> = Vector.<Vector3D>([dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
+			var axes:Vector.<Vector3D> = Vector.<Vector3D>([dirs0Arr[0], dirs0Arr[1], dirs0Arr[2],
 				dirs1Arr[0], dirs1Arr[1], dirs1Arr[2],
 				dirs0Arr[0].crossProduct(dirs1Arr[0]),
 				dirs0Arr[1].crossProduct(dirs1Arr[0]),
@@ -320,7 +318,7 @@ package jiglib.collision
 				dirs0Arr[0].crossProduct(dirs1Arr[2]),
 				dirs0Arr[1].crossProduct(dirs1Arr[2]),
 				dirs0Arr[2].crossProduct(dirs1Arr[2])]);
-				
+
 			var l2:Number;
 			// the overlap depths along each axis
 			var overlapDepths:Vector.<SpanData> = new Vector.<SpanData>();
@@ -409,30 +407,32 @@ package jiglib.collision
 			var bodyDeltaLen:Number = bodyDelta.dotProduct(N);
 			var oldDepth:Number = depth + bodyDeltaLen;
 
-			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
+			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>(contactPoints.length, true);
+			var i:int = 0;
 			if (contactPoints.length > 0)
 			{
 				var box0ReqPosition:Vector3D;
 				var box1ReqPosition:Vector3D;
 				var cpInfo:CollPointInfo;
-				
+
 				if (contactPointsFromOld)
 				{
 					box0ReqPosition = box0.oldState.position;
 					box1ReqPosition = box1.oldState.position;
 				}
+				else
 				{
 					box0ReqPosition = box0.currentState.position;
 					box1ReqPosition = box1.currentState.position;
 				}
-	
+
 				for each (var contactPoint:Vector3D in contactPoints)
 				{
 					cpInfo = new CollPointInfo();
-					cpInfo.r0 = contactPoint.subtract( box0ReqPosition);
-					cpInfo.r1 = contactPoint.subtract( box1ReqPosition);
+					cpInfo.r0 = contactPoint.subtract(box0ReqPosition);
+					cpInfo.r1 = contactPoint.subtract(box1ReqPosition);
 					cpInfo.initialPenetration = oldDepth;
-					collPts.push(cpInfo);
+					collPts[int(i++)] = cpInfo;
 				}
 
 				var collInfo:CollisionInfo = new CollisionInfo();
@@ -526,7 +526,8 @@ package jiglib.collision
 			}
 
 			var cpInfo:CollPointInfo;
-			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
+			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>(num, true);
+			var i:int = 0;
 			if (contactA.length > 0 && contactB.length > 0)
 			{
 				var num:int = (contactA.length > contactB.length) ? contactB.length : contactA.length;
@@ -536,7 +537,7 @@ package jiglib.collision
 					cpInfo.r0 = contactA[j].subtract(box0.currentState.position);
 					cpInfo.r1 = contactB[j].subtract(box1.currentState.position);
 					cpInfo.initialPenetration = depth;
-					collPts.push(cpInfo);
+					collPts[int(i++)] = cpInfo;
 				}
 			}
 			else
@@ -545,7 +546,7 @@ package jiglib.collision
 				cpInfo.r0 = new Vector3D();
 				cpInfo.r1 = new Vector3D();
 				cpInfo.initialPenetration = depth;
-				collPts.push(cpInfo);
+				collPts[int(i++)] = cpInfo;
 			}
 
 			var collInfo:CollisionInfo = new CollisionInfo();
