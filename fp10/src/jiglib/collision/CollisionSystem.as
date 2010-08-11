@@ -26,11 +26,10 @@
 package jiglib.collision
 {
 
-
 	import flash.geom.Vector3D;
+	import flash.utils.Dictionary;
 	
 	import jiglib.data.CollOutBodyData;
-	import jiglib.data.CollOutData;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
@@ -38,39 +37,34 @@ package jiglib.collision
 	public class CollisionSystem
 	{
 
-		private var detectionFunctors:Array;
+		private var detectionFunctors:Dictionary;
 		private var collBody:Vector.<RigidBody>;
 
 		public function CollisionSystem()
 		{
 			collBody = new Vector.<RigidBody>();
-			detectionFunctors = [];
-			detectionFunctors["BOX"] = [];
-			detectionFunctors["BOX"]["BOX"] = new CollDetectBoxBox();
-			detectionFunctors["BOX"]["SPHERE"] = new CollDetectSphereBox();
-			detectionFunctors["BOX"]["CAPSULE"] = new CollDetectCapsuleBox();
-			detectionFunctors["BOX"]["PLANE"] = new CollDetectBoxPlane();
-			detectionFunctors["BOX"]["TERRAIN"] = new CollDetectBoxTerrain();
-			detectionFunctors["SPHERE"] = [];
-			detectionFunctors["SPHERE"]["BOX"] = new CollDetectSphereBox();
-			detectionFunctors["SPHERE"]["SPHERE"] = new CollDetectSphereSphere();
-			detectionFunctors["SPHERE"]["CAPSULE"] = new CollDetectSphereCapsule();
-			detectionFunctors["SPHERE"]["PLANE"] = new CollDetectSpherePlane();
-			detectionFunctors["SPHERE"]["TERRAIN"] = new CollDetectSphereTerrain();
-			detectionFunctors["CAPSULE"] = [];
-			detectionFunctors["CAPSULE"]["CAPSULE"] = new CollDetectCapsuleCapsule();
-			detectionFunctors["CAPSULE"]["BOX"] = new CollDetectCapsuleBox();
-			detectionFunctors["CAPSULE"]["SPHERE"] = new CollDetectSphereCapsule();
-			detectionFunctors["CAPSULE"]["PLANE"] = new CollDetectCapsulePlane();
-			detectionFunctors["CAPSULE"]["TERRAIN"] = new CollDetectCapsuleTerrain();
-			detectionFunctors["PLANE"] = [];
-			detectionFunctors["PLANE"]["BOX"] = new CollDetectBoxPlane();
-			detectionFunctors["PLANE"]["SPHERE"] = new CollDetectSpherePlane();
-			detectionFunctors["PLANE"]["CAPSULE"] = new CollDetectCapsulePlane();
-			detectionFunctors["TERRAIN"] = [];
-			detectionFunctors["TERRAIN"]["SPHERE"] = new CollDetectSphereTerrain();
-			detectionFunctors["TERRAIN"]["BOX"] = new CollDetectBoxTerrain();
-			detectionFunctors["TERRAIN"]["CAPSULE"] = new CollDetectCapsuleTerrain();
+			detectionFunctors = new Dictionary(true);
+			detectionFunctors["BOX_BOX"] = new CollDetectBoxBox();
+			detectionFunctors["BOX_SPHERE"] = new CollDetectSphereBox();
+			detectionFunctors["BOX_CAPSULE"] = new CollDetectCapsuleBox();
+			detectionFunctors["BOX_PLANE"] = new CollDetectBoxPlane();
+			detectionFunctors["BOX_TERRAIN"] = new CollDetectBoxTerrain();
+			detectionFunctors["SPHERE_BOX"] = new CollDetectSphereBox();
+			detectionFunctors["SPHERE_SPHERE"] = new CollDetectSphereSphere();
+			detectionFunctors["SPHERE_CAPSULE"] = new CollDetectSphereCapsule();
+			detectionFunctors["SPHERE_PLANE"] = new CollDetectSpherePlane();
+			detectionFunctors["SPHERE_TERRAIN"] = new CollDetectSphereTerrain();
+			detectionFunctors["CAPSULE_CAPSULE"] = new CollDetectCapsuleCapsule();
+			detectionFunctors["CAPSULE_BOX"] = new CollDetectCapsuleBox();
+			detectionFunctors["CAPSULE_SPHERE"] = new CollDetectSphereCapsule();
+			detectionFunctors["CAPSULE_PLANE"] = new CollDetectCapsulePlane();
+			detectionFunctors["CAPSULE_TERRAIN"] = new CollDetectCapsuleTerrain();
+			detectionFunctors["PLANE_BOX"] = new CollDetectBoxPlane();
+			detectionFunctors["PLANE_SPHERE"] = new CollDetectSpherePlane();
+			detectionFunctors["PLANE_CAPSULE"] = new CollDetectCapsulePlane();
+			detectionFunctors["TERRAIN_SPHERE"] = new CollDetectSphereTerrain();
+			detectionFunctors["TERRAIN_BOX"] = new CollDetectBoxTerrain();
+			detectionFunctors["TERRAIN_CAPSULE"] = new CollDetectCapsuleTerrain();
 		}
 
 		public function addCollisionBody(body:RigidBody):void
@@ -106,12 +100,12 @@ package jiglib.collision
 
 			for each (var _collBody:RigidBody in collBody)
 			{
-				if (body != _collBody && checkCollidables(body, _collBody) && detectionFunctors[body.type][_collBody.type] != undefined)
+				if (body != _collBody && checkCollidables(body, _collBody) && detectionFunctors[body.type + "_" + _collBody.type] != undefined)
 				{
 					info = new CollDetectInfo();
 					info.body0 = body;
 					info.body1 = _collBody;
-					fu = detectionFunctors[info.body0.type][info.body1.type];
+					fu = detectionFunctors[info.body0.type + "_" + info.body1.type];
 					fu.collDetect(info, collArr);
 				}
 			}
@@ -124,7 +118,7 @@ package jiglib.collision
 			var fu:CollDetectFunctor;
 			var bodyID:int;
 			var bodyType:String;
-			
+
 			for each (var _body:RigidBody in bodies)
 			{
 				bodyID = _body.id;
@@ -141,12 +135,12 @@ package jiglib.collision
 						continue;
 					}
 
-					if (checkCollidables(_body, _collBody) && detectionFunctors[bodyType][_collBody.type] != undefined)
+					if (checkCollidables(_body, _collBody) && detectionFunctors[bodyType + "_" + _collBody.type] != undefined)
 					{
 						info = new CollDetectInfo();
 						info.body0 = _body;
 						info.body1 = _collBody;
-						fu = detectionFunctors[info.body0.type][info.body1.type];
+						fu = detectionFunctors[info.body0.type + "_" + info.body1.type];
 						fu.collDetect(info, collArr);
 					}
 				}
@@ -252,5 +246,4 @@ package jiglib.collision
 			return true;
 		}
 	}
-
 }
