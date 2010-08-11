@@ -227,29 +227,17 @@ package jiglib.physics
 
 		private function findBody(body:RigidBody):Boolean
 		{
-			for each (var _body:RigidBody in _bodies)
-				if (body == _body)
-					return true;
-
-			return false;
+			return _bodies.indexOf(body)>-1;
 		}
 
 		private function findConstraint(constraint:JConstraint):Boolean
 		{
-			for each (var _constraint:JConstraint in _constraints)
-				if (constraint == _constraint)
-					return true;
-
-			return false;
+			return _constraints.indexOf(constraint)>-1;
 		}
 
 		private function findController(controller:PhysicsController):Boolean
 		{
-			for each (var _controller:PhysicsController in _controllers)
-				if (controller == _controller)
-					return true;
-
-			return false;
+			return _controllers.indexOf(controller)>-1;
 		}
 
 		// fast-but-inaccurate pre-processor
@@ -947,9 +935,7 @@ package jiglib.physics
 		private function updateAllObject3D():void
 		{
 			for each (var _body:RigidBody in _bodies)
-			{
 				_body.updateObject3D();
-			}
 		}
 
 		private function limitAllVelocities():void

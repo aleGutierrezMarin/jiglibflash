@@ -25,10 +25,9 @@
 
 package jiglib.collision
 {
-
 	import flash.geom.Vector3D;
 	import flash.utils.Dictionary;
-	
+
 	import jiglib.data.CollOutBodyData;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
@@ -36,7 +35,6 @@ package jiglib.collision
 
 	public class CollisionSystem
 	{
-
 		private var detectionFunctors:Dictionary;
 		private var collBody:Vector.<RigidBody>;
 
@@ -70,17 +68,13 @@ package jiglib.collision
 		public function addCollisionBody(body:RigidBody):void
 		{
 			if (!findBody(body))
-			{
 				collBody.push(body);
-			}
 		}
 
 		public function removeCollisionBody(body:RigidBody):void
 		{
 			if (findBody(body))
-			{
 				collBody.splice(collBody.indexOf(body), 1);
-			}
 		}
 
 		public function removeAllCollisionBodys():void
@@ -92,9 +86,8 @@ package jiglib.collision
 		public function detectCollisions(body:RigidBody, collArr:Vector.<CollisionInfo>):void
 		{
 			if (!body.isActive)
-			{
 				return;
-			}
+
 			var info:CollDetectInfo;
 			var fu:CollDetectFunctor;
 
@@ -172,9 +165,8 @@ package jiglib.collision
 			}
 
 			if (out.frac > 1)
-			{
 				return false;
-			}
+
 			if (out.frac < 0)
 			{
 				out.frac = 0;
@@ -183,6 +175,7 @@ package jiglib.collision
 			{
 				out.frac = 1;
 			}
+
 			return true;
 		}
 
@@ -195,14 +188,11 @@ package jiglib.collision
 			{
 				var num1:Number = pos.subtract(obj.currentState.position).length;
 				var num2:Number = r + obj.boundingSphere;
+
 				if (num1 <= num2)
-				{
 					return true;
-				}
 				else
-				{
 					return false;
-				}
 			}
 			else
 			{
@@ -212,37 +202,22 @@ package jiglib.collision
 
 		private function findBody(body:RigidBody):Boolean
 		{
-			for each (var _collBody:RigidBody in collBody)
-			{
-				if (body == _collBody)
-				{
-					return true;
-				}
-			}
-			return false;
+			return collBody.indexOf(body) > -1;
 		}
 
 		private function checkCollidables(body0:RigidBody, body1:RigidBody):Boolean
 		{
 			if (body0.nonCollidables.length == 0 && body1.nonCollidables.length == 0)
-			{
 				return true;
-			}
 
 			for each (var _body0:RigidBody in body0.nonCollidables)
-			{
 				if (body1 == _body0)
-				{
 					return false;
-				}
-			}
+
 			for each (var _body1:RigidBody in body1.nonCollidables)
-			{
 				if (body0 == _body1)
-				{
 					return false;
-				}
-			}
+
 			return true;
 		}
 	}
