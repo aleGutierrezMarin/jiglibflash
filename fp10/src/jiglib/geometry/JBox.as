@@ -20,10 +20,10 @@ package jiglib.geometry
 		private var _sideLengths:Vector3D;
 		private var _points:Vector.<Vector3D>;
 		private var _edges:Vector.<EdgeData> = Vector.<EdgeData>([
-			new EdgeData( 0, 1 ), new EdgeData( 3, 1 ), new EdgeData( 2, 3 ),
-			new EdgeData( 2, 0 ), new EdgeData( 4, 5 ), new EdgeData( 5, 7 ),
-			new EdgeData( 6, 7 ), new EdgeData( 4, 6 ), new EdgeData( 7, 1 ),
-			new EdgeData( 5, 3 ), new EdgeData( 4, 2 ), new EdgeData( 6, 0 )]);
+			new EdgeData( 0, 1 ), new EdgeData( 0, 2 ), new EdgeData( 0, 6 ),
+			new EdgeData( 2, 3 ), new EdgeData( 2, 4 ), new EdgeData( 6, 7 ),
+			new EdgeData( 6, 4 ), new EdgeData( 1, 3 ), new EdgeData( 1, 7 ),
+			new EdgeData( 3, 5 ), new EdgeData( 7, 5 ), new EdgeData( 4, 5 )]);
 
 		private var _face:Vector.<Vector.<Number>> = Vector.<Vector.<Number>>([
 			Vector.<Number>([6, 7, 1, 0]), Vector.<Number>([5, 4, 2, 3]),
@@ -109,10 +109,9 @@ package jiglib.geometry
 			return obj;
 		}
 		
-		// Gets the corner points
+		// Gets the corner points in world space
 		public function getCornerPoints(state:PhysicsState):Vector.<Vector3D>
 		{
-			var vertex:Vector3D;
 			var _points_length:int = _points.length;
 			var arr:Vector.<Vector3D> = new Vector.<Vector3D>(_points_length, true);
 
@@ -126,6 +125,27 @@ package jiglib.geometry
 				i = int(i + 1);
 			}
 
+			return arr;
+		}
+		
+		// Gets the corner points in another box space
+		public function getCornerPointsInBoxSpace(thisState:PhysicsState, boxState:PhysicsState):Vector.<Vector3D> {
+			
+			var max:Matrix3D = JMatrix3D.getTransposeMatrix(boxState.orientation);
+			var pos:Vector3D = thisState.position.subtract(boxState.position);
+			pos = max.transformVector(pos);
+			
+			var orient:Matrix3D = JMatrix3D.getAppendMatrix3D(thisState.orientation, max);
+			
+			var arr:Vector.<Vector3D> = new Vector.<Vector3D>();
+			
+			var transform:Matrix3D = JMatrix3D.getTranslationMatrix(pos.x, pos.y, pos.z);
+			transform = JMatrix3D.getAppendMatrix3D(orient, transform);
+			
+			for each (var _point:Vector3D in _points) {
+				arr.push(transform.transformVector(new Vector3D(_point.x, _point.y, _point.z)));
+			}
+			arr.fixed = true;
 			return arr;
 		}
 		
@@ -204,63 +224,6 @@ package jiglib.geometry
 				}
 			}
 			return true;
-		}
-
-		public function getSupportVertices(axis:Vector3D):Vector.<Vector3D>
-		{
-			var vertices:Vector.<Vector3D> = new Vector.<Vector3D>();
-			var d:Vector.<uint> = new Vector.<uint>(3, true);
-			var H:Vector3D;
-			var temp:Vector.<Vector3D> = currentState.getOrientationCols();
-			temp[0].normalize();
-			temp[1].normalize();
-			temp[2].normalize();
-			for (var i:uint = 0; i < 3; i++)
-			{
-				d[i] = axis.dotProduct(temp[i]);
-				if (Math.abs(d[i]) > 1 - 0.001)
-				{
-					var f:int = (d[i] < 0) ? (i * 2) : (i * 2) + 1;
-					for (var j:int = 0; j < 4; j++)
-					{
-						H = _points[_face[f][j]];
-						var _vj:Vector3D = vertices[j] = currentState.position.clone();
-						_vj = _vj.add(JNumber3D.getScaleVector(temp[0], H.x));
-						_vj = _vj.add(JNumber3D.getScaleVector(temp[1], H.y));
-						_vj = _vj.add(JNumber3D.getScaleVector(temp[2], H.z));
-					}
-					return vertices;
-				}
-			}
-
-			for (i = 0; i < 3; i++)
-			{
-				if (Math.abs(d[i]) < 0.005)
-				{
-					var k:int;
-					var m:int = (i + 1) % 3;
-					var n:int = (i + 2) % 3;
-
-					H = currentState.position.clone();
-					k = (d[m] > 0) ? -1 : 1;
-					H = H.add(JNumber3D.getScaleVector(temp[m], k * JNumber3D.toArray(_sideLengths)[m] / 2));
-					k = (d[n] > 0) ? -1 : 1;
-					H = H.add(JNumber3D.getScaleVector(temp[n], k * JNumber3D.toArray(_sideLengths)[n] / 2));
-
-					vertices[0] = H.add(JNumber3D.getScaleVector(temp[i], JNumber3D.toArray(_sideLengths)[i] / 2));
-					vertices[1] = H.add(JNumber3D.getScaleVector(temp[i], -JNumber3D.toArray(_sideLengths)[i] / 2));
-					return vertices;
-				}
-			}
-
-			var _v0:Vector3D =vertices[0] = currentState.position.clone();
-			k = (d[0] > 0) ? -1 : 1;
-			vertices[0] = _v0.add(JNumber3D.getScaleVector(temp[0], k * _sideLengths.x / 2));
-			k = (d[1] > 0) ? -1 : 1;
-			vertices[0] = _v0.add(JNumber3D.getScaleVector(temp[1], k * _sideLengths.y / 2));
-			k = (d[2] > 0) ? -1 : 1;
-			vertices[0] = _v0.add(JNumber3D.getScaleVector(temp[2], k * _sideLengths.z / 2));
-			return vertices;
 		}
 
 		override public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean

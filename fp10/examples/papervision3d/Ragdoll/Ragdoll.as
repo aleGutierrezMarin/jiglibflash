@@ -50,52 +50,52 @@ package {
 		{
 			_limbs = new Array();
 			
-			_limbs["torso"] = new JCapsule(torsoSkin, 16, 40);
-			_limbs["torso"].maxLinVelocities = 200;
+			_limbs["torso"] = new JCapsule(torsoSkin, 20, 45);
+			_limbs["torso"].maxLinVelocities = 400;
 			_limbs["torso"].maxRotVelocities = 10;
 			PhysicsSystem.getInstance().addBody(limbs["torso"]);
-			_limbs["head"] = new JSphere(headSkin, 12);
-			_limbs["head"].maxLinVelocities = 200;
+			_limbs["head"] = new JSphere(headSkin, 16);
+			_limbs["head"].maxLinVelocities = 400;
 			_limbs["head"].maxRotVelocities = 10;
 			_limbs["head"].moveTo(new Vector3D(0, 32, 0));
 			PhysicsSystem.getInstance().addBody(limbs["head"]);
-			_limbs["upper_arm_left"] = new JCapsule(upperArmLeftSkin, 6, 20);
-			_limbs["upper_arm_left"].maxLinVelocities = 200;
+			_limbs["upper_arm_left"] = new JCapsule(upperArmLeftSkin, 10, 25);
+			_limbs["upper_arm_left"].maxLinVelocities = 400;
 			_limbs["upper_arm_left"].maxRotVelocities = 10;
 			_limbs["upper_arm_left"].moveTo(new Vector3D(20, 9, 0));
 			PhysicsSystem.getInstance().addBody(limbs["upper_arm_left"]);
-			_limbs["upper_arm_right"] = new JCapsule(upperArmRightSkin, 6, 20);
-			_limbs["upper_arm_right"].maxLinVelocities = 200;
+			_limbs["upper_arm_right"] = new JCapsule(upperArmRightSkin, 10, 25);
+			_limbs["upper_arm_right"].maxLinVelocities = 400;
 			_limbs["upper_arm_right"].maxRotVelocities = 10;
 			_limbs["upper_arm_right"].moveTo(new Vector3D( -20, 9, 0));
 			PhysicsSystem.getInstance().addBody(limbs["upper_arm_right"]);
-			_limbs["lower_arm_left"] = new JCapsule(lowerArmLeftSkin, 5, 25);
-			_limbs["lower_arm_left"].maxLinVelocities = 200;
+			_limbs["lower_arm_left"] = new JCapsule(lowerArmLeftSkin, 9, 30);
+			_limbs["lower_arm_left"].maxLinVelocities = 400;
 			_limbs["lower_arm_left"].maxRotVelocities = 10;
 			_limbs["lower_arm_left"].moveTo(new Vector3D(20, -13, 0));
 			PhysicsSystem.getInstance().addBody(limbs["lower_arm_left"]);
-			_limbs["lower_arm_right"] = new JCapsule(lowerArmRightSkin, 5, 25);
-			_limbs["lower_arm_right"].maxLinVelocities = 200;
+			_limbs["lower_arm_right"] = new JCapsule(lowerArmRightSkin, 9, 30);
+			_limbs["lower_arm_right"].maxLinVelocities = 400;
 			_limbs["lower_arm_right"].maxRotVelocities = 10;
 			_limbs["lower_arm_right"].moveTo(new Vector3D( -20, -13, 0));
 			PhysicsSystem.getInstance().addBody(limbs["lower_arm_right"]);
-			_limbs["upper_leg_left"] = new JCapsule(upperLegLeftSkin, 8, 30);
-			_limbs["upper_leg_left"].maxLinVelocities = 200;
+			_limbs["upper_leg_left"] = new JCapsule(upperLegLeftSkin, 12, 35);
+			_limbs["upper_leg_left"].maxLinVelocities = 400;
 			_limbs["upper_leg_left"].maxRotVelocities = 10;
 			_limbs["upper_leg_left"].moveTo(new Vector3D(10, -36, 0));
 			PhysicsSystem.getInstance().addBody(limbs["upper_leg_left"]);
-			_limbs["upper_leg_right"] = new JCapsule(upperLegRightSkin, 8, 30);
-			_limbs["upper_leg_right"].maxLinVelocities = 200;
+			_limbs["upper_leg_right"] = new JCapsule(upperLegRightSkin, 12, 35);
+			_limbs["upper_leg_right"].maxLinVelocities = 400;
 			_limbs["upper_leg_right"].maxRotVelocities = 10;
 			_limbs["upper_leg_right"].moveTo(new Vector3D( -10, -36, 0));
 			PhysicsSystem.getInstance().addBody(limbs["upper_leg_right"]);
-			_limbs["lower_leg_left"] = new JCapsule(lowerLegLeftSkin, 7, 30);
-			_limbs["lower_leg_left"].maxLinVelocities = 200;
+			_limbs["lower_leg_left"] = new JCapsule(lowerLegLeftSkin, 11, 35);
+			_limbs["lower_leg_left"].maxLinVelocities = 400;
 			_limbs["lower_leg_left"].maxRotVelocities = 10;
 			_limbs["lower_leg_left"].moveTo(new Vector3D(10, -66, 0));
 			PhysicsSystem.getInstance().addBody(limbs["lower_leg_left"]);
-			_limbs["lower_leg_right"] = new JCapsule(lowerLegRightSkin, 7, 30);
-			_limbs["lower_leg_right"].maxLinVelocities = 200;
+			_limbs["lower_leg_right"] = new JCapsule(lowerLegRightSkin, 11, 35);
+			_limbs["lower_leg_right"].maxLinVelocities = 400;
 			_limbs["lower_leg_right"].maxRotVelocities = 10;
 			_limbs["lower_leg_right"].moveTo(new Vector3D( -10, -66, 0));
 			PhysicsSystem.getInstance().addBody(limbs["lower_leg_right"]);
@@ -130,15 +130,15 @@ package {
 			
 			_joints = new Array();
 			// set up the hinge joints.
-			_joints["neck"] = new HingeJoint(_limbs["torso"], _limbs["head"], Vector3D.X_AXIS, new Vector3D(0, 20, 0), 5, 20, 50, 0.4, 0.5);
-			_joints["shoulder_left"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_left"], Vector3D.X_AXIS, new Vector3D(16, 20, 0), 5, 150, 10, 0.8, 0.5);
-			_joints["shoulder_right"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_right"], Vector3D.X_AXIS, new Vector3D( -16, 20, 0), 5, 150, 10, 0.8, 0.5);
-			_joints["elbow_left"] = new HingeJoint(_limbs["upper_arm_left"], _limbs["lower_arm_left"], Vector3D.X_AXIS, new Vector3D( 0, -10, 0), 5, 80, 0, 0.1, 0.5);
-			_joints["elbow_right"] = new HingeJoint(_limbs["upper_arm_right"], _limbs["lower_arm_right"], Vector3D.X_AXIS, new Vector3D( 0, -10, 0), 5, 80, 0, 0.1, 0.5);
-			_joints["hip_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["torso"], Vector3D.X_AXIS, new Vector3D(0, 15, 0), 5, 20, 130, 0.6, 0.5);
-			_joints["hip_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["torso"], Vector3D.X_AXIS, new Vector3D(0, 15, 0), 5, 20, 130, 0.6, 0.5);
-			_joints["knee_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["lower_leg_left"], Vector3D.X_AXIS, new Vector3D( 0, -15, 0), 5, 0, 70, 0.1, 0.5);
-			_joints["knee_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["lower_leg_right"], Vector3D.X_AXIS, new Vector3D( 0, -15, 0), 5, 0, 70, 0.1, 0.5);
+			_joints["neck"] = new HingeJoint(_limbs["torso"], _limbs["head"], Vector3D.X_AXIS, new Vector3D(0, 25, 0), 5, 20, 50, 0.4, 0.5);
+			_joints["shoulder_left"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_left"], Vector3D.X_AXIS, new Vector3D(18, 22, 0), 5, 150, 10, 0.8, 0.5);
+			_joints["shoulder_right"] = new HingeJoint(_limbs["torso"], _limbs["upper_arm_right"], Vector3D.X_AXIS, new Vector3D( -18, 22, 0), 5, 150, 10, 0.8, 0.5);
+			_joints["elbow_left"] = new HingeJoint(_limbs["upper_arm_left"], _limbs["lower_arm_left"], Vector3D.X_AXIS, new Vector3D( 0, -12, 0), 5, 80, 0, 0.1, 0.5);
+			_joints["elbow_right"] = new HingeJoint(_limbs["upper_arm_right"], _limbs["lower_arm_right"], Vector3D.X_AXIS, new Vector3D( 0, -12, 0), 5, 80, 0, 0.1, 0.5);
+			_joints["hip_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["torso"], Vector3D.X_AXIS, new Vector3D(0, 18, 0), 5, 20, 130, 0.6, 0.5);
+			_joints["hip_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["torso"], Vector3D.X_AXIS, new Vector3D(0, 18, 0), 5, 20, 130, 0.6, 0.5);
+			_joints["knee_left"] = new HingeJoint(_limbs["upper_leg_left"], _limbs["lower_leg_left"], Vector3D.X_AXIS, new Vector3D( 0, -18, 0), 5, 0, 70, 0.1, 0.5);
+			_joints["knee_right"] = new HingeJoint(_limbs["upper_leg_right"], _limbs["lower_leg_right"], Vector3D.X_AXIS, new Vector3D( 0, -18, 0), 5, 0, 70, 0.1, 0.5);
 		}
 		
 		public function get limbs():Array {

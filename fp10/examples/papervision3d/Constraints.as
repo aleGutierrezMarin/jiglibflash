@@ -79,7 +79,6 @@
 
 		private function initObject():void
 		{
-			JConfig.numContactIterations = 15;
 			physics = new Papervision3DPhysics(scene, 8);
 			
 			shadeMateria = new FlatShadeMaterial(mylight, 0x77ee77);
@@ -104,7 +103,7 @@
 			for (var i:int = 0; i < 12; i++)
 			{
 				chainBody1[i] = physics.createSphere(shadeMateria, 15,6,3);
-				chainBody1[i].maxLinVelocities = 100;
+				chainBody1[i].maxLinVelocities = 200;
 				chainBody1[i].maxRotVelocities = 10;
 				physics.getMesh(chainBody1[i]).addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
 				chainBody1[i].moveTo(new Vector3D( 0, 100 + (20 * i + 20), 0));
@@ -122,9 +121,9 @@
 		 
 		private function findSkinBody(skin:DisplayObject3D):int
 		{
-			for (var i:String in PhysicsSystem.getInstance().bodys)
+			for (var i:String in PhysicsSystem.getInstance().bodies)
 			{
-				if (skin == physics.getMesh(PhysicsSystem.getInstance().bodys[i]))
+				if (skin == physics.getMesh(PhysicsSystem.getInstance().bodies[i]))
 				{
 					return int(i);
 				}
@@ -136,7 +135,7 @@
 		{
 			onDraging = true;
 			startMousePos = new Vector3D(mouse3D.x, mouse3D.y, mouse3D.z);
-			currDragBody = PhysicsSystem.getInstance().bodys[findSkinBody(event.displayObject3D)];
+			currDragBody = PhysicsSystem.getInstance().bodies[findSkinBody(event.displayObject3D)];
 			planeToDragOn = new Plane3D(new Number3D(0, 0, -1), new Number3D(0, 0, -startMousePos.z));
 			
 			var bodyPoint:Vector3D = startMousePos.subtract(currDragBody.currentState.position);

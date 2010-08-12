@@ -66,6 +66,7 @@ package jiglib.physics
 		private var _force:Vector3D;
 		private var _torque:Vector3D;
 
+		private var _doShockProcessing:Boolean;
 		private var _linVelDamping:Vector3D;
 		private var _rotVelDamping:Vector3D;
 		private var _maxLinVelocities:Number;
@@ -110,18 +111,19 @@ package jiglib.physics
 			_currState = new PhysicsState();
 			_oldState = new PhysicsState();
 			_storeState = new PhysicsState();
-			_invOrientation = JMatrix3D.getInverseMatrix(_currState.orientation);
 			_currLinVelocityAux = new Vector3D();
 			_currRotVelocityAux = new Vector3D();
 
 			_force = new Vector3D();
 			_torque = new Vector3D();
 
+			_invOrientation = JMatrix3D.getInverseMatrix(_currState.orientation);
 			_linVelDamping = new Vector3D(0.995, 0.995, 0.995);
 			_rotVelDamping = new Vector3D(0.995, 0.995, 0.995);
 			_maxLinVelocities = 500;
 			_maxRotVelocities = 50;
 
+			_doShockProcessing = true;
 			_velChanged = false;
 			_inactiveTime = 0;
 
@@ -470,7 +472,7 @@ package jiglib.physics
 
 		public function removeAllConstraints():void
 		{
-			_constraints = new Vector.<JConstraint>();
+			_constraints.splice(0, _constraints.length);
 		}
 
 		private function findConstraint(constraint:JConstraint):Boolean
@@ -929,6 +931,17 @@ package jiglib.physics
 			return _nonCollidables;
 		}
 
+		public function get doShockProcessing():Boolean {
+			return _doShockProcessing;
+		}
+		public function set doShockProcessing(doShock:Boolean):void {
+			_doShockProcessing = doShock;
+		}
+		
+		public function get constraints():Vector.<JConstraint> {
+			return _constraints;
+		}
+		
 		//every dimension should be set to 0-1;
 		public function set linVelocityDamping(vel:Vector3D):void
 		{

@@ -101,48 +101,8 @@ package jiglib.collision
 				collPts.push(cpInfo);
 			}
 
-			oldSeg0 = new JSegment(capsule0.getBottomPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], capsule0.length));
-			newSeg0 = new JSegment(capsule0.getBottomPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], capsule0.length));
-			oldSeg1 = new JSegment(capsule1.getBottomPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], capsule1.length));
-			newSeg1 = new JSegment(capsule1.getBottomPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], capsule1.length));
-
-			oldObj = new Vector.<Number>(2, true);
-			oldDistSq = oldSeg0.segmentSegmentDistanceSq(oldObj, oldSeg1);
-			newObj = new Vector.<Number>(2, true);
-			newDistSq = newSeg0.segmentSegmentDistanceSq(oldObj, newSeg1);
-
-			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2))
-			{
-				pos0 = oldSeg0.getPoint(oldObj[0]);
-				pos1 = oldSeg1.getPoint(oldObj[1]);
-
-				delta = pos0.subtract(pos1);
-				dist = Math.sqrt(oldDistSq);
-				depth = radSum - dist;
-
-				if (dist > JNumber3D.NUM_TINY)
-				{
-					delta = JNumber3D.getDivideVector(delta, dist);
-				}
-				else
-				{
-					delta = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
-				}
-
-				worldPos = pos1.add(JNumber3D.getScaleVector(delta, capsule1.radius - 0.5 * depth));
-				averageNormal = averageNormal.add(delta);
-
-				cpInfo = new CollPointInfo();
-				cpInfo.r0 = worldPos.subtract(capsule0.oldState.position);
-				cpInfo.r1 = worldPos.subtract(capsule1.oldState.position);
-				cpInfo.initialPenetration = depth;
-				collPts.push(cpInfo);
-
-			}
-
 			if (collPts.length > 0)
 			{
-				averageNormal.normalize();
 				var collInfo:CollisionInfo = new CollisionInfo();
 				collInfo.objInfo = info;
 				collInfo.dirToBody = averageNormal;

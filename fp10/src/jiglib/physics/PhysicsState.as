@@ -12,18 +12,18 @@ package jiglib.physics
 	public class PhysicsState
 	{
 		public var position:Vector3D = new Vector3D();
-		private var _orientation:Matrix3D = new Matrix3D();
+		public var orientation:Matrix3D = new Matrix3D();
 		public var linVelocity:Vector3D = new Vector3D();
 		public var rotVelocity:Vector3D = new Vector3D();
-		public var orientationCols:Vector.<Vector3D> = new Vector.<Vector3D>(3,true);
+		//public var orientationCols:Vector.<Vector3D> = new Vector.<Vector3D>(3,true);
 		
 		public function PhysicsState():void
 		{
-			orientationCols[0] = new Vector3D();
-			orientationCols[1] = new Vector3D();
-			orientationCols[2] = new Vector3D();
+			//orientationCols[0] = new Vector3D();
+			//orientationCols[1] = new Vector3D();
+			//orientationCols[2] = new Vector3D();
 		}
-
+/*
 		public function get orientation():Matrix3D { return _orientation; }
 		public function set orientation(val:Matrix3D):void 
 		{ 
@@ -42,11 +42,11 @@ package jiglib.physics
 			orientationCols[2].y = _rawData[9];
 			orientationCols[2].z = _rawData[10];
 		}
-	
+	*/
 		//here for backwards compatibility should use public function instead unless you need a clone
 		public function getOrientationCols():Vector.<Vector3D>
 		{
-			return JMatrix3D.getCols(_orientation);
+			return JMatrix3D.getCols(orientation);
 		}
 	}
 }

@@ -105,16 +105,16 @@
 			 
 			//init car physics
 			carBody = new JCar(new Pv3dMesh(carSkin));
-			carBody.setCar(40,5,600);
+			carBody.setCar(40,1,400);
 			carBody.chassis.moveTo(new Vector3D( 4000, 100, -3000));
 			carBody.chassis.mass = 9;
 			carBody.chassis.sideLengths = new Vector3D(40, 20, 90);
 			physics.addBody(carBody.chassis);
 			 
-			carBody.setupWheel("WheelFL", new Vector3D( -20, -10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
-			carBody.setupWheel("WheelFR", new Vector3D(20, -10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
-			carBody.setupWheel("WheelBL", new Vector3D( -20, -10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
-			carBody.setupWheel("WheelBR", new Vector3D(20, -10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelFL", new Vector3D( -20, -10, 25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
+			carBody.setupWheel("WheelFR", new Vector3D(20, -10, 25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
+			carBody.setupWheel("WheelBL", new Vector3D( -20, -10, -25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
+			carBody.setupWheel("WheelBR", new Vector3D(20, -10, -25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
 			 
 			var shadeMateria:FlatShadeMaterial = new FlatShadeMaterial(mylight, 0x777777);
 			steerFL = carSkin.getChildByName( "WheelFL", true );
@@ -203,7 +203,7 @@
 		 
 		protected override function onRenderTick(event:Event = null):void {
 			//physics.step();
-			physics.engine.integrate(0.12);
+			physics.engine.integrate(0.1);
 			updateWheelSkin();
 			
 			renderer.renderScene(scene, springCamera, viewport);

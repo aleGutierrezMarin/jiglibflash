@@ -73,8 +73,6 @@
 			mylight.y = 500;
 			mylight.z = -700;
 			
-			JConfig.deactivationTime = 0.5;
-			JConfig.numContactIterations = 15;
 			physics = new Away3DPhysics(view, 8);
 			
 			materia = new ShadingColorMaterial(0x77ee77);
@@ -86,7 +84,7 @@
 			
 			ballBody = new Vector.<RigidBody>();
 			var color:uint;
-			for (var i:int = 0; i < 5; i++)
+			for (var i:int = 0; i < 6; i++)
 			{
 				color = (i == 0)?0xff8888:0xeeee00;
 				materia = new ShadingColorMaterial(color);
@@ -96,7 +94,7 @@
 			}
 			
 			boxBody=new Vector.<RigidBody>();
-			for (i = 0; i < 5; i++)
+			for (i = 0; i < 6; i++)
 			{
 				boxBody[i] = physics.createCube({ material:this.materia, width:50, height:30, depth:40 });
 				boxBody[i].moveTo(new Vector3D(0, 50 + (40 * i + 40), 0));
@@ -104,14 +102,13 @@
 			
 			var capsuleSkin:Cylinder;
 			capsuleBody = new Vector.<RigidBody>();
-			for (i = 0; i < 5; i++)
+			for (i = 0; i < 6; i++)
 			{
 				capsuleSkin = new Cylinder( { material:this.materia, radius:20, height:50 } );
 				view.scene.addChild(capsuleSkin);
 				
 				capsuleBody[i] = new JCapsule(new Away3dMesh(capsuleSkin), 20, 30);
 				capsuleBody[i].moveTo(new Vector3D(100, 10 + (80 * i + 80), -100));
-				capsuleBody[i].setOrientation(JMatrix3D.getRotationMatrixAxis(90, Vector3D.Z_AXIS));
 				physics.addBody(capsuleBody[i]);
 			}
 			
@@ -223,7 +220,7 @@
 				ballBody[0].addWorldForce(new Vector3D(0, 50, 0), ballBody[0].currentState.position);
 			}
 			
-			physics.engine.integrate(0.2);
+			physics.engine.integrate(0.1);
 			
 			resetBody();
             view.render();

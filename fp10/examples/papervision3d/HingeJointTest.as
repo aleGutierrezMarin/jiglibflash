@@ -79,7 +79,6 @@ package
 
 		private function initObject():void
 		{
-			JConfig.numContactIterations = 12;
 			physics = new Papervision3DPhysics(scene, 8);
 			
 			shadeMateria = new FlatShadeMaterial(mylight, 0x77ee77);
@@ -126,9 +125,9 @@ package
 		 
 		private function findSkinBody(skin:DisplayObject3D):int
 		{
-			for (var i:String in PhysicsSystem.getInstance().bodys)
+			for (var i:String in PhysicsSystem.getInstance().bodies)
 			{
-				if (skin == physics.getMesh(PhysicsSystem.getInstance().bodys[i]))
+				if (skin == physics.getMesh(PhysicsSystem.getInstance().bodies[i]))
 				{
 					return int(i);
 				}
@@ -140,7 +139,7 @@ package
 		{
 			onDraging = true;
 			startMousePos = new Vector3D(mouse3D.x, mouse3D.y, mouse3D.z);
-			currDragBody = PhysicsSystem.getInstance().bodys[findSkinBody(event.displayObject3D)];
+			currDragBody = PhysicsSystem.getInstance().bodies[findSkinBody(event.displayObject3D)];
 			planeToDragOn = new Plane3D(new Number3D(0, 0, -1), new Number3D(0, 0, -startMousePos.z));
 			
 			var bodyPoint:Vector3D = startMousePos.subtract(currDragBody.currentState.position);
