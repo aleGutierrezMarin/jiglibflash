@@ -103,70 +103,70 @@ package jiglib.geometry {
 		
 		public function addSphere(sphere:JSphere):void {
 			if (sphere.currentState.position.x - sphere.radius < _minPos.x) {
-				_minPos.x = (sphere.currentState.position.x - sphere.radius) - JNumber3D.NUM_TINY;
+				_minPos.x = (sphere.currentState.position.x - sphere.radius) - 1;
 			}
 			if (sphere.currentState.position.x + sphere.radius > _maxPos.x) {
-				_maxPos.x = (sphere.currentState.position.x + sphere.radius) + JNumber3D.NUM_TINY;
+				_maxPos.x = (sphere.currentState.position.x + sphere.radius) + 1;
 			}
 			
 			if (sphere.currentState.position.y - sphere.radius < _minPos.y) {
-				_minPos.y = (sphere.currentState.position.y - sphere.radius) - JNumber3D.NUM_TINY;
+				_minPos.y = (sphere.currentState.position.y - sphere.radius) - 1;
 			}
 			if (sphere.currentState.position.y + sphere.radius > _maxPos.y) {
-				_maxPos.y = (sphere.currentState.position.y + sphere.radius) + JNumber3D.NUM_TINY;
+				_maxPos.y = (sphere.currentState.position.y + sphere.radius) + 1;
 			}
 			
 			if (sphere.currentState.position.z - sphere.radius < _minPos.z) {
-				_minPos.z = (sphere.currentState.position.z - sphere.radius) - JNumber3D.NUM_TINY;
+				_minPos.z = (sphere.currentState.position.z - sphere.radius) - 1;
 			}
 			if (sphere.currentState.position.z + sphere.radius > _maxPos.z) {
-				_maxPos.z = (sphere.currentState.position.z + sphere.radius) + JNumber3D.NUM_TINY;
+				_maxPos.z = (sphere.currentState.position.z + sphere.radius) + 1;
 			}
 		}
 		
 		public function addCapsule(capsule:JCapsule):void {
 			var pos:Vector3D = capsule.getBottomPos(capsule.currentState);
 			if (pos.x - capsule.radius < _minPos.x) {
-				_minPos.x = (pos.x - capsule.radius) - JNumber3D.NUM_TINY;
+				_minPos.x = (pos.x - capsule.radius) - 1;
 			}
 			if (pos.x + capsule.radius > _maxPos.x) {
-				_maxPos.x = (pos.x + capsule.radius) + JNumber3D.NUM_TINY;
+				_maxPos.x = (pos.x + capsule.radius) + 1;
 			}
 			
 			if (pos.y - capsule.radius < _minPos.y) {
-				_minPos.y = (pos.y - capsule.radius) - JNumber3D.NUM_TINY;
+				_minPos.y = (pos.y - capsule.radius) - 1;
 			}
 			if (pos.y + capsule.radius > _maxPos.y) {
-				_maxPos.y = (pos.y + capsule.radius) + JNumber3D.NUM_TINY;
+				_maxPos.y = (pos.y + capsule.radius) + 1;
 			}
 			
 			if (pos.z - capsule.radius < _minPos.z) {
-				_minPos.z = (pos.z - capsule.radius) - JNumber3D.NUM_TINY;
+				_minPos.z = (pos.z - capsule.radius) - 1;
 			}
 			if (pos.z + capsule.radius > _maxPos.z) {
-				_maxPos.z = (pos.z + capsule.radius) + JNumber3D.NUM_TINY;
+				_maxPos.z = (pos.z + capsule.radius) + 1;
 			}
 			
 			pos = capsule.getEndPos(capsule.currentState);
 			if (pos.x - capsule.radius < _minPos.x) {
-				_minPos.x = (pos.x - capsule.radius) - JNumber3D.NUM_TINY;
+				_minPos.x = (pos.x - capsule.radius) - 1;
 			}
 			if (pos.x + capsule.radius > _maxPos.x) {
-				_maxPos.x = (pos.x + capsule.radius) + JNumber3D.NUM_TINY;
+				_maxPos.x = (pos.x + capsule.radius) + 1;
 			}
 			
 			if (pos.y - capsule.radius < _minPos.y) {
-				_minPos.y = (pos.y - capsule.radius) - JNumber3D.NUM_TINY;
+				_minPos.y = (pos.y - capsule.radius) - 1;
 			}
 			if (pos.y + capsule.radius > _maxPos.y) {
-				_maxPos.y = (pos.y + capsule.radius) + JNumber3D.NUM_TINY;
+				_maxPos.y = (pos.y + capsule.radius) + 1;
 			}
 			
 			if (pos.z - capsule.radius < _minPos.z) {
-				_minPos.z = (pos.z - capsule.radius) - JNumber3D.NUM_TINY;
+				_minPos.z = (pos.z - capsule.radius) - 1;
 			}
 			if (pos.z + capsule.radius > _maxPos.z) {
-				_maxPos.z = (pos.z + capsule.radius) + JNumber3D.NUM_TINY;
+				_maxPos.z = (pos.z + capsule.radius) + 1;
 			}
 		}
 		

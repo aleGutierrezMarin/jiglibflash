@@ -6,24 +6,24 @@ package
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-
+	
+	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
-	import jiglib.cof.JConfig;
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.papervision3d.*;
-
+	
 	import org.papervision3d.cameras.CameraType;
+	import org.papervision3d.core.geom.renderables.Vertex3D;
 	import org.papervision3d.core.math.Number3D;
 	import org.papervision3d.core.math.Plane3D;
 	import org.papervision3d.core.utils.Mouse3D;
 	import org.papervision3d.events.*;
 	import org.papervision3d.lights.PointLight3D;
-	import org.papervision3d.materials.utils.MaterialsList;
 	import org.papervision3d.materials.shadematerials.*;
+	import org.papervision3d.materials.utils.MaterialsList;
 	import org.papervision3d.objects.DisplayObject3D;
-	import org.papervision3d.core.geom.renderables.Vertex3D;
 	import org.papervision3d.objects.primitives.*;
 	import org.papervision3d.view.BasicView;
 	import org.papervision3d.view.layer.ViewportLayer;
@@ -72,9 +72,7 @@ package
 
 		private function init3D():void
 		{
-			JConfig.deactivationTime = 0.5;
-			JConfig.numContactIterations = 15;
-			
+			JConfig.numContactIterations = 12;
 			physics = new Papervision3DPhysics(scene, 8);
 			
 			Mouse3D.enabled = true;
@@ -91,7 +89,7 @@ package
 			
 			ground = physics.createCube(materiaList, 500, 500, 10);
 			ground.movable = false;
-			ground.friction = 0.2;
+			//ground.friction = 0.9;
 			ground.restitution = 0.8;
 			viewport.getChildLayer(physics.getMesh(ground)).layerIndex = 1;
 
@@ -102,7 +100,7 @@ package
 			
 			ballBody = new Vector.<RigidBody>();
 			var color:uint;
-			for (var i:int = 0; i < 5; i++)
+			for (var i:int = 0; i < 6; i++)
 			{
 				color = (i == 0)?0xff8888:0xeeee00;
 				shadeMateria = new FlatShadeMaterial(mylight, color);
@@ -119,31 +117,30 @@ package
 			materiaList = new MaterialsList();
 			materiaList.addMaterial(shadeMateria,"all");
 			boxBody=new Vector.<RigidBody>();
-			for (i = 0; i < 5; i++)
+			for (i = 0; i < 6; i++)
 			{
-				boxBody[i] = physics.createCube(materiaList, 50, 40, 30);
+				boxBody[i] = physics.createCube(materiaList, 50, 50, 30);
 				physics.getMesh(boxBody[i]).addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
-				boxBody[i].moveTo(new Vector3D(0, 50 + (40 * i + 40), 0));
+				boxBody[i].moveTo(new Vector3D(0, 10 + (40 * i + 40), 0));
 				vplObjects.addDisplayObject3D(physics.getMesh(boxBody[i]));
 			}
-			
 			var capsuleSkin:Cylinder;
 			capsuleBody = new Vector.<RigidBody>();
-			for (i = 0; i < 5; i++)
+			for (i = 0; i < 6; i++)
 			{
 				capsuleSkin = new Cylinder(shadeMateria, 20, 50);
 				capsuleSkin.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
 				scene.addChild(capsuleSkin);
 				vplObjects.addDisplayObject3D(capsuleSkin);
 				
-				capsuleBody[i] = new JCapsule(new Pv3dMesh(capsuleSkin), 20, 30);
+				capsuleBody[i] = new JCapsule(new Pv3dMesh(capsuleSkin), 20, 50);
 				capsuleBody[i].moveTo(new Vector3D(100, 10 + (80 * i + 80), -100));
 				PhysicsSystem.getInstance().addBody(capsuleBody[i]);
 			}
 			
 			camera.y = mylight.y;
 			camera.z = mylight.z;
-			 
+						 
 			var stats:StatsView = new StatsView(renderer);
 			addChild(stats);
 			 
@@ -152,9 +149,9 @@ package
 		
 		private function findSkinBody(skin:DisplayObject3D):int
 		{
-			for (var i:String in PhysicsSystem.getInstance().bodys)
+			for (var i:String in PhysicsSystem.getInstance().bodies)
 			{
-				if (skin == physics.getMesh(PhysicsSystem.getInstance().bodys[i]))
+				if (skin == physics.getMesh(PhysicsSystem.getInstance().bodies[i]))
 				{
 					return int(i);
 				}
@@ -166,7 +163,7 @@ package
 		{
 			onDraging = true;
 			startMousePos = new Vector3D(mouse3D.x, mouse3D.y, mouse3D.z);
-			currDragBody = PhysicsSystem.getInstance().bodys[findSkinBody(event.displayObject3D)];
+			currDragBody = PhysicsSystem.getInstance().bodies[findSkinBody(event.displayObject3D)];
 			planeToDragOn = new Plane3D(new Number3D(0, 0, -1), new Number3D(0, 0, -startMousePos.z));
 			
 			var bodyPoint:Vector3D = startMousePos.subtract(currDragBody.currentState.position);
@@ -355,7 +352,7 @@ package
 			}
 			
 			//physics.step();//dynamic timeStep
-			PhysicsSystem.getInstance().integrate(0.2);//static timeStep
+			physics.engine.integrate(0.1);//static timeStep
 			resetBox();
 			//testFreezeObject();
 			super.onRenderTick(event);

@@ -80,7 +80,7 @@ package {
 			
 			ballBody = new Vector.<RigidBody>();
 			var color:uint;
-			for (var i:int = 0; i < 6; i++)
+			for (var i:int = 0; i < 5; i++)
 			{
 				color = (i == 0)?0xff8888:0xeeee00;
 				shadeMateria = new FlatShadeMaterial(mylight, color);
@@ -94,7 +94,7 @@ package {
 			var materiaList:MaterialsList = new MaterialsList();
 			materiaList.addMaterial(shadeMateria,"all");
 			boxBody=new Vector.<RigidBody>();
-			for (i = 0; i < 2; i++)
+			for (i = 0; i < 3; i++)
 			{
 				boxBody[i] = physics.createCube(materiaList, 50, 40, 30);
 				boxBody[i].moveTo(new Vector3D(-200, 100 + (50 * i + 50), 0));
@@ -103,7 +103,7 @@ package {
 		
 			var capsuleSkin:Cylinder;
 			capsuleBody = new Vector.<RigidBody>();
-			for (i = 0; i < 2; i++)
+			for (i = 0; i < 3; i++)
 			{
 				capsuleSkin = new Cylinder(shadeMateria, 20, 50);
 				scene.addChild(capsuleSkin);

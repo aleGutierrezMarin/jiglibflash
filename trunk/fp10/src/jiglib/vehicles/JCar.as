@@ -60,31 +60,45 @@ package jiglib.vehicles
 			setCar();
 		}
 
-		public function setCar(maxSteerAngle:Number = 45, steerRate:Number = 4, driveTorque:Number = 500):void
+		/*
+		 * maxSteerAngle: the max steer angle
+		 * steerRate: the flexibility of steer
+		 * driveTorque: the max torque of wheel
+		 */
+		public function setCar(maxSteerAngle:Number = 45, steerRate:Number = 1, driveTorque:Number = 500):void
 		{
 			_maxSteerAngle = maxSteerAngle;
 			_steerRate = steerRate;
 			_driveTorque = driveTorque;
 		}
 
+		/*
+		 * _name: name of wheel
+		 * pos: position of wheel relative to the car's center
+		 * wheelSideFriction: side friction
+		 * wheelFwdFriction: forward friction
+		 * wheelTravel: suspension travel upwards
+		 * wheelRadius: wheel radius
+		 * wheelRestingFrac: elasticity coefficient
+		 * wheelDampingFrac: suspension damping
+		 */
 		public function setupWheel(_name:String, pos:Vector3D,
 			wheelSideFriction:Number = 2, wheelFwdFriction:Number = 2,
 			wheelTravel:Number = 3, wheelRadius:Number = 10,
 			wheelRestingFrac:Number = 0.5, wheelDampingFrac:Number = 0.5,
 			wheelNumRays:int = 1):void
 		{
-			var gravity:Vector3D = PhysicsSystem.getInstance().gravity.clone();
 			var mass:Number = _chassis.mass;
-			var mass4:Number = mass / _steerRate;
-			var gravityLen:Number = PhysicsSystem.getInstance().gravity.length;
+			var mass4:Number = 0.25 * mass;
 			
+			var gravity:Vector3D = PhysicsSystem.getInstance().gravity.clone();
+			var gravityLen:Number = PhysicsSystem.getInstance().gravity.length;
 			gravity.normalize();
-			var axis:Vector3D =JNumber3D.getScaleVector(gravity,-1);
+			var axis:Vector3D = JNumber3D.getScaleVector(gravity, -1);
 			var spring:Number = mass4 * gravityLen / (wheelRestingFrac * wheelTravel);
-			var inertia:Number = 0.5 * wheelRadius * wheelRadius * mass;
+			var inertia:Number = 0.015 * wheelRadius * wheelRadius * mass;
 			var damping:Number = 2 * Math.sqrt(spring * mass);
-			damping /= _steerRate;
-			damping *= wheelDampingFrac;
+			damping *= (0.25 * wheelDampingFrac);
 
 			_wheels[_name] = new JWheel(this);
 			_wheels[_name].setup(pos, axis, spring, wheelTravel, inertia,
@@ -154,7 +168,7 @@ package jiglib.vehicles
 				wheel.update(dt);
 			}
 
-			var deltaAccelerate:Number = dt * _steerRate;
+			var deltaAccelerate:Number = dt;
 			var deltaSteering:Number = dt * _steerRate;
 			var dAccelerate:Number = _destAccelerate - _accelerate;
 			if (dAccelerate < -deltaAccelerate)

@@ -36,7 +36,7 @@ package jiglib.collision
 	public class CollisionSystem
 	{
 		private var detectionFunctors:Dictionary;
-		private var collBody:Vector.<RigidBody>;
+		public var collBody:Vector.<RigidBody>;
 
 		public function CollisionSystem()
 		{
@@ -77,9 +77,9 @@ package jiglib.collision
 				collBody.splice(collBody.indexOf(body), 1);
 		}
 
-		public function removeAllCollisionBodys():void
+		public function removeAllCollisionBodies():void
 		{
-			collBody = new Vector.<RigidBody>();
+			collBody.splice(0, collBody.length);
 		}
 
 		// Detects collisions between the body and all the registered collision bodies

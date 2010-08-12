@@ -1,38 +1,38 @@
-﻿package
+package  
 {
+	import flash.text.TextField;
 	import flash.ui.Keyboard;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-
+	
+	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
-	import jiglib.cof.JConfig;
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.papervision3d.*;
-
+	
 	import org.papervision3d.cameras.CameraType;
+	import org.papervision3d.core.geom.renderables.Vertex3D;
 	import org.papervision3d.core.math.Number3D;
 	import org.papervision3d.core.math.Plane3D;
 	import org.papervision3d.core.utils.Mouse3D;
 	import org.papervision3d.events.*;
 	import org.papervision3d.lights.PointLight3D;
-	import org.papervision3d.materials.utils.MaterialsList;
 	import org.papervision3d.materials.shadematerials.*;
+	import org.papervision3d.materials.utils.MaterialsList;
 	import org.papervision3d.objects.DisplayObject3D;
-	import org.papervision3d.core.geom.renderables.Vertex3D;
 	import org.papervision3d.objects.primitives.*;
 	import org.papervision3d.view.BasicView;
 	import org.papervision3d.view.layer.ViewportLayer;
 	import org.papervision3d.view.layer.util.ViewportLayerSortMode;
 	import org.papervision3d.view.stats.StatsView;
-
 	
 	[SWF(width="800", height="600", backgroundColor="#ffffff", frameRate="60")]
-	public class RagdollTest extends BasicView
+	public class StackingTest extends BasicView
 	{
 		private var mylight:PointLight3D;
 		private var mouse3D:Mouse3D;
@@ -40,7 +40,7 @@
 		private var vplObjects:ViewportLayer;
 		
 		private var ground:RigidBody;
-		private var ragdoll:Vector.<Ragdoll>;
+		private var bodiesArr:Vector.<RigidBody>;
 		
 		private var onDraging:Boolean = false;
 		
@@ -51,12 +51,29 @@
 		
 		private var physics:Papervision3DPhysics;
 		 
-		public function RagdollTest()
+		public function StackingTest()
 		{
 			super(800, 600, true, true, CameraType.TARGET);
 			
+			stage.addEventListener( KeyboardEvent.KEY_UP, keyUpHandler);
 			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
+			
+			var text:TextField = new TextField();
+			text.x = 600;
+			text.y = 20;
+			text.width = 200;
+			text.text = "press num1: box stacking \n press num2: sphere stacking \n press num3: capsule stacking";
+			addChild(text);
+			
+			init3D();
+		}
+
+		private function init3D():void
+		{
+			JConfig.doShockStep = true;
+			
+			physics = new Papervision3DPhysics(scene, 8);
 			
 			Mouse3D.enabled = true;
 			mouse3D = viewport.interactiveSceneManager.mouse3D;
@@ -66,75 +83,84 @@
 			mylight.y = 300;
 			mylight.z = -400;
 			
-			camera.y = mylight.y;
-			camera.z = mylight.z;
+			camera.y = 300;
+			camera.z = -650;
+			var target:Sphere = new Sphere();
+			target.y = 400;
+			camera.target = target;
 			 
-			var stats:StatsView = new StatsView(renderer);
-			addChild(stats);
-			 
-			startRendering();
-			
-			initObjects();
-		}
-
-		private function initObjects():void
-		{
-			physics = new Papervision3DPhysics(scene, 8);
-			
 			shadeMateria = new FlatShadeMaterial(mylight, 0x77ee77);
-			var materiaList :MaterialsList = new MaterialsList();
-			materiaList.addMaterial(shadeMateria, "all");
 			
-			ground = physics.createCube(materiaList, 500, 500, 10);
-			ground.movable = false;
-			ground.restitution = 0.8;
+			ground = physics.createGround(shadeMateria, 1000, 10);
+			ground.restitution = 0.9;
 			viewport.getChildLayer(physics.getMesh(ground)).layerIndex = 1;
-			
-			 
+
 			vplObjects = new ViewportLayer(viewport,null);
 			vplObjects.layerIndex = 2;
 			vplObjects.sortMode = ViewportLayerSortMode.Z_SORT;
 			viewport.containerSprite.addLayer(vplObjects);
-			 
-			ragdoll = new Vector.<Ragdoll>();
-			var ragdollSkins:Array;
-			shadeMateria = new FlatShadeMaterial(mylight, 0xeeee00);
+			
+			shadeMateria = new FlatShadeMaterial(mylight,0xeeee00);
 			shadeMateria.interactive = true;
-			for (var i:int = 0; i < 1; i++ ) {
-				ragdollSkins = createRagdollSkin();
-				ragdoll[i] = new Ragdoll(new Pv3dMesh(ragdollSkins[Ragdoll.HEAD]), new Pv3dMesh(ragdollSkins[Ragdoll.TORSO]),
-				                         new Pv3dMesh(ragdollSkins[Ragdoll.UPPER_ARM_LEFT]), new Pv3dMesh(ragdollSkins[Ragdoll.UPPER_ARM_RIGHT]),
-										 new Pv3dMesh(ragdollSkins[Ragdoll.LOWER_ARM_LEFT]), new Pv3dMesh(ragdollSkins[Ragdoll.LOWER_ARM_RIGHT]),
-										 new Pv3dMesh(ragdollSkins[Ragdoll.UPPER_LEG_LEFT]), new Pv3dMesh(ragdollSkins[Ragdoll.UPPER_LEG_RIGHT]),
-										 new Pv3dMesh(ragdollSkins[Ragdoll.LOWER_LEG_LEFT]), new Pv3dMesh(ragdollSkins[Ragdoll.LOWER_LEG_RIGHT]));
-										 
-				ragdoll[i].moveTo(new Vector3D(0, 200 * i + 200, 0));
+			
+			setupBoxStacking();
+			
+			var stats:StatsView = new StatsView(renderer);
+			addChild(stats);
+			 
+			startRendering();
+		}
+		
+		private function setupBoxStacking():void {
+			var materiaList :MaterialsList = new MaterialsList();
+			materiaList.addMaterial(shadeMateria,"all");
+			bodiesArr=new Vector.<RigidBody>();
+			for (var i:int = 0; i < 25; i++)
+			{
+				bodiesArr[i] = physics.createCube(materiaList, 50, 50, 40);
+				physics.getMesh(bodiesArr[i]).addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
+				bodiesArr[i].moveTo(new Vector3D(0, 0 + (40 * i + 40), 0));
+				vplObjects.addDisplayObject3D(physics.getMesh(bodiesArr[i]));
 			}
 		}
-		 
-		private function createRagdollSkin():Array {
-			var skins:Array = new Array();
-			
-			skins[Ragdoll.HEAD] = new Sphere(shadeMateria, 16);
-			skins[Ragdoll.TORSO] = new Cylinder(shadeMateria, 20, 45);
-			skins[Ragdoll.UPPER_ARM_LEFT] = new Cylinder(shadeMateria, 10, 25);
-			skins[Ragdoll.UPPER_ARM_RIGHT] = new Cylinder(shadeMateria, 10, 25);
-			skins[Ragdoll.LOWER_ARM_LEFT] = new Cylinder(shadeMateria, 9, 30);
-			skins[Ragdoll.LOWER_ARM_RIGHT] = new Cylinder(shadeMateria, 9, 30);
-			skins[Ragdoll.UPPER_LEG_LEFT] = new Cylinder(shadeMateria, 12, 35);
-			skins[Ragdoll.UPPER_LEG_RIGHT] = new Cylinder(shadeMateria, 12, 35);
-			skins[Ragdoll.LOWER_LEG_LEFT] = new Cylinder(shadeMateria, 11, 35);
-			skins[Ragdoll.LOWER_LEG_RIGHT] = new Cylinder(shadeMateria, 11, 35);
-			
-			for (var i:String in skins) {
-				skins[i].addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
-				vplObjects.addDisplayObject3D(skins[i]);
-				scene.addChild(skins[i]);
+		private function setupBallStacking():void {
+			bodiesArr = new Vector.<RigidBody>();
+			for (var i:int = 0; i < 25; i++)
+			{
+				bodiesArr[i] = physics.createSphere(shadeMateria, 25);
+				physics.getMesh(bodiesArr[i]).addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
+				bodiesArr[i].moveTo(new Vector3D(0, 0 + (50 * i + 50), 0));
+				vplObjects.addDisplayObject3D(physics.getMesh(bodiesArr[i]));
 			}
-			
-			return skins;
 		}
-		 
+		private function setupCapsuleStacking():void {
+			var capsuleSkin:Cylinder;
+			bodiesArr = new Vector.<RigidBody>();
+			for (var i:int = 0; i < 25; i++)
+			{
+				capsuleSkin = new Cylinder(shadeMateria, 20, 60);
+				capsuleSkin.addEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
+				scene.addChild(capsuleSkin);
+				vplObjects.addDisplayObject3D(capsuleSkin);
+				
+				bodiesArr[i] = new JCapsule(new Pv3dMesh(capsuleSkin), 20, 60);
+				bodiesArr[i].moveTo(new Vector3D(0, 0 + (40 * i + 40), 0));
+				if(i%2==0){
+					bodiesArr[i].setOrientation(JMatrix3D.getRotationMatrix(0, 0, 1, 90));
+				}else {
+					bodiesArr[i].setOrientation(JMatrix3D.getRotationMatrix(1, 0, 0, 90));
+				}
+				PhysicsSystem.getInstance().addBody(bodiesArr[i]);
+			}
+		}
+		
+		private function clearBodies():void {
+			for each(var body:RigidBody in bodiesArr) {
+				scene.removeChild(physics.getMesh(body));
+				physics.engine.removeBody(body);
+			}
+		}
+		
 		private function findSkinBody(skin:DisplayObject3D):int
 		{
 			for (var i:String in PhysicsSystem.getInstance().bodies)
@@ -156,6 +182,7 @@
 			
 			var bodyPoint:Vector3D = startMousePos.subtract(currDragBody.currentState.position);
 			dragConstraint = new JConstraintWorldPoint(currDragBody, bodyPoint, startMousePos);
+			PhysicsSystem.getInstance().addConstraint(dragConstraint);
 		}
 		
 		private function handleMouseMove(event:MouseEvent):void
@@ -178,26 +205,35 @@
 			if (onDraging)
 			{
 				onDraging = false;
-				dragConstraint.disableConstraint();
+				PhysicsSystem.getInstance().removeConstraint(dragConstraint);
 				currDragBody.setActive();
 			}
 		}
 		
-		private function resetRagdoll():void {
-			for (var i:String in ragdoll)
+		private function keyUpHandler(event:KeyboardEvent):void
+		{
+			switch(event.keyCode)
 			{
-				if (ragdoll[i].limbs[Ragdoll.TORSO].currentState.position.y < -600)
-				{
-					ragdoll[i].moveTo(new Vector3D(0, 600 + (200 * int(i) + 200), 0));
-				}
+				case Keyboard.NUMBER_1:
+					clearBodies();
+					setupBoxStacking();
+					break;
+				case Keyboard.NUMBER_2:
+					clearBodies();
+					setupBallStacking();
+					break;
+				case Keyboard.NUMBER_3:
+					clearBodies();
+					setupCapsuleStacking();
+					break;
 			}
 		}
 		
 		protected override function onRenderTick(event:Event = null):void {
-			resetRagdoll();
-			//physics.step();//dynamic timeStep
+			
 			physics.engine.integrate(0.1);//static timeStep
 			super.onRenderTick(event);
 		}
 	}
+
 }

@@ -70,8 +70,8 @@ package jiglib.collision
 			var cpInfo:CollPointInfo;
 
 			var averageNormal:Vector3D = new Vector3D();
-			var oldSeg:JSegment = new JSegment(capsule.getEndPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], -capsule.length));
-			var newSeg:JSegment = new JSegment(capsule.getEndPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], -capsule.length));
+			var oldSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], capsule.length));
+			var newSeg:JSegment = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length));
 			var radius:Number = capsule.radius;
 
 			var oldObj:Vector.<Number> = new Vector.<Number>(4, true);
@@ -115,52 +115,8 @@ package jiglib.collision
 				collPts.push(cpInfo);
 			}
 
-
-			oldSeg = new JSegment(capsule.getBottomPos(capsule.oldState), JNumber3D.getScaleVector(capsule.oldState.getOrientationCols()[1], capsule.length));
-			newSeg = new JSegment(capsule.getBottomPos(capsule.currentState), JNumber3D.getScaleVector(capsule.currentState.getOrientationCols()[1], capsule.length));
-
-			oldObj = new Vector.<Number>(4, true);
-			oldDistSq = oldSeg.segmentBoxDistanceSq(oldObj, box, box.oldState);
-			newObj = new Vector.<Number>(4, true);
-			newDistSq = newSeg.segmentBoxDistanceSq(newObj, box, box.currentState);
-
-			if (Math.min(oldDistSq, newDistSq) < Math.pow(radius + JConfig.collToll, 2))
-			{
-				segPos = oldSeg.getPoint(Number(oldObj[3]));
-				boxPos = box.oldState.position.clone();
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[0], oldObj[0]));
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[1], oldObj[1]));
-				boxPos = boxPos.add(JNumber3D.getScaleVector(arr[2], oldObj[2]));
-
-				dist = Math.sqrt(oldDistSq);
-				depth = radius - dist;
-
-				if (dist > JNumber3D.NUM_TINY)
-				{
-					dir = segPos.subtract(boxPos);
-					dir.normalize();
-				}
-				else if (segPos.subtract(box.oldState.position).length > JNumber3D.NUM_TINY)
-				{
-					dir = segPos.subtract(box.oldState.position);
-					dir.normalize();
-				}
-				else
-				{
-					dir = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
-				}
-				averageNormal = averageNormal.add(dir);
-
-				cpInfo = new CollPointInfo();
-				cpInfo.r0 = boxPos.subtract(capsule.oldState.position);
-				cpInfo.r1 = boxPos.subtract(box.oldState.position);
-				cpInfo.initialPenetration = depth;
-				collPts.push(cpInfo);
-			}
-
 			if (collPts.length > 0)
 			{
-				averageNormal.normalize();
 				var collInfo:CollisionInfo = new CollisionInfo();
 				collInfo.objInfo = info;
 				collInfo.dirToBody = averageNormal;

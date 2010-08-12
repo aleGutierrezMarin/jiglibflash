@@ -36,8 +36,8 @@ package jiglib.geometry{
 	
 	public class JCapsule extends RigidBody {
 		
-		private var _length:Number;
-		private var _radius:Number;
+		private var _length:Number;//cylinder height
+		private var _radius:Number;//radius of sphere
 		
 		public function JCapsule(skin:ISkin3D, r:Number, l:Number) {
 			super(skin);
@@ -72,15 +72,11 @@ package jiglib.geometry{
 		}
 		 
 		public function getBottomPos(state:PhysicsState):Vector3D {
-			var temp:Vector3D = state.getOrientationCols()[1];
-			//temp.normalize();
-			return state.position.add(JNumber3D.getScaleVector(temp, -_length / 2 - _radius));
+			return state.position.add(JNumber3D.getScaleVector(state.getOrientationCols()[1], -_length / 2));
 		}
 		 
 		public function getEndPos(state:PhysicsState):Vector3D {
-			var temp:Vector3D = state.getOrientationCols()[1];
-			//temp.normalize();
-			return state.position.add(JNumber3D.getScaleVector(temp, _length / 2 + _radius));
+			return state.position.add(JNumber3D.getScaleVector(state.getOrientationCols()[1], _length / 2));
 		}
 
 		override public function segmentIntersect(out:CollOutData, seg:JSegment, state:PhysicsState):Boolean
@@ -146,22 +142,15 @@ package jiglib.geometry{
 		
 		override public function getInertiaProperties(m:Number):Matrix3D {
 			var cylinderMass:Number = m * Math.PI * _radius * _radius * _length / getVolume();
-			var Ixx:Number = 0.25 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
-			var Iyy:Number = 0.5 * cylinderMass * _radius * _radius;
+			var Ixx:Number = 0.5 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
+			var Iyy:Number = 0.25 * cylinderMass * _radius * _radius;
 			var Izz:Number = Ixx;
 			 
 			var endMass:Number = m - cylinderMass;
 			Ixx += (0.4 * endMass * _radius * _radius + endMass * Math.pow(0.5 * _length, 2));
 			Iyy += (0.2 * endMass * _radius * _radius);
 			Izz += (0.4 * endMass * _radius * _radius + endMass * Math.pow(0.5 * _length, 2));
-			
-			 /*
-			var inertiaTensor:JMatrix3D = new JMatrix3D();
-			inertiaTensor.n11 = Ixx;
-			inertiaTensor.n22 = Iyy;
-			inertiaTensor.n33 = Izz;
-			*/
-			
+			 
 			return JMatrix3D.getScaleMatrix(Ixx, Iyy, Izz);
 		}
 		
