@@ -82,17 +82,17 @@ package
 			carSkin.materialLibrary.getMaterial("ColorMaterial_E3989800").material = new WireColorMaterial();
 
 			carBody = new JCar(new Away3DLiteMesh(carSkin));
-			carBody.setCar(40, 5, 500);
+			carBody.setCar(40, 1, 400);
 			carBody.chassis.moveTo(new Vector3D(0, -100, 0));
 			carBody.chassis.rotationY = 90;
 			carBody.chassis.mass = 9;
 			carBody.chassis.sideLengths = new Vector3D(40, 20, 90);
 			physics.addBody(carBody.chassis);
 
-			carBody.setupWheel("WheelFL", new Vector3D(-20, 10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
-			carBody.setupWheel("WheelFR", new Vector3D(20, 10, 25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
-			carBody.setupWheel("WheelBL", new Vector3D(-20, 10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
-			carBody.setupWheel("WheelBR", new Vector3D(20, 10, -25), 1.2, 1.2, 3, 10, 0.4, 0.6, 2);
+			carBody.setupWheel("WheelFL", new Vector3D(-20, 10, 25), 1.2, 1.2, 3, 10, 0.5, 0.6, 2);
+			carBody.setupWheel("WheelFR", new Vector3D(20, 10, 25), 1.2, 1.2, 3, 10, 0.5, 0.6, 2);
+			carBody.setupWheel("WheelBL", new Vector3D(-20, 10, -25), 1.2, 1.2, 3, 10, 0.5, 0.6, 2);
+			carBody.setupWheel("WheelBR", new Vector3D(20, 10, -25), 1.2, 1.2, 3, 10, 0.5, 0.6, 2);
 
 			steerFL = carSkin.getChildByName("WheelFL") as ObjectContainer3D;
 			steerFR = carSkin.getChildByName("WheelFR") as ObjectContainer3D;
@@ -181,7 +181,7 @@ package
 			updateWheelSkin();
 
 			//run
-			physics.engine.integrate(0.12);
+			physics.engine.integrate(0.1);
 
 			//system
 			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position);
