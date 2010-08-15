@@ -100,9 +100,6 @@ package
 			vplObjects.sortMode = ViewportLayerSortMode.Z_SORT;
 			viewport.containerSprite.addLayer(vplObjects);
 			
-			shadeMateria = new FlatShadeMaterial(mylight,0xeeee00);
-			shadeMateria.interactive = true;
-			
 			setupBoxStacking();
 			
 			var stats:StatsView = new StatsView(renderer);
@@ -112,6 +109,8 @@ package
 		}
 		
 		private function setupBoxStacking():void {
+			shadeMateria = new FlatShadeMaterial(mylight,0xeeee00);
+			shadeMateria.interactive = true;
 			var materiaList :MaterialsList = new MaterialsList();
 			materiaList.addMaterial(shadeMateria,"all");
 			bodiesArr=new Vector.<RigidBody>();
@@ -124,6 +123,8 @@ package
 			}
 		}
 		private function setupBallStacking():void {
+			shadeMateria = new FlatShadeMaterial(mylight,0xeeee00);
+			shadeMateria.interactive = true;
 			bodiesArr = new Vector.<RigidBody>();
 			for (var i:int = 0; i < 25; i++)
 			{
@@ -134,6 +135,8 @@ package
 			}
 		}
 		private function setupCapsuleStacking():void {
+			shadeMateria = new FlatShadeMaterial(mylight,0xeeee00);
+			shadeMateria.interactive = true;
 			var capsuleSkin:Cylinder;
 			bodiesArr = new Vector.<RigidBody>();
 			for (var i:int = 0; i < 25; i++)
@@ -156,9 +159,13 @@ package
 		
 		private function clearBodies():void {
 			for each(var body:RigidBody in bodiesArr) {
+				vplObjects.removeDisplayObject3D(physics.getMesh(body));
+				physics.getMesh(body).material.destroy();
+				physics.getMesh(body).removeEventListener(InteractiveScene3DEvent.OBJECT_PRESS, handleMousePress);
 				scene.removeChild(physics.getMesh(body));
 				physics.engine.removeBody(body);
 			}
+			bodiesArr.splice(0, bodiesArr.length);
 		}
 		
 		private function findSkinBody(skin:DisplayObject3D):int
@@ -182,7 +189,6 @@ package
 			
 			var bodyPoint:Vector3D = startMousePos.subtract(currDragBody.currentState.position);
 			dragConstraint = new JConstraintWorldPoint(currDragBody, bodyPoint, startMousePos);
-			PhysicsSystem.getInstance().addConstraint(dragConstraint);
 		}
 		
 		private function handleMouseMove(event:MouseEvent):void
