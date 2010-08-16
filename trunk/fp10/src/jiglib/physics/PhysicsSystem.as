@@ -27,7 +27,7 @@
 package jiglib.physics
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
 	import jiglib.collision.CollPointInfo;
 	import jiglib.collision.CollisionInfo;
@@ -977,18 +977,18 @@ package jiglib.physics
 				{
 					for (var j:int = origNumCollisions; j < len; j++)
 					{
-						_collisions[j].mat.restitution = 0;
-						_collisions[j].satisfied = false;
-						preProcessContactFn(_collisions[j], dt);
+						collInfo = _collisions[int(j)];
+						collInfo.mat.restitution = 0;
+						collInfo.satisfied = false;
+						preProcessContactFn(collInfo, dt);
 					}
 				}
 				else
 				{
 					for (j = origNumCollisions; j < len; j++)
-					{
-						preProcessCollisionFn(_collisions[j], dt);
-					}
+						preProcessCollisionFn(_collisions[int(j)], dt);
 				}
+				
 				origNumCollisions = _collisions.length;
 				
 				if (!gotOne)
@@ -1002,22 +1002,24 @@ package jiglib.physics
 				return;
 
 			body.setActive();
+			_activeBodies.fixed = false;
 			_activeBodies.push(body);
+			_activeBodies.fixed = true;
 			var orig_num:int = _collisions.length;
 			_collisionSystem.detectCollisions(body, _collisions);
 			var other_body:RigidBody;
 			var thisBody_normal:Vector3D;
 			var len:int = _collisions.length;
 
-			for (var i:int = orig_num; i < len; i++)
+			for each (var collisionInfo:CollisionInfo in _collisions)
 			{
-				other_body = _collisions[i].objInfo.body0;
-				thisBody_normal = _collisions[i].dirToBody;
+				other_body = collisionInfo.objInfo.body0;
+				thisBody_normal = collisionInfo.dirToBody;
 
 				if (other_body == body)
 				{
-					other_body = _collisions[i].objInfo.body1;
-					thisBody_normal = JNumber3D.getScaleVector(_collisions[i].dirToBody, -1);
+					other_body = collisionInfo.objInfo.body1;
+					thisBody_normal = JNumber3D.getScaleVector(collisionInfo.dirToBody, -1);
 				}
 
 				if (!other_body.isActive && other_body.force.dotProduct(thisBody_normal) < -JNumber3D.NUM_TINY)
@@ -1135,20 +1137,30 @@ package jiglib.physics
 				_activeBody.restoreState();
 		}
 
-		private function copyAllCurrentStatesToOld():void
+		private function findAllActiveBodiesAndCopyStates():void
 		{
-			for each (var _body:RigidBody in _bodies)
-				if (_body.isActive || _body.getVelChanged())
-					_body.copyCurrentStateToOld();
-		}
-
-		private function findAllActiveBodies():void
-		{
-			_activeBodies = new Vector.<RigidBody>();
+			_activeBodies = new Vector.<RigidBody>(_bodies.length, true);
+			var i:int = 0;
 
 			for each (var _body:RigidBody in _bodies)
+			{
+				// findAllActiveBodies
 				if (_body.isActive)
-					_activeBodies.push(_body);
+				{
+					_activeBodies[int(i++)] = _body;
+					
+					// copyAllCurrentStatesToOld
+					if(_body.getVelChanged())
+						_body.copyCurrentStateToOld();
+				}
+			}
+			
+			// correct length
+			_activeBodies.fixed = false;
+			_activeBodies.length = i;
+			
+			// fixed is faster
+			_activeBodies.fixed = true;
 		}
 
 		// Integrates the system forwards by dt - the caller is
@@ -1158,8 +1170,7 @@ package jiglib.physics
 		{
 			_doingIntegration = true;
 
-			findAllActiveBodies();
-			copyAllCurrentStatesToOld();
+			findAllActiveBodiesAndCopyStates();
 
 			getAllExternalForces(dt);
 			detectAllCollisions(dt);
