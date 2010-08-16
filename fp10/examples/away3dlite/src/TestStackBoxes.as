@@ -1,6 +1,5 @@
 package
 {
-	import away3dlite.core.utils.Debug;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
 
@@ -11,8 +10,7 @@ package
 	import flash.text.TextFieldAutoSize;
 
 	import jiglib.cof.JConfig;
-	import jiglib.math.*;
-	import jiglib.physics.*;
+	import jiglib.physics.RigidBody;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 
 	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
@@ -37,7 +35,7 @@ package
 
 		protected override function build():void
 		{
-			title += " | JigLib Physics | Stack Boxes | Click to reset |";
+			title += " | Stack Boxes | Click to reset |";
 
 			init3D();
 

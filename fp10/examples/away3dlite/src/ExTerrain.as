@@ -3,16 +3,15 @@ package
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.primitives.Cylinder;
 	import away3dlite.templates.PhysicsTemplate;
-	
+
 	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.geometry.JCapsule;
 	import jiglib.geometry.JTerrain;
-	import jiglib.math.*;
-	import jiglib.physics.*;
+	import jiglib.physics.RigidBody;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import jiglib.plugin.away3dlite.Away3DLitePhysics;
 	import jiglib.plugin.away3dlite.HeightMapData;
@@ -28,7 +27,7 @@ package
 	 */
 	public class ExTerrain extends PhysicsTemplate
 	{
-		[Embed(source="assets/heightmap_invert.png")]
+		[Embed(source="../bin/assets/heightmap_invert.png")]
 		private var TERRIAN_MAP:Class;
 		private var terrainBMD:Bitmap = new TERRIAN_MAP;
 
@@ -38,7 +37,7 @@ package
 
 		protected override function onInit():void
 		{
-			title += " | JigLib Physics | Terrain | Click to jump |";
+			title += " | Terrain | Click to reset |";
 
 			physics = new Away3DLitePhysics(scene, 10);
 
@@ -61,12 +60,12 @@ package
 			var totalBox:int = 8;
 			var i:int;
 			var temp:RigidBody
-			
+
 			for (i = 0; i < totalBox; i++)
 			{
 				_boxBodies[i] = physics.createCube(new WireframeMaterial, 25, 25, 25);
-				_boxBodies[i].moveTo(new Vector3D(0, -100 - i * 75, 0));
-				//_boxBodies[i].moveTo(new Vector3D(160 * Math.cos(i * Math.PI / totalBox), -320, 160 * Math.sin(i * Math.PI / totalBox)));
+				_boxBodies[i].moveTo(new Vector3D(0, -255 - i * 25, 0));
+					//_boxBodies[i].moveTo(new Vector3D(160 * Math.cos(i * Math.PI / totalBox), -320, 160 * Math.sin(i * Math.PI / totalBox)));
 			}
 
 			for (i = 0; i < totalBox; i++)
@@ -96,7 +95,7 @@ package
 			var i:int = 0;
 			for each (var box:RigidBody in _boxBodies)
 			{
-				box.moveTo(new Vector3D(0, -100 - (i++) * 75, 0));
+				box.moveTo(new Vector3D(0, -255 - (i++) * 25, 0));
 				box.rotationX = box.rotationY = box.rotationZ = 0;
 				box.setActive();
 			}
