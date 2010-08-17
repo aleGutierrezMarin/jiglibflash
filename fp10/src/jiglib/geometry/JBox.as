@@ -137,15 +137,15 @@ package jiglib.geometry
 			
 			var orient:Matrix3D = JMatrix3D.getAppendMatrix3D(thisState.orientation, max);
 			
-			var arr:Vector.<Vector3D> = new Vector.<Vector3D>();
+			var arr:Vector.<Vector3D> = new Vector.<Vector3D>(_points.length, true);
 			
 			var transform:Matrix3D = JMatrix3D.getTranslationMatrix(pos.x, pos.y, pos.z);
 			transform = JMatrix3D.getAppendMatrix3D(orient, transform);
 			
-			for each (var _point:Vector3D in _points) {
-				arr.push(transform.transformVector(new Vector3D(_point.x, _point.y, _point.z)));
-			}
-			arr.fixed = true;
+			var i:int = 0;
+			for each (var _point:Vector3D in _points)
+				arr[int(i++)] = transform.transformVector(_point);
+			
 			return arr;
 		}
 		
