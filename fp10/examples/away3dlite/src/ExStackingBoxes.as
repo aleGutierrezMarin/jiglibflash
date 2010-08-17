@@ -13,7 +13,7 @@ package
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 
-	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
+	[SWF(backgroundColor="#DDDDDD", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : Stack Boxes
 	 *
@@ -22,10 +22,10 @@ package
 	 *
 	 * @author katopz
 	 */
-	public class TestStackBoxes extends PhysicsTemplate
+	public class ExStackingBoxes extends PhysicsTemplate
 	{
 		private var _boxes:Vector.<RigidBody>;
-		private var _BOX_SIZE:int = 25;
+		private var _BOX_SIZE:int = 50;
 
 		private var _SIZE_X:int = 3;
 		private var _SIZE_Y:int = 4;
@@ -42,7 +42,7 @@ package
 			JConfig.doShockStep = true;
 
 			camera.x = 1000;
-			camera.y = -500;
+			camera.y = -1000 * Math.SQRT2 * .5;
 			camera.lookAt(new Vector3D);
 
 			addChild(logTextField = new TextField());
@@ -91,9 +91,9 @@ package
 				{
 					for (var i:int = 0; i < _SIZE_X; i++)
 					{
-						var box:RigidBody = _boxes[(_SIZE_X * _SIZE_Z) * k + j * _SIZE_Z + i];
+						var box:RigidBody = _boxes[(_SIZE_X * _SIZE_Z) * k + j * _SIZE_X + i];
 						box.rotationX = box.rotationY = box.rotationZ = 0;
-						box.moveTo(new Vector3D(i * _BOX_SIZE * 2, -(k + 1) * _BOX_SIZE - _BOX_SIZE, j * _BOX_SIZE * 2));
+						box.moveTo(new Vector3D(i * _BOX_SIZE * 2 - _SIZE_X * _BOX_SIZE * .5, -(k + 1) * _BOX_SIZE - _BOX_SIZE, j * _BOX_SIZE * 2 - _SIZE_Z * _BOX_SIZE * .5));
 						box.setActive();
 					}
 				}
@@ -102,7 +102,7 @@ package
 
 		override protected function onPreRender():void
 		{
-			physics.engine.integrate(0.1);
+			physics.engine.integrate(0.12);
 		}
 	}
 }
