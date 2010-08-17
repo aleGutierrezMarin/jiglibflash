@@ -5,14 +5,13 @@ package
 	import away3dlite.ui.Keyboard3D;
 	
 	import flash.events.MouseEvent;
-	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 
-	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : First Person Control
 	 * 
@@ -73,7 +72,6 @@ package
 		override protected function onPreRender():void
 		{
 			// current state
-			var _matrix3D:Matrix3D = _cameraRigidBody.getTransform();
 			var _p:Vector3D = Keyboard3D.position.clone();
 			
 			// look

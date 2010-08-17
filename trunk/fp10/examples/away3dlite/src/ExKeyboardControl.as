@@ -10,7 +10,7 @@ package
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import away3dlite.templates.PhysicsTemplate;
 
-	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : Keyboard Control
 	 *

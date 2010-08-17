@@ -1,6 +1,5 @@
 package
 {
-	import away3dlite.core.render.FastRenderer;
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
@@ -14,7 +13,7 @@ package
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 
-	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : Physics Constraint
 	 *
@@ -97,7 +96,6 @@ package
 		private function handleMousePress(event:MouseEvent):void
 		{
 			onDraging = true;
-			var layer:Sprite = event.target as Sprite;
 
 			startMousePos = new Vector3D(currDragBody.x, currDragBody.y, currDragBody.z);
 
