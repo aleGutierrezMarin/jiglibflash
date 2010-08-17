@@ -16,7 +16,7 @@ package
 	import jiglib.plugin.away3dlite.Away3DLitePhysics;
 	import jiglib.plugin.away3dlite.HeightMapData;
 
-	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : Terrain
 	 *
@@ -27,7 +27,7 @@ package
 	 */
 	public class ExTerrain extends PhysicsTemplate
 	{
-		[Embed(source="../bin/assets/heightmap_invert.png")]
+		[Embed(source="assets/heightmap_invert.png")]
 		private var TERRIAN_MAP:Class;
 		private var terrainBMD:Bitmap = new TERRIAN_MAP;
 
@@ -59,7 +59,7 @@ package
 			_boxBodies = [];
 			var totalBox:int = 8;
 			var i:int;
-			var temp:RigidBody
+			var temp:RigidBody;
 
 			for (i = 0; i < totalBox; i++)
 			{
