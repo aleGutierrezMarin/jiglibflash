@@ -13,7 +13,7 @@ package
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 
-	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : Mouse Control
 	 *

@@ -5,7 +5,6 @@ package
 	import away3dlite.events.Loader3DEvent;
 	import away3dlite.loaders.Collada;
 	import away3dlite.loaders.Loader3D;
-	import away3dlite.loaders.data.MaterialData;
 	import away3dlite.materials.WireColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
@@ -18,7 +17,7 @@ package
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
 	import jiglib.vehicles.JCar;
 
-	[SWF(backgroundColor="#666666", frameRate="30", quality="MEDIUM", width="800", height="600")]
+	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
 	/**
 	 * Example : Car Drive
 	 *
