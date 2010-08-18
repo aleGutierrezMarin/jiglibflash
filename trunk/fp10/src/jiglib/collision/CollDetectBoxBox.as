@@ -26,9 +26,8 @@
 package jiglib.collision
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
-	import jiglib.data.CollOutData;
 	import jiglib.data.EdgeData;
 	import jiglib.data.SpanData;
 	import jiglib.geometry.*;
@@ -209,14 +208,10 @@ package jiglib.collision
 			var box1:JBox = info.body1 as JBox;
 
 			if (!box0.hitTestObject3D(box1))
-			{
 				return;
-			}
 
 			if (JConfig.aabbDetection && !box0.boundingBox.overlapTest(box1.boundingBox))
-			{
 				return;
-			}
 
 			var numTiny:Number = JNumber3D.NUM_TINY;
 			var numHuge:Number = JNumber3D.NUM_HUGE;
@@ -252,15 +247,12 @@ package jiglib.collision
 
 				l2 = axes[i].lengthSquared;
 				if (l2 < numTiny)
-				{
 					continue;
-				}
+				
 				var ax:Vector3D = axes[i].clone();
 				ax.normalize();
 				if (disjoint(overlapDepths[i], ax, box0, box1))
-				{
 					return;
-				}
 			}
 
 			// The box overlap, find the separation depth closest to 0.
@@ -271,9 +263,7 @@ package jiglib.collision
 			{
 				l2 = axes[i].lengthSquared;
 				if (l2 < numTiny)
-				{
 					continue;
-				}
 
 				// If this axis is the minimum, select it
 				if (overlapDepths[i].depth < minDepth)
@@ -282,16 +272,14 @@ package jiglib.collision
 					minAxis = int(i);
 				}
 			}
+			
 			if (minAxis == -1)
-			{
 				return;
-			}
+			
 			// Make sure the axis is facing towards the box0. if not, invert it
 			var N:Vector3D = axes[minAxis].clone();
 			if (box1.currentState.position.subtract(box0.currentState.position).dotProduct(N) > 0)
-			{
 				N = JNumber3D.getScaleVector(N, -1);
-			}
 			
 			var contactPointsFromOld:Boolean = true;
 			var contactPoints:Vector.<Vector3D> = new Vector.<Vector3D>();
@@ -300,9 +288,8 @@ package jiglib.collision
 			combinationDist *= combinationDist;
 
 			if (minDepth > -JNumber3D.NUM_TINY)
-			{
 				getBoxBoxIntersectionPoints(contactPoints, box0, box1, false);
-			}
+			
 			if (contactPoints.length == 0)
 			{
 				contactPointsFromOld = false;
@@ -384,9 +371,8 @@ package jiglib.collision
 				//-----------------------------------------------------------------
 				// plane and ray colinear, skip the intersection.
 				//-----------------------------------------------------------------
-				if (Math.abs(div) < JNumber3D.NUM_TINY) {
+				if (Math.abs(div) < JNumber3D.NUM_TINY)
 					return;
-				}
       
 				var t:Number = (planeD - P0.dotProduct(planeNormal)) / div;
       
@@ -398,10 +384,12 @@ package jiglib.collision
 				break;
 			}
 			}
-			
-			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
+
+			var collPts:Vector.<CollPointInfo>;
 			if (contactPoints.length > 0)
 			{
+				collPts = new Vector.<CollPointInfo>(contactPoints.length, true);
+
 				var minDist:Number = JNumber3D.NUM_HUGE;
 				var maxDist:Number = -JNumber3D.NUM_HUGE;
 				var dist:Number;
@@ -409,44 +397,55 @@ package jiglib.collision
 				var depthScale:Number;
 				var cpInfo:CollPointInfo;
 				var contactPoint:Vector3D;
-				for each (contactPoint in contactPoints) {
+
+				for each (contactPoint in contactPoints)
+				{
 					dist = contactPoint.subtract(SATPoint).length;
-					if (dist < minDist) {
+					
+					if (dist < minDist)
 						minDist = dist;
-					}
-					if (dist > maxDist) {
+
+					if (dist > maxDist)
 						maxDist = dist;
-					}
 				}
-				if (maxDist < minDist + JNumber3D.NUM_TINY) {
+
+				if (maxDist < minDist + JNumber3D.NUM_TINY)
 					maxDist = minDist + JNumber3D.NUM_TINY;
-				}
-				for each (contactPoint in contactPoints) {
+
+				i = 0;
+				for each (contactPoint in contactPoints)
+				{
 					dist = contactPoint.subtract(SATPoint).length;
 					depthScale = (dist - minDist) / (maxDist - minDist);
 					depth = (1 - depthScale) * oldDepth;
-					if (contactPointsFromOld) {
-						cpInfo = new CollPointInfo();
-						cpInfo.r0 = contactPoint.subtract( box0.oldState.position);
-						cpInfo.r1 = contactPoint.subtract( box1.oldState.position);
-						cpInfo.initialPenetration = depth;
-						collPts.push(cpInfo);
-					}else {
-						cpInfo = new CollPointInfo();
-						cpInfo.r0 = contactPoint.subtract( box0.currentState.position);
-						cpInfo.r1 = contactPoint.subtract( box1.currentState.position);
-						cpInfo.initialPenetration = depth;
-						collPts.push(cpInfo);
+					cpInfo = new CollPointInfo();
+					
+					if (contactPointsFromOld)
+					{
+						cpInfo.r0 = contactPoint.subtract(box0.oldState.position);
+						cpInfo.r1 = contactPoint.subtract(box1.oldState.position);
 					}
+					else
+					{
+						cpInfo.r0 = contactPoint.subtract(box0.currentState.position);
+						cpInfo.r1 = contactPoint.subtract(box1.currentState.position);
+					}
+					
+					cpInfo.initialPenetration = depth;
+					collPts[int(i++)] = cpInfo;
 				}
-			}else {
-				cpInfo = new CollPointInfo();
-				cpInfo.r0 = SATPoint.subtract( box0.currentState.position);
-				cpInfo.r1 = SATPoint.subtract( box1.currentState.position);
-				cpInfo.initialPenetration = oldDepth;
-				collPts.push(cpInfo);
 			}
-			
+			else
+			{
+				cpInfo = new CollPointInfo();
+				cpInfo.r0 = SATPoint.subtract(box0.currentState.position);
+				cpInfo.r1 = SATPoint.subtract(box1.currentState.position);
+				cpInfo.initialPenetration = oldDepth;
+				
+				collPts = new Vector.<CollPointInfo>(1, true);
+				collPts[0] = cpInfo;
+			}
+
 			var collInfo:CollisionInfo = new CollisionInfo();
 			collInfo.objInfo = info;
 			collInfo.dirToBody = N;
@@ -457,7 +456,7 @@ package jiglib.collision
 			mat.friction = Math.sqrt(box0.material.friction * box1.material.friction);
 			collInfo.mat = mat;
 			collArr.push(collInfo);
-			
+
 			info.body0.collisions.push(collInfo);
 			info.body1.collisions.push(collInfo);
 		}
