@@ -26,7 +26,7 @@
 package jiglib.collision
 {
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
 	import jiglib.geometry.*;
 	import jiglib.math.*;
@@ -58,9 +58,7 @@ package jiglib.collision
 
 			var centreDist:Number = plane.pointPlaneDistance(box.currentState.position);
 			if (centreDist > box.boundingSphere + JConfig.collToll)
-			{
 				return;
-			}
 
 			var newPts:Vector.<Vector3D> = box.getCornerPoints(box.currentState);
 			var oldPts:Vector.<Vector3D> = box.getCornerPoints(box.oldState);
@@ -70,12 +68,15 @@ package jiglib.collision
 			var oldPt:Vector3D;
 			var newDepth:Number;
 			var oldDepth:Number;
-			for (var i:String in newPts)
+			var newPts_length:int = newPts.length;
+			
+			for (var i:int = 0; i < newPts_length; i++)
 			{
-				newPt = newPts[i];
-				oldPt = oldPts[i];
+				newPt = newPts[int(i)];
+				oldPt = oldPts[int(i)];
 				newDepth = -1 * plane.pointPlaneDistance(newPt);
 				oldDepth = -1 * plane.pointPlaneDistance(oldPt);
+				
 				if (Math.max(newDepth, oldDepth) > -JConfig.collToll)
 				{
 					cpInfo = new CollPointInfo();
@@ -85,6 +86,7 @@ package jiglib.collision
 					collPts.push(cpInfo);
 				}
 			}
+			
 			if (collPts.length > 0)
 			{
 				var collInfo:CollisionInfo = new CollisionInfo();
