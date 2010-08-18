@@ -29,6 +29,7 @@ package jiglib.physics
 	import flash.geom.Vector3D;
 	
 	import jiglib.cof.JConfig;
+	import jiglib.collision.CollDetectInfo;
 	import jiglib.collision.CollPointInfo;
 	import jiglib.collision.CollisionInfo;
 	import jiglib.collision.CollisionSystem;
@@ -892,21 +893,37 @@ package jiglib.physics
 
 		private function updateContactCache():void
 		{
-			_cachedContacts = new Vector.<ContactData>();
+			_cachedContacts = new Vector.<ContactData>(0, true);
 			var fricImpulse:Vector3D;
 			var contact:ContactData;
 
+			var objInfo:CollDetectInfo;
+			var pointInfo:Vector.<CollPointInfo>;
+			
+			var body0:RigidBody;
+			var body1:RigidBody;
+			var i:int = 0;
+			
 			for each (var collInfo:CollisionInfo in _collisions)
-				for each (var ptInfo:CollPointInfo in collInfo.pointInfo)
+			{
+				objInfo = collInfo.objInfo;
+				body0 = objInfo.body0;
+				body1 = objInfo.body1;
+				
+				pointInfo = collInfo.pointInfo;
+				_cachedContacts.fixed = false;
+				_cachedContacts.length += pointInfo.length;
+				_cachedContacts.fixed = true;
+				
+				for each (var ptInfo:CollPointInfo in pointInfo)
 				{
-					fricImpulse = (collInfo.objInfo.body0.id > collInfo.objInfo.body1.id) ? ptInfo.accumulatedFrictionImpulse : JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, -1);
+					fricImpulse = (body0.id > body1.id) ? ptInfo.accumulatedFrictionImpulse : JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, -1);
 
-					contact = new ContactData();
-					contact.pair = new BodyPair(collInfo.objInfo.body0, collInfo.objInfo.body1, ptInfo.r0, ptInfo.r1);
+					_cachedContacts[int(i++)] = contact = new ContactData();
+					contact.pair = new BodyPair(body0, body1, ptInfo.r0, ptInfo.r1);
 					contact.impulse = new CachedImpulse(ptInfo.accumulatedNormalImpulse, ptInfo.accumulatedNormalImpulseAux, ptInfo.accumulatedFrictionImpulse);
-
-					_cachedContacts.push(contact);
 				}
+			}
 		}
 
 		private function handleAllConstraints(dt:Number, iter:int, forceInelastic:Boolean):void
@@ -916,10 +933,11 @@ package jiglib.physics
 			var _constraint:JConstraint;
 			var step:int;
 
-			if (_constraints.length > 0) {
+			if (_constraints.length > 0)
+			{
 				for each (_constraint in _constraints)
 					_constraint.preApply(dt);
-				
+
 				var iteration:int = JConfig.numConstraintIterations;
 				for (step = 0; step < iteration; step++)
 				{
@@ -936,7 +954,7 @@ package jiglib.physics
 						break;
 				}
 			}
-			
+
 			if (forceInelastic)
 			{
 				for each (collInfo in _collisions)
@@ -965,13 +983,13 @@ package jiglib.physics
 							flag = processContactFn(collInfo, dt);
 						else
 							flag = processCollisionFn(collInfo, dt);
-	
+
 						gotOne = gotOne || flag;
 					}
 				}
-		
+
 				tryToActivateAllFrozenObjects();
-	
+
 				var len:int = _collisions.length;
 				if (forceInelastic)
 				{
@@ -988,9 +1006,9 @@ package jiglib.physics
 					for (j = origNumCollisions; j < len; j++)
 						preProcessCollisionFn(_collisions[int(j)], dt);
 				}
-				
+
 				origNumCollisions = _collisions.length;
-				
+
 				if (!gotOne)
 					break;
 			}
