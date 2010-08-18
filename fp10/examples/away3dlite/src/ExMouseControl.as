@@ -1,13 +1,16 @@
 package
 {
+	import away3dlite.containers.Lines;
+	import away3dlite.core.base.Line3D;
 	import away3dlite.materials.ColorMaterial;
+	import away3dlite.materials.LineMaterial;
 	import away3dlite.materials.WireframeMaterial;
 	import away3dlite.templates.PhysicsTemplate;
-	
+
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
-	
+
 	import jiglib.math.*;
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
@@ -33,6 +36,10 @@ package
 		private var _planeToDragOn:Vector3D;
 
 		private var _startMousePos:Vector3D;
+
+		private var lines:Lines;
+		private var dragLineMaterial:LineMaterial = new LineMaterial(0xFF00FF);
+		private var rayLineMaterial:LineMaterial = new LineMaterial(0x00FFFF);
 
 		override protected function build():void
 		{
@@ -86,15 +93,25 @@ package
 			_isDrag = true;
 
 			_startMousePos = _currDragBody.getTransform().position;
+
 			_planeToDragOn = JMath3D.fromNormalAndPoint(Vector3D.Y_AXIS, new Vector3D(0, 0, -_startMousePos.z));
 			var bodyPoint:Vector3D = _startMousePos.subtract(_currDragBody.currentState.position);
 
 			_dragConstraint = new JConstraintWorldPoint(_currDragBody, bodyPoint, _startMousePos);
 
 			physics.engine.addConstraint(_dragConstraint);
-			
+
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
+
+			if (lines)
+				lines.destroy();
+
+			lines = new Lines();
+			scene.addChild(lines);
+
+			lines.addLine(new Line3D(_startMousePos, _startMousePos, dragLineMaterial));
+			lines.addLine(new Line3D(camera.position, _startMousePos, rayLineMaterial));
 		}
 
 		private function handleMouseMove(event:MouseEvent):void
@@ -104,6 +121,9 @@ package
 				var _ray:Vector3D = camera.lens.unProject(view.mouseX, view.mouseY, camera.screenMatrix3D.position.z);
 				_ray = camera.transform.matrix3D.transformVector(_ray);
 				_dragConstraint.worldPosition = JMath3D.getIntersectionLine(_planeToDragOn, camera.position, _ray);
+
+				lines.children[0].endPosition = _dragConstraint.worldPosition;
+				lines.children[1].endPosition = _ray;
 			}
 		}
 
@@ -115,7 +135,7 @@ package
 				physics.engine.removeConstraint(_dragConstraint);
 				_currDragBody.setActive();
 			}
-			
+
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
@@ -126,7 +146,7 @@ package
 			physics.step();
 
 			//system
-			camera.lookAt(Away3DLiteMesh(ground.skin).mesh.position);
+			camera.lookAt(new Vector3D(0, -100, 0));
 		}
 	}
 }
