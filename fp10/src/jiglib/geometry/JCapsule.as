@@ -142,8 +142,8 @@ package jiglib.geometry{
 		
 		override public function getInertiaProperties(m:Number):Matrix3D {
 			var cylinderMass:Number = m * Math.PI * _radius * _radius * _length / getVolume();
-			var Ixx:Number = 0.5 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
-			var Iyy:Number = 0.25 * cylinderMass * _radius * _radius;
+			var Ixx:Number = 0.25 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
+			var Iyy:Number = 0.5 * cylinderMass * _radius * _radius;
 			var Izz:Number = Ixx;
 			 
 			var endMass:Number = m - cylinderMass;
