@@ -118,7 +118,7 @@ package jiglib.physics
 			
 			// do update only when dirty, faster than call every time in step
 			for each (var _body:RigidBody in _bodies)
-				_body.updateGravityForce(_gravity);
+				_body.updateGravity(_gravity, _gravityAxis);
 		}
 		
 		// global gravity acceleration
@@ -146,7 +146,7 @@ package jiglib.physics
 				_collisionSystem.addCollisionBody(body);
 				
 				// update only once, and callback later when dirty
-				body.updateGravityForce(_gravity);
+				body.updateGravity(_gravity, _gravityAxis);
 			}
 		}
 		

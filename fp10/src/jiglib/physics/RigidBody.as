@@ -98,6 +98,7 @@ package jiglib.physics
 		
 		// Bypass rapid call to PhysicsSystem, will update only when dirty.
 		private var _gravity:Vector3D;
+		private var _gravityAxis:int;
 		
 		// Calculate only when gravity is dirty or mass is dirty.
 		private var _gravityForce:Vector3D;
@@ -338,9 +339,11 @@ package jiglib.physics
 		 * CallBack from PhysicsSystem to update gravity force only when gravity or mass is dirty.
 		 * @param gravity
 		 */		
-		public function updateGravityForce(gravity:Vector3D):void
+		public function updateGravity(gravity:Vector3D, gravityAxis:int):void
 		{
 			_gravity = gravity;
+			_gravityAxis = gravityAxis;
+			
 			_gravityForce = JNumber3D.getScaleVector(_gravity, _mass);
 		}
 		
@@ -548,7 +551,7 @@ package jiglib.physics
 				return;
 			}
 
-			var ga:int = PhysicsSystem.getInstance().gravityAxis;
+			var ga:int = _gravityAxis;
 			if (ga != -1)
 			{
 				var arr:Array = JNumber3D.toArray(_currLinVelocityAux);
@@ -636,7 +639,8 @@ package jiglib.physics
 			setInertia(getInertiaProperties(m));
 			
 			// mass is dirty have to recalculate gravity force
-			updateGravityForce(PhysicsSystem.getInstance().gravity);
+			var physicsSystem:PhysicsSystem = PhysicsSystem.getInstance();
+			updateGravity(physicsSystem.gravity, physicsSystem.gravityAxis);
 		}
 
 		public function setInertia(matrix3D:Matrix3D):void
