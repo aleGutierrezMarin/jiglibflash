@@ -59,11 +59,26 @@ package jiglib.math
 		
 		public static function getSubMatrix(a:Matrix3D, b:Matrix3D):Matrix3D
 		{
-			var num:Vector.<Number> = new Vector.<Number>(16, true);
-			for (var i:int = 0; i < num.length; i++ ) {
-				num[i] = a.rawData[i] - b.rawData[i];
-			}
-			return new Matrix3D(num);
+			var ar:Vector.<Number> = a.rawData;
+			var br:Vector.<Number> = b.rawData;
+			return new Matrix3D(new Vector.<Number>([
+				ar[0] - br[0],
+				ar[1] - br[1],
+				ar[2] - br[2],
+				ar[3] - br[3],
+				ar[4] - br[4],
+				ar[5] - br[5],
+				ar[6] - br[6],
+				ar[7] - br[7],
+				ar[8] - br[8],
+				ar[9] - br[9],
+				ar[10] - br[10],
+				ar[11] - br[11],
+				ar[12] - br[12],
+				ar[13] - br[13],
+				ar[14] - br[14],
+				ar[15] - br[15]
+			]));
 		}
 		
 		public static function getRotationMatrixAxis(degree:Number, rotateAxis:Vector3D = null):Matrix3D
@@ -75,12 +90,12 @@ package jiglib.math
 		
 		public static function getCols(matrix3D:Matrix3D):Vector.<Vector3D>
 		{
-			var _rawData:Vector.<Number> =  matrix3D.rawData;
+			var rawData:Vector.<Number> =  matrix3D.rawData;
 			var cols:Vector.<Vector3D> = new Vector.<Vector3D>(3, true);
 			
-			cols[0] = new Vector3D(_rawData[0], _rawData[1], _rawData[2]);
-			cols[1] = new Vector3D(_rawData[4], _rawData[5], _rawData[6]);
-			cols[2] = new Vector3D(_rawData[8], _rawData[9], _rawData[10]);
+			cols[0] = new Vector3D(rawData[0], rawData[1], rawData[2]);
+			cols[1] = new Vector3D(rawData[4], rawData[5], rawData[6]);
+			cols[2] = new Vector3D(rawData[8], rawData[9], rawData[10]);
 			
 			return cols;
 		}
