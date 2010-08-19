@@ -61,7 +61,7 @@ package jiglib.math
 		{
 			var ar:Vector.<Number> = a.rawData;
 			var br:Vector.<Number> = b.rawData;
-			return new Matrix3D(new Vector.<Number>([
+			return new Matrix3D(Vector.<Number>([
 				ar[0] - br[0],
 				ar[1] - br[1],
 				ar[2] - br[2],
