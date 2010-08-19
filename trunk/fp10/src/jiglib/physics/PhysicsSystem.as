@@ -91,11 +91,11 @@ package jiglib.physics
 		
 		private function getAllExternalForces(dt:Number):void
 		{
-			for each (var _body:RigidBody in _bodies)
-				_body.addExternalForces(dt);
+			for each (var body:RigidBody in _bodies)
+				body.addExternalForces(dt);
 			
-			for each (var _controller:PhysicsController in _controllers)
-				_controller.updateController(dt);
+			for each (var controller:PhysicsController in _controllers)
+				controller.updateController(dt);
 		}
 		
 		public function getCollisionSystem():CollisionSystem
@@ -117,8 +117,8 @@ package jiglib.physics
 				_gravityAxis = 2;
 			
 			// do update only when dirty, faster than call every time in step
-			for each (var _body:RigidBody in _bodies)
-				_body.updateGravity(_gravity, _gravityAxis);
+			for each (var body:RigidBody in _bodies)
+				body.updateGravity(_gravity, _gravityAxis);
 		}
 		
 		// global gravity acceleration
@@ -466,21 +466,21 @@ package jiglib.physics
 				var bestDistSq:Number = 0.04;
 				var bp:BodyPair = new BodyPair(body0, body1, new Vector3D(), new Vector3D());
 				
-				for each (var _cachedContact:ContactData in _cachedContacts)
+				for each (var cachedContact:ContactData in _cachedContacts)
 				{
-					if (!(bp.body0 == _cachedContact.pair.body0 && bp.body1 == _cachedContact.pair.body1))
+					if (!(bp.body0 == cachedContact.pair.body0 && bp.body1 == cachedContact.pair.body1))
 						continue;
 					
-					var distSq:Number = (_cachedContact.pair.body0 == body0) ? _cachedContact.pair.r.subtract(ptInfo.r0).lengthSquared : _cachedContact.pair.r.subtract(ptInfo.r1).lengthSquared;
+					var distSq:Number = (cachedContact.pair.body0 == body0) ? cachedContact.pair.r.subtract(ptInfo.r0).lengthSquared : cachedContact.pair.r.subtract(ptInfo.r1).lengthSquared;
 					
 					if (distSq < bestDistSq)
 					{
 						bestDistSq = distSq;
-						ptInfo.accumulatedNormalImpulse = _cachedContact.impulse.normalImpulse;
-						ptInfo.accumulatedNormalImpulseAux = _cachedContact.impulse.normalImpulseAux;
-						ptInfo.accumulatedFrictionImpulse = _cachedContact.impulse.frictionImpulse;
+						ptInfo.accumulatedNormalImpulse = cachedContact.impulse.normalImpulse;
+						ptInfo.accumulatedNormalImpulseAux = cachedContact.impulse.normalImpulseAux;
+						ptInfo.accumulatedFrictionImpulse = cachedContact.impulse.frictionImpulse;
 						
-						if (_cachedContact.pair.body0 != body0)
+						if (cachedContact.pair.body0 != body0)
 							ptInfo.accumulatedFrictionImpulse = JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, -1);
 					}
 				}
@@ -972,23 +972,23 @@ package jiglib.physics
 		{
 			var origNumCollisions:int = _collisions.length;
 			var collInfo:CollisionInfo;
-			var _constraint:JConstraint;
+			var constraint:JConstraint;
 			var step:int;
 			
 			if (_constraints.length > 0)
 			{
-				for each (_constraint in _constraints)
-					_constraint.preApply(dt);
+				for each (constraint in _constraints)
+					constraint.preApply(dt);
 				
 				var iteration:int = JConfig.numConstraintIterations;
 				for (step = 0; step < iteration; step++)
 				{
 					gotOne = false;
-					for each (_constraint in _constraints)
+					for each (constraint in _constraints)
 					{
-						if (!_constraint.satisfied)
+						if (!constraint.satisfied)
 						{
-							flag = _constraint.apply(dt);
+							flag = constraint.apply(dt);
 							gotOne = gotOne || flag;
 						}
 					}
@@ -1089,27 +1089,27 @@ package jiglib.physics
 		
 		private function dampAllActiveBodies():void
 		{
-			for each (var _activeBody:RigidBody in _activeBodies)
-				_activeBody.dampForDeactivation();
+			for each (var activeBody:RigidBody in _activeBodies)
+				activeBody.dampForDeactivation();
 		}
 		
 		private function tryToActivateAllFrozenObjects():void
 		{
-			for each (var _body:RigidBody in _bodies)
+			for each (var body:RigidBody in _bodies)
 			{
-				if (!_body.isActive)
+				if (!body.isActive)
 				{
-					if (_body.getShouldBeActive())
+					if (body.getShouldBeActive())
 					{
-						activateObject(_body);
+						activateObject(body);
 					}
 					else
 					{
-						if (_body.getVelChanged())
+						if (body.getVelChanged())
 						{
-							_body.setVelocity(new Vector3D());
-							_body.setAngVel(new Vector3D());
-							_body.clearVelChanged();
+							body.setVelocity(new Vector3D());
+							body.setAngVel(new Vector3D());
+							body.clearVelChanged();
 						}
 					}
 				}
@@ -1125,7 +1125,7 @@ package jiglib.physics
 			{
 				if (body.isActive)
 				{
-					body.doMovementActivations();
+					body.doMovementActivations(this);
 					body_collisions = body.collisions;
 					if (body_collisions.length > 0)
 					{
@@ -1145,59 +1145,59 @@ package jiglib.physics
 		
 		private function updateAllVelocities(dt:Number):void
 		{
-			for each (var _activeBody:RigidBody in _activeBodies)
-				_activeBody.updateVelocity(dt);
+			for each (var activeBody:RigidBody in _activeBodies)
+				activeBody.updateVelocity(dt);
 		}
 		
 		private function updateAllPositions(dt:Number):void
 		{
-			for each (var _activeBody:RigidBody in _activeBodies)
-				_activeBody.updatePositionWithAux(dt);
+			for each (var activeBody:RigidBody in _activeBodies)
+				activeBody.updatePositionWithAux(dt);
 		}
 		
 		private function notifyAllPostPhysics(dt:Number):void
 		{
-			for each (var _body:RigidBody in _bodies)
-				_body.postPhysics(dt);
+			for each (var body:RigidBody in _bodies)
+				body.postPhysics(dt);
 		}
 		
 		private function updateAllObject3D():void
 		{
-			for each (var _body:RigidBody in _bodies)
-				_body.updateObject3D();
+			for each (var body:RigidBody in _bodies)
+				body.updateObject3D();
 		}
 		
 		private function limitAllVelocities():void
 		{
-			for each (var _activeBody:RigidBody in _activeBodies)
+			for each (var activeBody:RigidBody in _activeBodies)
 			{
-				_activeBody.limitVel();
-				_activeBody.limitAngVel();
+				activeBody.limitVel();
+				activeBody.limitAngVel();
 			}
 		}
 		
 		private function tryToFreezeAllObjects(dt:Number):void
 		{
-			for each (var _activeBody:RigidBody in _activeBodies)
-				_activeBody.tryToFreeze(dt);
+			for each (var activeBody:RigidBody in _activeBodies)
+				activeBody.tryToFreeze(dt);
 		}
 		
 		private function detectAllCollisions(dt:Number):void
 		{
-			for each (var _activeBody:RigidBody in _activeBodies)
-				_activeBody.storeState();
+			for each (var activeBody:RigidBody in _activeBodies)
+				activeBody.storeState();
 			
 			updateAllVelocities(dt);
 			updateAllPositions(dt);
 			
-			for each (var _body:RigidBody in _bodies)
-				_body.collisions = new Vector.<CollisionInfo>();
+			for each (var body:RigidBody in _bodies)
+				body.collisions = new Vector.<CollisionInfo>();
 			
 			_collisions = new Vector.<CollisionInfo>();
 			_collisionSystem.detectAllCollisions(_activeBodies, _collisions);
 			
-			for each (_activeBody in _activeBodies)
-				_activeBody.restoreState();
+			for each (activeBody in _activeBodies)
+				activeBody.restoreState();
 		}
 		
 		private function findAllActiveBodiesAndCopyStates():void
@@ -1205,16 +1205,16 @@ package jiglib.physics
 			_activeBodies = new Vector.<RigidBody>(_bodies.length, true);
 			var i:int = 0;
 			
-			for each (var _body:RigidBody in _bodies)
+			for each (var body:RigidBody in _bodies)
 			{
 				// findAllActiveBodies
-				if (_body.isActive)
+				if (body.isActive)
 				{
-					_activeBodies[int(i++)] = _body;
+					_activeBodies[int(i++)] = body;
 					
 					// copyAllCurrentStatesToOld
-					if(_body.getVelChanged())
-						_body.copyCurrentStateToOld();
+					if(body.getVelChanged())
+						body.copyCurrentStateToOld();
 				}
 			}
 			
@@ -1259,8 +1259,8 @@ package jiglib.physics
 			if (JConfig.solverType == "ACCUMULATED")
 				updateContactCache();
 			
-			for each (var _body:RigidBody in _bodies)
-				_body.clearForces();
+			for each (var body:RigidBody in _bodies)
+				body.clearForces();
 			
 			_doingIntegration = false;
 		}
