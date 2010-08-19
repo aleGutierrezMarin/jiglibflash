@@ -777,12 +777,11 @@ package jiglib.physics
 		// function provided for use of physics system. Activates any
 		// body in its list if it's moved more than a certain distance,
 		// in which case it also clears its list.
-		public function doMovementActivations():void
+		public function doMovementActivations(physicsSystem:PhysicsSystem):void
 		{
 			if (_bodiesToBeActivatedOnMovement.length == 0 || _currState.position.subtract(_storedPositionForActivation).length < JConfig.posThreshold)
 				return;
 
-			var physicsSystem:PhysicsSystem = PhysicsSystem.getInstance();
 			for each (var body:RigidBody in _bodiesToBeActivatedOnMovement)
 				physicsSystem.activateObject(body);
 
