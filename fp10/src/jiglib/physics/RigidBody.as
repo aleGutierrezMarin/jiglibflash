@@ -27,7 +27,7 @@ package jiglib.physics
 {
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-
+	
 	import jiglib.cof.JConfig;
 	import jiglib.collision.CollisionInfo;
 	import jiglib.data.CollOutData;
@@ -95,6 +95,12 @@ package jiglib.physics
 		private var _nonCollidables:Vector.<RigidBody>;
 		private var _constraints:Vector.<JConstraint>;
 		public var collisions:Vector.<CollisionInfo>;
+		
+		// Bypass rapid call to PhysicsSystem, will update only when dirty.
+		private var _gravity:Vector3D;
+		
+		// Calculate only when gravity is dirty or mass is dirty.
+		private var _gravityForce:Vector3D;
 
 		public function RigidBody(skin:ISkin3D)
 		{
@@ -328,13 +334,22 @@ package jiglib.physics
 			_currRotVelocityAux = angVel.clone();
 		}
 
+		/**
+		 * CallBack from PhysicsSystem to update gravity force only when gravity or mass is dirty.
+		 * @param gravity
+		 */		
+		public function updateGravityForce(gravity:Vector3D):void
+		{
+			_gravity = gravity;
+			_gravityForce = JNumber3D.getScaleVector(_gravity, _mass);
+		}
+		
 		public function addGravity():void
 		{
 			if (!_movable)
-			{
 				return;
-			}
-			_force = _force.add(JNumber3D.getScaleVector(PhysicsSystem.getInstance().gravity, _mass));
+			
+			_force = _force.add(_gravityForce);
 			_velChanged = true;
 		}
 
@@ -619,6 +634,9 @@ package jiglib.physics
 			_mass = m;
 			_invMass = 1 / m;
 			setInertia(getInertiaProperties(m));
+			
+			// mass is dirty have to recalculate gravity force
+			updateGravityForce(PhysicsSystem.getInstance().gravity);
 		}
 
 		public function setInertia(matrix3D:Matrix3D):void

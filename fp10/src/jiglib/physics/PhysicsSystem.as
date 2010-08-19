@@ -63,7 +63,6 @@ package jiglib.physics
 		private var _cachedContacts:Vector.<ContactData>;
 		private var _collisionSystem:CollisionSystem;
 		
-		
 		public static function getInstance():PhysicsSystem
 		{
 			if (!_currentPhysicsSystem)
@@ -116,6 +115,10 @@ package jiglib.physics
 			
 			if (Math.abs(_gravity.z) > Math.abs(JNumber3D.toArray(_gravity)[_gravityAxis]))
 				_gravityAxis = 2;
+			
+			// do update only when dirty, faster than call every time in step
+			for each (var _body:RigidBody in _bodies)
+				_body.updateGravityForce(_gravity);
 		}
 		
 		// global gravity acceleration
@@ -141,6 +144,9 @@ package jiglib.physics
 			{
 				_bodies.push(body);
 				_collisionSystem.addCollisionBody(body);
+				
+				// update only once, and callback later when dirty
+				body.updateGravityForce(_gravity);
 			}
 		}
 		
