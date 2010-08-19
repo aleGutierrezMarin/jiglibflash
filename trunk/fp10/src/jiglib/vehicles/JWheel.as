@@ -82,6 +82,9 @@ package jiglib.vehicles
 		private var rimVel:Vector3D;
 		private var worldVel:Vector3D;
 		private var wheelCentreVel:Vector3D;
+		
+		// proxy for CollisionSystem, avoid calling singleton every time in loop
+		private var _collisionSystem:CollisionSystem;
 
 		public function JWheel(car:JCar)
 		{
@@ -179,6 +182,7 @@ package jiglib.vehicles
 		public function setRotationDamping(vel:Number):void {
 			_rotDamping = vel;
 		}
+		
 		public function getRotationDamping():Number {
 			return _rotDamping;
 		}
@@ -210,7 +214,8 @@ package jiglib.vehicles
 			wheelRayEnd = worldPos.subtract(JNumber3D.getScaleVector(worldAxis, _radius));
 			wheelRay = new JSegment(wheelRayEnd.add(JNumber3D.getScaleVector(worldAxis, rayLen)), JNumber3D.getScaleVector(worldAxis, -rayLen));
 
-			var collSystem:CollisionSystem = PhysicsSystem.getInstance().getCollisionSystem();
+			if(!_collisionSystem)
+				_collisionSystem = PhysicsSystem.getInstance().getCollisionSystem();
 
 			var maxNumRays:int = 10;
 			var numRays:int = Math.min(_numRays, maxNumRays);
@@ -227,17 +232,19 @@ package jiglib.vehicles
 			var yOffset:Number;
 			var bestIRay:int = 0;
 			var iRay:int = 0;
+			var collOutBodyData:CollOutBodyData;
+			var segment:JSegment;
 			for (iRay = 0; iRay < numRays; iRay++)
 			{
-				objArr[iRay] = new CollOutBodyData();
+				collOutBodyData = objArr[iRay] = new CollOutBodyData();
 				distFwd = (deltaFwdStart + iRay * deltaFwd) - _radius;
 				yOffset = _radius * (1 - Math.cos(90 * (distFwd / _radius) * Math.PI / 180));
-				segments[iRay] = wheelRay.clone();
-				segments[iRay].origin = segments[iRay].origin.add(JNumber3D.getScaleVector(wheelFwd, distFwd).add(JNumber3D.getScaleVector(wheelUp, yOffset)));
-				if (collSystem.segmentIntersect(objArr[iRay], segments[iRay], carBody))
+				segment = segments[iRay] = wheelRay.clone();
+				segment.origin = segment.origin.add(JNumber3D.getScaleVector(wheelFwd, distFwd).add(JNumber3D.getScaleVector(wheelUp, yOffset)));
+				if (_collisionSystem.segmentIntersect(collOutBodyData, segment, carBody))
 				{
 					_lastOnFloor = true;
-					if (objArr[iRay].frac < objArr[bestIRay].frac)
+					if (collOutBodyData.frac < objArr[bestIRay].frac)
 					{
 						bestIRay = iRay;
 					}
@@ -258,11 +265,11 @@ package jiglib.vehicles
 			{
 				for (iRay = 0; iRay < numRays; iRay++)
 				{
-					if (objArr[iRay].frac <= 1)
-					{
-						groundNormal = groundNormal.add(JNumber3D.getScaleVector(worldPos.subtract(segments[iRay].getEnd()), 1 - objArr[iRay].frac));
-					}
+					collOutBodyData = objArr[iRay];
+					if (collOutBodyData.frac <= 1)
+						groundNormal = groundNormal.add(JNumber3D.getScaleVector(worldPos.subtract(segments[iRay].getEnd()), 1 - collOutBodyData.frac));
 				}
+				
 				groundNormal.normalize();
 			}
 			else
@@ -271,14 +278,11 @@ package jiglib.vehicles
 			}
 
 			_displacement = rayLen * (1 - frac);
+			
 			if (_displacement < 0)
-			{
 				_displacement = 0;
-			}
 			else if (_displacement > _travel)
-			{
 				_displacement = _travel;
-			}
 
 			var displacementForceMag:Number = _displacement * _spring;
 			displacementForceMag *= groundNormal.dotProduct(worldAxis);
@@ -286,9 +290,8 @@ package jiglib.vehicles
 			var dampingForceMag:Number = _upSpeed * _damping;
 			var totalForceMag:Number = displacementForceMag + dampingForceMag;
 			if (totalForceMag < 0)
-			{
 				totalForceMag = 0;
-			}
+			
 			var extraForce:Vector3D = JNumber3D.getScaleVector(worldAxis, totalForceMag);
 			force = force.add(extraForce);
 
@@ -311,14 +314,12 @@ package jiglib.vehicles
 
 			var friction:Number = _sideFriction;
 			var sideVel:Number = wheelPointVel.dotProduct(groundLeft);
+			
 			if ((sideVel > slipVel) || (sideVel < -slipVel))
-			{
 				friction *= slipFactor;
-			}
 			else if ((sideVel > noslipVel) || (sideVel < -noslipVel))
-			{
 				friction *= (1 - (1 - slipFactor) * (Math.abs(sideVel) - noslipVel) / (slipVel - noslipVel));
-			}
+			
 			if (sideVel < 0)
 			{
 				friction *= -1;
@@ -414,7 +415,6 @@ package jiglib.vehicles
 
 		}
 
-
 		public function reset():void
 		{
 			_angVel = 0;
@@ -430,7 +430,5 @@ package jiglib.vehicles
 			_angVelForGrip = 0;
 			_rotDamping = 0.99;
 		}
-
 	}
-
 }
