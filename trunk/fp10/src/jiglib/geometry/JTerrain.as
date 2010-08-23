@@ -40,6 +40,7 @@
 		{
 			i = limiteInt(i, 0, _terrain.sw);
 			j = limiteInt(j, 0, _terrain.sh);
+
 			return _terrain.heights[i][j];
 		}
 
@@ -152,21 +153,19 @@
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
 
-			if (seg.delta.y > -JNumber3D.NUM_TINY)
-			{
+			// yUp for lite
+			var segY:Number = _yUp ? seg.delta.y : -seg.delta.y;
+
+			if (segY > JNumber3D.NUM_TINY)
 				return false;
-			}
-			
+
 			var obj1:TerrainData = getHeightAndNormalByPoint(seg.origin);
 			if (obj1.height < 0)
-			{
 				return false;
-			}
+
 			var obj2:TerrainData = getHeightAndNormalByPoint(seg.getEnd());
 			if (obj2.height > 0)
-			{
 				return false;
-			}
 
 			var depthEnd:Number = -obj2.height;
 			var weightStart:Number = 1 / (JNumber3D.NUM_TINY + obj1.height);
@@ -182,18 +181,15 @@
 
 			return true;
 		}
-		
-		private function limiteInt(num:int,min:int,max:int):int
+
+		private function limiteInt(num:int, min:int, max:int):int
 		{
 			var n:int = num;
 			if (n < min)
-			{
 				n = min;
-			}
 			else if (n > max)
-			{
 				n = max;
-			}
+
 			return n;
 		}
 	}
