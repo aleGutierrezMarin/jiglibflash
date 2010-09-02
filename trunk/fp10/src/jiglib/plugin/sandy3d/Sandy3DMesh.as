@@ -22,25 +22,25 @@ package jiglib.plugin.sandy3d
 
 		public function get transform():Matrix3D 
 		{
-			var tr:Matrix3D = new Matrix3D();
-			tr.rawData[0] = this.shape.matrix.n11; 
-			tr.rawData[4] = this.shape.matrix.n12; 
-			tr.rawData[8] = this.shape.matrix.n13; 
-			tr.rawData[12] = this.shape.matrix.n14;
-			tr.rawData[1] = this.shape.matrix.n21; 
-			tr.rawData[5] = this.shape.matrix.n22; 
-			tr.rawData[9] = this.shape.matrix.n23; 
-			tr.rawData[13] = this.shape.matrix.n24;
-			tr.rawData[2] = this.shape.matrix.n31; 
-			tr.rawData[6] = this.shape.matrix.n32; 
-			tr.rawData[10] = this.shape.matrix.n33; 
-			tr.rawData[14] = this.shape.matrix.n34;
-			tr.rawData[3] = this.shape.matrix.n41; 
-			tr.rawData[7] = this.shape.matrix.n42; 
-			tr.rawData[11] = this.shape.matrix.n43; 
-			tr.rawData[15] = this.shape.matrix.n44;
+			var rawData:Vector.<Number> = new Vector.<Number>(16, true);
+			rawData[0] = this.shape.matrix.n11; 
+			rawData[4] = this.shape.matrix.n12; 
+			rawData[8] = this.shape.matrix.n13; 
+			rawData[12] = this.shape.matrix.n14;
+			rawData[1] = this.shape.matrix.n21; 
+			rawData[5] = this.shape.matrix.n22; 
+			rawData[9] = this.shape.matrix.n23; 
+			rawData[13] = this.shape.matrix.n24;
+			rawData[2] = this.shape.matrix.n31; 
+			rawData[6] = this.shape.matrix.n32; 
+			rawData[10] = this.shape.matrix.n33; 
+			rawData[14] = this.shape.matrix.n34;
+			rawData[3] = this.shape.matrix.n41; 
+			rawData[7] = this.shape.matrix.n42; 
+			rawData[11] = this.shape.matrix.n43; 
+			rawData[15] = this.shape.matrix.n44;
 			 
-			return tr;
+			return new Matrix3D(rawData);
 		}
 		
 		public function set transform(m:Matrix3D):void 

@@ -17,25 +17,25 @@ package jiglib.plugin.away3d {
 		}
 
 		public function get transform():Matrix3D {
-			var tr:Matrix3D = new Matrix3D();
-			tr.rawData[0] = _mesh.transform.sxx; 
-			tr.rawData[4] = _mesh.transform.sxy; 
-			tr.rawData[8] = _mesh.transform.sxz; 
-			tr.rawData[12] = _mesh.transform.tx;
-			tr.rawData[1] = _mesh.transform.syx; 
-			tr.rawData[5] = _mesh.transform.syy; 
-			tr.rawData[9] = _mesh.transform.syz; 
-			tr.rawData[13] = _mesh.transform.ty;
-			tr.rawData[2] = _mesh.transform.szx; 
-			tr.rawData[6] = _mesh.transform.szy; 
-			tr.rawData[10] = _mesh.transform.szz; 
-			tr.rawData[14] = _mesh.transform.tz;
-			tr.rawData[3] = _mesh.transform.swx; 
-			tr.rawData[7] = _mesh.transform.swy; 
-			tr.rawData[11] = _mesh.transform.swz; 
-			tr.rawData[15] = _mesh.transform.tw;
+			var rawData:Vector.<Number> = new Vector.<Number>(16, true);
+			rawData[0] = _mesh.transform.sxx; 
+			rawData[4] = _mesh.transform.sxy; 
+			rawData[8] = _mesh.transform.sxz; 
+			rawData[12] = _mesh.transform.tx;
+			rawData[1] = _mesh.transform.syx; 
+			rawData[5] = _mesh.transform.syy; 
+			rawData[9] = _mesh.transform.syz; 
+			rawData[13] = _mesh.transform.ty;
+			rawData[2] = _mesh.transform.szx; 
+			rawData[6] = _mesh.transform.szy; 
+			rawData[10] = _mesh.transform.szz; 
+			rawData[14] = _mesh.transform.tz;
+			rawData[3] = _mesh.transform.swx; 
+			rawData[7] = _mesh.transform.swy; 
+			rawData[11] = _mesh.transform.swz; 
+			rawData[15] = _mesh.transform.tw;
 			
-			return tr;
+			return new Matrix3D(rawData);
 		}
 		
 		public function set transform(m:Matrix3D):void {
