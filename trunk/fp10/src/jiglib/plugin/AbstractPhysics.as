@@ -5,7 +5,7 @@
 	import jiglib.physics.RigidBody;
 
 	/**
-	 * @author bartekd
+	 * @author bartekd and Ringo
 	 */
 	public class AbstractPhysics {
 		
@@ -32,7 +32,11 @@
 		public function get engine():PhysicsSystem {
 			return physicsSystem ;
 		}
-		
+
+		public function afterPause():void {
+			initTime = getTimer();
+		}
+
 		public function step():void {
 			stepTime = getTimer();
 	        deltaTime = ((stepTime - initTime) / 1000) * speed;
