@@ -13,7 +13,7 @@ package jiglib.plugin.away3dlite
 	{
 		public function get transform():Matrix3D
 		{
-			return _mesh.transform.matrix3D
+			return _mesh.transform.matrix3D;
 		}
 
 		public function set transform(m:Matrix3D):void

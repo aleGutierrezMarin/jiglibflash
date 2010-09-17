@@ -3,7 +3,7 @@ package jiglib.plugin.away3d {
 	
 	import jiglib.plugin.ISkin3D;
 	import away3d.core.base.Mesh;
-	import away3d.core.math.MatrixAway3D;
+	import away3d.core.math.Number3D;
 	
 	/**
 	 * @author bartekd
@@ -17,51 +17,13 @@ package jiglib.plugin.away3d {
 		}
 
 		public function get transform():Matrix3D {
-			var rawData:Vector.<Number> = new Vector.<Number>(16, true);
-			rawData[0] = _mesh.transform.sxx; 
-			rawData[4] = _mesh.transform.sxy; 
-			rawData[8] = _mesh.transform.sxz; 
-			rawData[12] = _mesh.transform.tx;
-			rawData[1] = _mesh.transform.syx; 
-			rawData[5] = _mesh.transform.syy; 
-			rawData[9] = _mesh.transform.syz; 
-			rawData[13] = _mesh.transform.ty;
-			rawData[2] = _mesh.transform.szx; 
-			rawData[6] = _mesh.transform.szy; 
-			rawData[10] = _mesh.transform.szz; 
-			rawData[14] = _mesh.transform.tz;
-			rawData[3] = _mesh.transform.swx; 
-			rawData[7] = _mesh.transform.swy; 
-			rawData[11] = _mesh.transform.swz; 
-			rawData[15] = _mesh.transform.tw;
 			
-			return new Matrix3D(rawData);
+			return _mesh.transform;
 		}
 		
 		public function set transform(m:Matrix3D):void {
-			var tr:MatrixAway3D = new MatrixAway3D();
-			tr.sxx = m.rawData[0]; 
-			tr.sxy = m.rawData[4]; 
-			tr.sxz = m.rawData[8]; 
-			tr.tx = m.rawData[12];
-			tr.syx = m.rawData[1]; 
-			tr.syy = m.rawData[5]; 
-			tr.syz = m.rawData[9]; 
-			tr.ty = m.rawData[13];
-			tr.szx = m.rawData[2]; 
-			tr.szy = m.rawData[6]; 
-			tr.szz = m.rawData[10]; 
-			tr.tz = m.rawData[14];
-			tr.swx = m.rawData[3]; 
-			tr.swy = m.rawData[7]; 
-			tr.swz = m.rawData[11]; 
-			tr.tw = m.rawData[15];
 			
-			var scale:MatrixAway3D = new MatrixAway3D();
-			scale.scaleMatrix(_mesh.scaleX, _mesh.scaleY, _mesh.scaleZ);
-			tr.multiply(tr, scale);
-			
-			_mesh.transform = tr;
+			_mesh.transform = m.clone();
 		}
 		
 		public function get mesh():Mesh {
