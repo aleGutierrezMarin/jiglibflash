@@ -3,7 +3,6 @@ package jiglib.plugin.away3d {
 	
 	import jiglib.plugin.ISkin3D;
 	import away3d.core.base.Mesh;
-	import away3d.core.math.Number3D;
 	
 	/**
 	 * @author bartekd

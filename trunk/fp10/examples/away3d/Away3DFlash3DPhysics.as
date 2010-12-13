@@ -28,6 +28,7 @@
 	 */
 	[SWF(width="800", height="600", backgroundColor="#222266", frameRate="60")]
 	public class Away3DFlash3DPhysics extends Sprite
+	
 	{
 		private var view:View3D;
 		private var mylight:PointLight3D;
@@ -48,7 +49,6 @@
 		
 		public function Away3DFlash3DPhysics() 
 		{
-			
 			stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDownHandler);
 			stage.addEventListener( KeyboardEvent.KEY_UP, keyUpHandler);
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -66,18 +66,20 @@
             view.y = stage.stageHeight / 2;
             addChild(view);
 			
-			view.renderer = Renderer.CORRECT_Z_ORDER;
-			
 			mylight = new PointLight3D();
-			view.scene.addChild(mylight);
+			view.scene.addLight(mylight);
+			mylight.ambient = 0.4;
 			mylight.y = 500;
 			mylight.z = -700;
+			
+			view.camera.y = mylight.y;
+			view.camera.z = mylight.z;
+			view.camera.lookAt(new Vector3D());
 			
 			physics = new Away3DPhysics(view, 8);
 			
 			materia = new ShadingColorMaterial(0x77ee77);
-			//ground = physics.createGround({ material:this.materia, width:500, height:500 });
-			ground = physics.createCube( { material:this.materia, width:500, height:10, depth:500 } );
+			ground = physics.createCube( { material:this.materia, width:500, height:10, depth:500, segmentsW:2, segmentsH:1, segmentsD:2} );
 			ground.movable = false;
 			ground.friction = 0.2;
 			ground.restitution = 0.8;
@@ -93,7 +95,8 @@
 				ballBody[i].moveTo(new Vector3D( -100, 30 + (50 * i + 50), -100));
 			}
 			
-			boxBody=new Vector.<RigidBody>();
+			boxBody = new Vector.<RigidBody>();
+			materia = new ShadingColorMaterial(0xeeee00);
 			for (i = 0; i < 6; i++)
 			{
 				boxBody[i] = physics.createCube({ material:this.materia, width:50, height:30, depth:40 });
@@ -111,10 +114,14 @@
 				capsuleBody[i].moveTo(new Vector3D(100, 10 + (80 * i + 80), -100));
 				physics.addBody(capsuleBody[i]);
 			}
-			
-			view.camera.y = mylight.y;
-			view.camera.z = mylight.z;
-			view.camera.lookAt(physics.getMesh(ground).position);
+		}
+		
+		private function clearBodies():void {
+			for each(var body:RigidBody in boxBody) {
+				view.scene.removeChild(physics.getMesh(body));
+				physics.engine.removeBody(body);
+			}
+			boxBody.splice(0, boxBody.length);
 		}
 		
 		private function keyDownHandler(event:KeyboardEvent):void
@@ -143,6 +150,7 @@
 				case Keyboard.SPACE:
 					keyUp = true;
 					break;
+				break;
 			}
 		}
 		
@@ -166,7 +174,7 @@
 					keyRight = false;
 					break;
 				case Keyboard.SPACE:
-					keyUp=false;
+					//keyUp=false;
 			}
 		}
 		
@@ -219,7 +227,6 @@
 			{
 				ballBody[0].addWorldForce(new Vector3D(0, 50, 0), ballBody[0].currentState.position);
 			}
-			
 			physics.engine.integrate(0.1);
 			
 			resetBody();

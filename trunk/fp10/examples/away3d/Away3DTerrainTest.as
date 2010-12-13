@@ -11,7 +11,6 @@
     import away3d.containers.*;
     import away3d.primitives.*;
 	import away3d.lights.PointLight3D;
-	import away3d.core.math.Number3D;
 	import away3d.core.base.Mesh;
 	import away3d.core.render.Renderer;
 	import away3d.materials.ShadingColorMaterial;
@@ -67,7 +66,8 @@
 			//view.renderer = Renderer.CORRECT_Z_ORDER;
 			
 			mylight = new PointLight3D();
-			view.scene.addChild(mylight);
+			view.scene.addLight(mylight);
+			mylight.ambient = 0.4;
 			mylight.y = 900;
 			
 			materia = new ShadingColorMaterial(0x77ee77);
