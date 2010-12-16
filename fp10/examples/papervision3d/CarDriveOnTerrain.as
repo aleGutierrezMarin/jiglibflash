@@ -73,7 +73,7 @@
 			springCamera.mass = 10;
 			springCamera.damping = 10;
 			springCamera.stiffness = 1;
-			springCamera.positionOffset = new Number3D(0, 100, -150);
+			springCamera.positionOffset = new Number3D(0, 150, -200);
 			
 			mylight = new PointLight3D(true, true);
 			mylight.y = 5000;
@@ -90,7 +90,7 @@
 			shadeMateria = new FlatShadeMaterial(mylight,0xeeeeff);
 			var materiaList:MaterialsList = new MaterialsList();
 			materiaList.addMaterial(shadeMateria,"all");
-			carSkin = new Collada("res/car.DAE", materiaList, 0.01);
+			carSkin = new Collada("res/car.DAE", materiaList, 0.02);
 			carSkin.addEventListener(FileLoadEvent.LOAD_COMPLETE,onCarLoaded);
 			 
 			springCamera.target = carSkin;
@@ -108,13 +108,13 @@
 			carBody.setCar(40,1,400);
 			carBody.chassis.moveTo(new Vector3D( 4000, 100, -3000));
 			carBody.chassis.mass = 9;
-			carBody.chassis.sideLengths = new Vector3D(40, 20, 90);
+			carBody.chassis.sideLengths = new Vector3D(80, 40, 180);
 			physics.addBody(carBody.chassis);
 			 
-			carBody.setupWheel("WheelFL", new Vector3D( -20, -10, 25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
-			carBody.setupWheel("WheelFR", new Vector3D(20, -10, 25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
-			carBody.setupWheel("WheelBL", new Vector3D( -20, -10, -25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
-			carBody.setupWheel("WheelBR", new Vector3D(20, -10, -25), 1.2, 1.2, 3, 10, 0.5, 0.5, 2);
+			carBody.setupWheel("WheelFL", new Vector3D(-40, -20, 45), 1.4, 1.4, 5, 20, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelFR", new Vector3D(40, -20, 45), 1.4, 1.4, 5, 20, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelBL", new Vector3D( -40, -20, -45), 1.4, 1.4, 5, 20, 0.4, 0.5, 2);
+			carBody.setupWheel("WheelBR", new Vector3D(40, -20, -45), 1.4, 1.4, 5, 20, 0.4, 0.5, 2);
 			 
 			var shadeMateria:FlatShadeMaterial = new FlatShadeMaterial(mylight, 0x777777);
 			steerFL = carSkin.getChildByName( "WheelFL", true );

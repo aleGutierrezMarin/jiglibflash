@@ -61,7 +61,7 @@
 					_heights[ix][iy] = (terrainHeightMap.getPixel((ix / gridX) * terrainHeightMap.width, (iy / gridY) * terrainHeightMap.height) & 0xFF);
 					_heights[ix][iy] *= (maxHeight / 255);
 					
-					vertex(ix, iy).y = _heights[ix][iy];
+					vertex(iy, ix).y = _heights[ix][iy];
 				}
 			}
 		}
