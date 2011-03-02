@@ -24,7 +24,7 @@ package jiglib.geometry
 			_distance = 0;
 			this.movable = false;
 			
-			var huge:Number=JNumber3D.NUM_HUGE;
+			var huge:Number=JMath3D.NUM_HUGE;
 			_boundingBox.minPos = new Vector3D(-huge, -huge, -huge);
 			_boundingBox.maxPos = new Vector3D(huge, huge, huge);
 
@@ -55,7 +55,7 @@ package jiglib.geometry
 			var frac:Number = 0,t:Number,denom:Number;
 
 			denom = _normal.dotProduct(seg.delta);
-			if (Math.abs(denom) > JNumber3D.NUM_TINY)
+			if (Math.abs(denom) > JMath3D.NUM_TINY)
 			{
 				t = -1 * (_normal.dotProduct(seg.origin) - _distance) / denom;
 

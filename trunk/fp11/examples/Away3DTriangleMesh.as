@@ -1,14 +1,14 @@
 package
 {
-	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.View3D;
-	import away3d.entities.Mesh;
 	import away3d.events.LoaderEvent;
 	import away3d.events.ResourceEvent;
 	import away3d.lights.PointLight;
 	import away3d.loading.ResourceManager;
 	import away3d.materials.BitmapMaterial;
 	import away3d.materials.ColorMaterial;
+	import away3d.entities.Mesh;
+	import away3d.containers.ObjectContainer3D;
 	
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
@@ -31,11 +31,11 @@ package
 	 * ...
 	 * @author Muzer
 	 */
-	[SWF(width="960", height="540", frameRate="60")]
+	[SWF(width="800", height="600", frameRate="60")]
 	public class Away3DTriangleMesh extends Sprite
 	{
 		
-		[Embed(source="assets/fskin.jpg")]
+		[Embed(source="res/fskin.jpg")]
 		private var CarSkin : Class;
 		
 		private var view:View3D;
@@ -58,7 +58,8 @@ package
 		private var bridgeBodies:Vector.<RigidBody>;
 		private var bridges:Vector.<HingeJoint>;
 		private var carBody:JCar;
-				
+		
+		private var base_url:String;
 		public function Away3DTriangleMesh()
 		{
 			super();
@@ -85,21 +86,21 @@ package
 			
 			// init physics
 			JConfig.solverType="FAST";
-			physics = new Away3D4Physics(view, 6);
+			physics = new Away3D4Physics(view, 8);
 			
 			ResourceManager.instance.addEventListener(ResourceEvent.RESOURCE_RETRIEVED, onResourceRetrieved);
-			containerCity = ObjectContainer3D(ResourceManager.instance.getResource("assets/scene.obj"));
+			containerCity = ObjectContainer3D(ResourceManager.instance.getResource("res/scene.obj"));
 			view.scene.addChild(containerCity);
 			
 			carMaterial = new BitmapMaterial(new CarSkin().bitmapData);
 			carMaterial.lights = [mylight];
-			containerCar = ObjectContainer3D(ResourceManager.instance.getResource("assets/car.obj"));
+			containerCar = ObjectContainer3D(ResourceManager.instance.getResource("res/car.obj"));
 			view.scene.addChild(containerCar);
 		}
 		
 		private function onResourceRetrieved(event : ResourceEvent) : void
 		{
-			if(event.uri=="assets/scene.obj"){
+			if(event.uri=="res/scene.obj"){
 				
 				var materia:ColorMaterial = new ColorMaterial(0x77ee77);
 				materia.lights=[mylight];
@@ -154,7 +155,7 @@ package
 				new JConstraintWorldPoint(bridgeBodies[4],new Vector3D(120,0,100),new Vector3D(1200,920,1600));
 				new JConstraintWorldPoint(bridgeBodies[4],new Vector3D(120,0,-100),new Vector3D(1200,920,1400));
 				
-			}else if(event.uri=="assets/car.obj"){
+			}else if(event.uri=="res/car.obj"){
 				for (i = 0; i < containerCar.numChildren; ++i) {
 					mesh = Mesh(containerCar.getChildAt(i));
 					mesh.geometry.scale(40);

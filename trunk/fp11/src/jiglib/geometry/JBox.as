@@ -218,7 +218,7 @@ package jiglib.geometry
 			{
 				dirVec = cols[dir].clone();
 				dirVec.normalize();
-				if (Math.abs(dirVec.dotProduct(p)) > JNumber3D.toArray(h)[dir] + JNumber3D.NUM_TINY)
+				if (Math.abs(dirVec.dotProduct(p)) > JNumber3D.toArray(h)[dir] + JMath3D.NUM_TINY)
 				{
 					return false;
 				}
@@ -232,7 +232,7 @@ package jiglib.geometry
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
 			
-			var tiny:Number=JNumber3D.NUM_TINY,huge:Number=JNumber3D.NUM_HUGE,frac:Number,min:Number,max:Number,dirMin:Number=0,dirMax:Number=0,dir:Number=0,e:Number,f:Number,t:Number,t1:Number,t2:Number,directionVectorNumber:Number;
+			var tiny:Number=JMath3D.NUM_TINY,huge:Number=JMath3D.NUM_HUGE,frac:Number,min:Number,max:Number,dirMin:Number=0,dirMax:Number=0,dir:Number=0,e:Number,f:Number,t:Number,t1:Number,t2:Number,directionVectorNumber:Number;
 			var p:Vector3D,h:Vector3D;
 
 			frac = huge;

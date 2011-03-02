@@ -93,7 +93,7 @@ package jiglib.physics
 			}
 			else
 			{
-				_damping = JNumber3D.getLimiteNumber(_damping, 0, 1);
+				_damping = JMath3D.getLimiteNumber(_damping, 0, 1);
 			}
 
 			enableHinge();

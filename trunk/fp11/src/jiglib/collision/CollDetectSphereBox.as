@@ -45,7 +45,7 @@ package jiglib.collision
 			var oldBoxPoint:Vector.<Vector3D> = Vector.<Vector3D>([new Vector3D()]);
 			var newBoxPoint:Vector.<Vector3D> = Vector.<Vector3D>([new Vector3D()]);
 			
-			var oldDist:Number,newDist:Number,oldDepth:Number,newDepth:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var oldDist:Number,newDist:Number,oldDepth:Number,newDepth:Number,tiny:Number=JMath3D.NUM_TINY;
 			oldDist = box.getDistanceToPoint(box.oldState, oldBoxPoint, sphere.oldState.position);
 			newDist = box.getDistanceToPoint(box.currentState, newBoxPoint, sphere.currentState.position);
 			

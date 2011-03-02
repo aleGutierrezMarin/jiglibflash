@@ -6,6 +6,7 @@
 	import jiglib.data.CollOutBodyData;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.RigidBody;
 	
 	public class CollisionSystemAbstract
@@ -13,6 +14,8 @@
 		public var detectionFunctors:Dictionary;
 		public var collBody:Vector.<RigidBody>;
 		public var _numCollisionsChecks:uint = 0;
+		
+		public var startPoint:Vector3D;//for grid system
 		
 		public function CollisionSystemAbstract()
 		{
@@ -100,7 +103,7 @@
 		
 		public function segmentIntersect(out:CollOutBodyData, seg:JSegment, ownerBody:RigidBody):Boolean
 		{
-			out.frac = JNumber3D.NUM_HUGE;
+			out.frac = JMath3D.NUM_HUGE;
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
 			

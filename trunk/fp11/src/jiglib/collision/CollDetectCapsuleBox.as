@@ -66,12 +66,12 @@ package jiglib.collision
 				var depth:Number = radius - dist;
 
 				var dir:Vector3D;
-				if (dist > JNumber3D.NUM_TINY)
+				if (dist > JMath3D.NUM_TINY)
 				{
 					dir = segPos.subtract(boxPos);
 					dir.normalize();
 				}
-				else if (segPos.subtract(box.oldState.position).length > JNumber3D.NUM_TINY)
+				else if (segPos.subtract(box.oldState.position).length > JMath3D.NUM_TINY)
 				{
 					dir = segPos.subtract(box.oldState.position);
 					dir.normalize();

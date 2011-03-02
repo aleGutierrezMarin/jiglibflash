@@ -4,6 +4,7 @@ package jiglib.geometry
 	
 	import jiglib.data.CollOutData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.PhysicsState;
 
 	// A Segment is a line that starts at origin and goes only as far as (origin + delta).
@@ -46,7 +47,7 @@ package jiglib.geometry
 			fC = kDiff.lengthSquared;
 			fDet = Math.abs(fA00 * fA11 - fA01 * fA01);
 
-			if (fDet >= JNumber3D.NUM_TINY)
+			if (fDet >= JMath3D.NUM_TINY)
 			{
 				fB1 = -kDiff.dotProduct(seg.delta);
 				fS = fA01 * fB1 - fA11 * fB0;

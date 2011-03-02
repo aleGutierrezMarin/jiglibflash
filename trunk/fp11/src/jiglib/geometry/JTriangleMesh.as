@@ -5,8 +5,7 @@ package jiglib.geometry
 	
 	import jiglib.data.CollOutData;
 	import jiglib.data.TriangleVertexIndices;
-	import jiglib.math.JMatrix3D;
-	import jiglib.math.JNumber3D;
+	import jiglib.math.*;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.ISkin3D;
@@ -75,7 +74,7 @@ package jiglib.geometry
 			var potentialTriangles:Vector.<uint> = new Vector.<uint>();
 			var numTriangles:uint = _octree.getTrianglesIntersectingtAABox(potentialTriangles, segBox);
 			
-			var bestFrac:Number = JNumber3D.NUM_HUGE;
+			var bestFrac:Number = JMath3D.NUM_HUGE;
 			var tri:JTriangle;
 			var meshTriangle:JIndexedTriangle;
 			for (var iTriangle:uint = 0 ; iTriangle < numTriangles ; iTriangle++) {
@@ -92,7 +91,7 @@ package jiglib.geometry
 				}
 			}
 			out.frac = bestFrac;
-			if (bestFrac < JNumber3D.NUM_HUGE) {
+			if (bestFrac < JMath3D.NUM_HUGE) {
 				return true;
 			}else {
 				return false;

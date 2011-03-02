@@ -6,6 +6,7 @@ package jiglib.geometry
 	import jiglib.data.PlaneData;
 	import jiglib.data.SpanData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	
 	// Defines a 3d triangle. Each edge goes from the origin. Cross(edge0, edge1)  gives the triangle normal.
 	public class JTriangle
@@ -94,7 +95,7 @@ package jiglib.geometry
 			p = seg.delta.crossProduct(edge1);
 			a = edge0.dotProduct(p);
 			
-			if (a > -JNumber3D.NUM_TINY && a < JNumber3D.NUM_TINY) {
+			if (a > -JMath3D.NUM_TINY && a < JMath3D.NUM_TINY) {
 				return false;
 			}
 			f = 1 / a;

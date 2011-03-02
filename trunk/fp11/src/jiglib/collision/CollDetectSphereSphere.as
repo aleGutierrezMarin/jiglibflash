@@ -36,7 +36,7 @@ package jiglib.collision
 			{
 				oldDist = Math.sqrt(oldDistSq);
 				depth = radSum - oldDist;
-				if (oldDist > JNumber3D.NUM_TINY)
+				if (oldDist > JMath3D.NUM_TINY)
 				{
 					oldDelta = JNumber3D.getDivideVector(oldDelta, oldDist);
 				}

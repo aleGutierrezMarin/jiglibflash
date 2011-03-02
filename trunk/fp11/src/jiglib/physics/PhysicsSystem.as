@@ -43,6 +43,7 @@ package jiglib.physics
 	import jiglib.collision.CollisionSystemGrid;
 	import jiglib.data.ContactData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.constraint.JConstraint;
 	
 	public class PhysicsSystem
@@ -96,11 +97,11 @@ package jiglib.physics
 			setGravity(JNumber3D.getScaleVector(Vector3D.Y_AXIS, -10));
 		}
 		
-		public function setCollisionSystem(collisionSystemGrid:Boolean = false,nx:int=20,ny:int=20,nz:int=20,dx:int=200,dy:int=200,dz:int=200):void {
+		public function setCollisionSystem(collisionSystemGrid:Boolean = false, sx:Number = 0, sy:Number = 0, sz:Number = 0, nx:int = 20, ny:int = 20, nz:int = 20, dx:int = 200, dy:int = 200, dz:int = 200):void {
 			// which collisionsystem to use grid / brute
 			if (collisionSystemGrid)
 			{
-				_collisionSystem = new CollisionSystemGrid(nx,ny,nz,dx,dy,dz);	
+				_collisionSystem = new CollisionSystemGrid(sx, sy, sz, nx, ny, nz, dx, dy, dz);
 			}
 			else {
 				_collisionSystem = new CollisionSystemBrute(); // brute by default	
@@ -111,12 +112,7 @@ package jiglib.physics
 		{
 			return _collisionSystem;
 		}
-
-		public function set collisionSystem(collisionSystem:CollisionSystemAbstract):void
-		{
-			_collisionSystem = collisionSystem;
-		}
-
+		
 		public function setGravity(gravity:Vector3D):void
 		{
 			_gravity = gravity;
@@ -288,7 +284,7 @@ package jiglib.physics
 			body1 = collision.objInfo.body1;
 			
 			var N:Vector3D = collision.dirToBody,tempV:Vector3D;
-			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,tiny:Number=JNumber3D.NUM_TINY,allowedPenetration:Number=JConfig.allowedPenetration;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,tiny:Number=JMath3D.NUM_TINY,allowedPenetration:Number=JConfig.allowedPenetration;
 			var ptInfo:CollPointInfo;
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
@@ -359,7 +355,7 @@ package jiglib.physics
 			body1 = collision.objInfo.body1;
 			
 			var N:Vector3D = collision.dirToBody,tempV:Vector3D;
-			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,tiny:Number=JNumber3D.NUM_TINY,allowedPenetration:Number=JConfig.allowedPenetration;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,tiny:Number=JMath3D.NUM_TINY,allowedPenetration:Number=JConfig.allowedPenetration;
 			var ptInfo:CollPointInfo;
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
@@ -421,7 +417,7 @@ package jiglib.physics
 			body1 = collision.objInfo.body1;
 			
 			var N:Vector3D = collision.dirToBody,tempV:Vector3D;
-			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,numTiny:Number = JNumber3D.NUM_TINY,allowedPenetration:Number = JConfig.allowedPenetration;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,numTiny:Number = JMath3D.NUM_TINY,allowedPenetration:Number = JConfig.allowedPenetration;
 			var ptInfo:CollPointInfo;
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
@@ -530,7 +526,7 @@ package jiglib.physics
 			body1 = collision.objInfo.body1;
 			
 			var gotOne:Boolean=false;
-			var deltaVel:Number=0,normalVel:Number=0,finalNormalVel:Number=0,normalImpulse:Number=0,tangent_speed:Number,denominator:Number,impulseToReverse:Number,impulseFromNormalImpulse:Number,frictionImpulse:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var deltaVel:Number=0,normalVel:Number=0,finalNormalVel:Number=0,normalImpulse:Number=0,tangent_speed:Number,denominator:Number,impulseToReverse:Number,impulseFromNormalImpulse:Number,frictionImpulse:Number,tiny:Number=JMath3D.NUM_TINY;
 			var N:Vector3D = collision.dirToBody,impulse:Vector3D,Vr0:Vector3D,Vr1:Vector3D,tempV:Vector3D,VR:Vector3D,tangent_vel:Vector3D,T:Vector3D;
 			var ptInfo:CollPointInfo;
 			
@@ -626,7 +622,7 @@ package jiglib.physics
 			body1 = collision.objInfo.body1;
 			
 			var gotOne:Boolean=false;
-			var deltaVel:Number=0,normalVel:Number=0,finalNormalVel:Number=0,normalImpulse:Number=0,tangent_speed:Number,denominator:Number,impulseToReverse:Number,AFIMag:Number,maxAllowedAFIMag:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var deltaVel:Number=0,normalVel:Number=0,finalNormalVel:Number=0,normalImpulse:Number=0,tangent_speed:Number,denominator:Number,impulseToReverse:Number,AFIMag:Number,maxAllowedAFIMag:Number,tiny:Number=JMath3D.NUM_TINY;
 			var N:Vector3D = collision.dirToBody,impulse:Vector3D,Vr0:Vector3D,Vr1:Vector3D,tempV:Vector3D,VR:Vector3D,tangent_vel:Vector3D,T:Vector3D,frictionImpulseVec:Vector3D,origAccumulatedFrictionImpulse:Vector3D,actualFrictionImpulse:Vector3D;
 			var ptInfo:CollPointInfo;
 			
@@ -1021,7 +1017,7 @@ package jiglib.physics
 			_activeBodies.fixed = true;
 			_collisionSystem.detectCollisions(body, _collisions);
 			
-			var tiny:Number=JNumber3D.NUM_TINY;
+			var tiny:Number=JMath3D.NUM_TINY;
 			var other_body:RigidBody;
 			var thisBody_normal:Vector3D;
 			

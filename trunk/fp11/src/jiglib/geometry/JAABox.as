@@ -3,6 +3,7 @@
 	
 	import jiglib.data.EdgeData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	
 	// An axis-aligned box
 	public class JAABox {
@@ -61,7 +62,7 @@
 		}
 		
 		public function clear():void {
-			var huge:Number=JNumber3D.NUM_HUGE;
+			var huge:Number=JMath3D.NUM_HUGE;
 			minPos = new Vector3D(huge, huge, huge);
 			maxPos = new Vector3D( -huge, -huge, -huge);
 		}
@@ -76,7 +77,7 @@
 		
 		
 		public function addPoint(pos:Vector3D):void {
-			var tiny:Number=JNumber3D.NUM_TINY;
+			var tiny:Number=JMath3D.NUM_TINY;
 			if (pos.x < minPos.x) minPos.x = pos.x - tiny;
 			if (pos.x > maxPos.x) maxPos.x = pos.x + tiny;
 			if (pos.y < minPos.y) minPos.y = pos.y - tiny;
@@ -209,7 +210,7 @@
 		
 		public function segmentAABoxOverlap(seg:JSegment):Boolean {
 			var jDir:int,kDir:int,i:int,iFace:int;
-			var frac:Number,dist0:Number,dist1:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var frac:Number,dist0:Number,dist1:Number,tiny:Number=JMath3D.NUM_TINY;
 			
 			var pt:Vector.<Number>,minPosArr:Vector.<Number>,maxPosArr:Vector.<Number>,p0:Vector.<Number>,p1:Vector.<Number>,faceOffsets:Vector.<Number>;
 			minPosArr = JNumber3D.toArray(minPos);

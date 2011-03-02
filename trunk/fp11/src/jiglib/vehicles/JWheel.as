@@ -356,7 +356,7 @@
 				return;
 			}
 			var origAngVel:Number = _angVel;
-			_upSpeed = (_displacement - _lastDisplacement) / Math.max(dt, JNumber3D.NUM_TINY);
+			_upSpeed = (_displacement - _lastDisplacement) / Math.max(dt, JMath3D.NUM_TINY);
 
 			if (_locked)
 			{

@@ -2,6 +2,7 @@
 {
 	import flash.geom.Vector3D;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 
 	public class PlaneData
 	{
@@ -50,7 +51,7 @@
 			_normal = dr1.crossProduct(dr2);
 			
 			var nLen:Number = _normal.length;
-			if (nLen < JNumber3D.NUM_TINY) {
+			if (nLen < JMath3D.NUM_TINY) {
 				_normal = new Vector3D(0, 1, 0);
 				_distance = 0;
 			}else {

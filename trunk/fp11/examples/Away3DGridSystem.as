@@ -18,6 +18,7 @@
 	import flash.system.Capabilities;
 	import flash.utils.getTimer;
 	
+	import jiglib.cof.JConfig;
 	import jiglib.debug.Stats;
 	import jiglib.math.JNumber3D;
 	import jiglib.physics.PhysicsSystem;
@@ -34,7 +35,8 @@
 	public class Away3DGridSystem extends Sprite 
 	{
 		// var settings
-		private var numSpheres				: uint = 100; // how many sphere's to spawn at start, total objects max is 163 (164 total) due flash limits
+		private var numSpheres				: uint = 60; // how many sphere's to spawn at start, total objects max is 163 (164 total) due flash limits
+		private var numBoxes				: uint = 60;// how many box's to spawn at start
 		private var gridSystem				: Boolean = true; // use grid system for physics, otherwise bruteforce is used
 		
 		// 3d engine
@@ -83,11 +85,13 @@
 		}
 
 		private function setup3DPhysicEngine():void {
+			
+			JConfig.solverType = "FAST";
 			physics = new Away3D4Physics(view, 8);
 			
 			// setup grid system, only use it when having lots of objects otherwise it may slow down
 			if (gridSystem) {
-				physics.engine.setCollisionSystem(true,20,20,20,200,200,200); // 0,0,0 is start point of the grid to positive numbers, might change in future
+				physics.engine.setCollisionSystem(true, -1500, 0, -1500, 30, 30, 30, 100, 100, 100);
 			}
 		}
 
@@ -97,7 +101,7 @@
 			sleepMat.ambientColor = 0xadadad;
 			sleepMat.specular = .25;
 		
-			awakeMat = new ColorMaterial(0x3f2500);		
+			awakeMat = new ColorMaterial(0xeeee00);		
 			awakeMat.lights = [light];
 			awakeMat.ambientColor = 0xadadad;
 			awakeMat.specular = .25;
@@ -108,11 +112,11 @@
 			rigidBodies = new Vector.<RigidBody>;			
 
 			// ground
-			ground = physics.createGround(new ColorMaterial(0x00ce22), 10000, 10000, 4, 4,true,0);
+			ground = physics.createGround(new ColorMaterial(0x00ce22), 10000, 10000, 1, 1,true,0);
 			ground.rotationX = 90;
 			ground.movable = false;
 			ground.friction = 0.2;
-			ground.restitution = 0.8;
+			ground.restitution = 0.9;
 			//var groundMesh:Mesh = Away3D4Mesh(ground.skin).mesh; // get ref. to mesh
 			rigidBodies.push(ground);
 			
@@ -120,27 +124,32 @@
 			for (var i:int = 0;i<numSpheres;i++) {
 				spawnNewSphere();
 			}
+			// spawn box
+			for (i = 0;i<numBoxes;i++) {
+				spawnNewCube();
+			}
 		}
 		
 		private function spawnNewSphere(evt:Event=null):void
 		{
-			// material
-			var color:uint = 0xFFFFFF * Math.random();
+			// each material execute one draw call so just use one material for all bodies
+			
+			/*var color:uint = 0xFFFFFF * Math.random();
 			var mat:ColorMaterial = new ColorMaterial(color);
 			mat.lights = [light];
 			mat.ambientColor = 0xadadad;
-			mat.specular = .25;
+			mat.specular = .25;*/
 			
 			// physics and 3d object
-			var radius:Number = 20;
-			var nextSphere:RigidBody = physics.createSphere(mat,radius,24,16,true);
+			var radius:Number = 25;
+			var nextSphere:RigidBody = physics.createSphere(awakeMat,radius,10,10,true);
 			nextSphere.friction = .1;
-			nextSphere.restitution = .2;
+			nextSphere.restitution = .9;
 
 			// position
-			nextSphere.x = 500+2000*Math.random();
+			nextSphere.x = -1000+2000*Math.random();
 			nextSphere.y = 1000+1000*Math.random();
-			nextSphere.z = 500+2000*Math.random();
+			nextSphere.z = -1000+2000*Math.random();
 
 			// enable mouseevents on mesh
 			var meshSphere:Away3D4Mesh = nextSphere.skin as Away3D4Mesh;
@@ -159,21 +168,24 @@
 		
 		private function spawnNewCube(evt:Event=null):void
 		{
-			var width:Number = (Math.random() * 80) + 20;
-			var depth:Number = (Math.random() * 50) + 20;
-			var height:Number = (Math.random() * 80) + 20;
-			var color:uint = 0xFFFFFF * Math.random();
-			var mat:ColorMaterial = new ColorMaterial(color);
-			var nextCube:RigidBody = physics.createCube(mat,width,height,depth);
-			nextCube.x = 500+2000*Math.random();
+			var width:Number = (Math.random() * 40) + 20;
+			var depth:Number = (Math.random() * 40) + 20;
+			var height:Number = (Math.random() * 40) + 20;
+			//var color:uint = 0xFFFFFF * Math.random();
+			//var mat:ColorMaterial = new ColorMaterial(color);
+			//mat.specular = .25;
+			var nextCube:RigidBody = physics.createCube(awakeMat, width, height, depth);
+			nextCube.x = -1000+2000*Math.random();
 			nextCube.y = 1000+1000*Math.random();
-			nextCube.z = 500+2000*Math.random();
+			nextCube.z = -1000 + 2000 * Math.random();
+			
+			rigidBodies.push(nextCube);
 		}
 
 		// loop
 		private function handleEnterFrame(evt: Event) : void {
 			physics.step();
-			changeMatMeshActive(); // checks if object is active and chang
+			//changeMatMeshActive(); // checks if object is active and chang
 			view.render();
 		}
 		
@@ -213,10 +225,10 @@
 		private function setup3DEngine():void {
 			// camera
 			camera = new Camera3D();
-			camera.x = 1500;
-			camera.y = 150;
-			camera.z = 400;
-			camera.rotationX = -5;
+			camera.x = 0;
+			camera.y = 500;
+			camera.z = -2000;
+			camera.rotationX = -10;
 			
 			view = new View3D(null,camera);
 			view.backgroundColor = 0x0c00ff;
@@ -227,10 +239,10 @@
 			// lights
 			light = new PointLight(); 
 			light.x = 0;
-			light.y = 100;
+			light.y = -2000;
 			light.z = -2000;
-			light.color = 0xfffdd2;
-			light.specular = 1;
+			light.color = 0xffffff;
+			//light.specular = 1;
 			view.scene.addChild(light);
 			
 			this.addChild(view);

@@ -60,7 +60,7 @@
 				return false;
 			}
 
-			var clampedRelPos0Mag:Number,normalVel:Number,denominator:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var clampedRelPos0Mag:Number,normalVel:Number,denominator:Number,tiny:Number=JMath3D.NUM_TINY;
 			var currentVel0:Vector3D,currentVel1:Vector3D,predRelPos0:Vector3D,clampedRelPos0:Vector3D,desiredRelVel0:Vector3D,Vr:Vector3D,N:Vector3D,tempVec1:Vector3D,tempVec2:Vector3D,normalImpulse:Vector3D;
 			
 			currentVel0 = _body0.getVelocity(r0);
