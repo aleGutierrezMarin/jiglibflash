@@ -6,6 +6,7 @@
 	import jiglib.data.PlaneData;
 	import jiglib.data.TerrainData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.PhysicsState;
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.ITerrain;
@@ -99,8 +100,8 @@
 
 			iFrac = 1 - (w - (i0 * _terrain.dw + _terrain.minW)) / _terrain.dw;
 			jFrac = (h - (j0 * _terrain.dh + _terrain.minH)) / _terrain.dh;
-			iFrac = JNumber3D.getLimiteNumber(iFrac, 0, 1);
-			jFrac = JNumber3D.getLimiteNumber(jFrac, 0, 1);
+			iFrac = JMath3D.getLimiteNumber(iFrac, 0, 1);
+			jFrac = JMath3D.getLimiteNumber(jFrac, 0, 1);
 
 			// yUp for lite
 			h00 = _yUp ? _terrain.heights[i0][j0] : -_terrain.heights[i0][j0];
@@ -159,7 +160,7 @@
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
 
-			var segY:Number,depthEnd:Number,weightStart:Number,weightEnd:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var segY:Number,depthEnd:Number,weightStart:Number,weightEnd:Number,tiny:Number=JMath3D.NUM_TINY;
 			// yUp for lite
 			segY = _yUp ? seg.delta.y : -seg.delta.y;
 

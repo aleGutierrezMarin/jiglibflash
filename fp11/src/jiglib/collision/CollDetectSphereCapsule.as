@@ -58,7 +58,7 @@ package jiglib.collision
 				var dist:Number = Math.sqrt(oldDistSq);
 				var depth:Number = radSum - dist;
 
-				if (dist > JNumber3D.NUM_TINY)
+				if (dist > JMath3D.NUM_TINY)
 				{
 					delta = JNumber3D.getDivideVector(delta, dist);
 				}

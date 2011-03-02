@@ -1,8 +1,6 @@
 package  
 {
-	import away3d.containers.ObjectContainer3D;
 	import away3d.containers.View3D;
-	import away3d.entities.Mesh;
 	import away3d.events.LoaderEvent;
 	import away3d.events.ResourceEvent;
 	import away3d.lights.PointLight;
@@ -11,6 +9,8 @@ package
 	import away3d.materials.BitmapMaterial;
 	import away3d.materials.ColorMaterial;
 	import away3d.primitives.Cube;
+	import away3d.entities.Mesh;
+	import away3d.containers.ObjectContainer3D;
 	
 	import flash.display.*;
 	import flash.events.*;
@@ -26,12 +26,13 @@ package
 	import jiglib.vehicles.JWheel;
 		
 	/**
+	 * ...
 	 * @author Muzer
 	 */
-	 [SWF(width="960", height="540", frameRate="60")]
+	 [SWF(width="800", height="600", frameRate="60")]
 	public class Away3DCarDrive extends Sprite
 	{
-		[Embed(source="assets/fskin.jpg")]
+		[Embed(source="res/fskin.jpg")]
         private var CarSkin : Class;
 		
 		public var view:View3D;
@@ -88,7 +89,7 @@ package
 			}
 			
 			ResourceManager.instance.addEventListener(ResourceEvent.RESOURCE_RETRIEVED, onResourceRetrieved);
-			container=ObjectContainer3D(ResourceManager.instance.getResource("assets/car.obj"));
+			container=ObjectContainer3D(ResourceManager.instance.getResource("res/car.obj"));
 			view.scene.addChild(container);
 			
 			carMaterial = new BitmapMaterial(new CarSkin().bitmapData);

@@ -1,28 +1,29 @@
 ﻿package 
 {
-    import flash.display.Sprite;
-	import flash.display.Bitmap;
-	import flash.ui.Keyboard;
-    import flash.events.Event;
-	import flash.events.KeyboardEvent;
-	import flash.geom.Vector3D;
-    
     import away3d.containers.*;
+    import away3d.lights.PointLight;
+    import away3d.materials.ColorMaterial;
     import away3d.primitives.*;
-	import away3d.lights.PointLight;
-	import away3d.materials.ColorMaterial;
-	
-	import jiglib.geometry.*;
-	import jiglib.math.*;
-	import jiglib.physics.RigidBody;
-	import jiglib.plugin.away3d4.*;
-	import jiglib.debug.Stats;
-	import jiglib.cof.JConfig;
+    import away3d.entities.Mesh;
     
-    [SWF(backgroundColor="#222266", frameRate="60", width="960", height="540")]
+    import flash.display.Bitmap;
+    import flash.display.Sprite;
+    import flash.events.Event;
+    import flash.events.KeyboardEvent;
+    import flash.geom.Vector3D;
+    import flash.ui.Keyboard;
+    
+    import jiglib.cof.JConfig;
+    import jiglib.debug.Stats;
+    import jiglib.geometry.*;
+    import jiglib.math.*;
+    import jiglib.physics.RigidBody;
+    import jiglib.plugin.away3d4.*;
+    
+    [SWF(backgroundColor="#222266", frameRate="60", width="800", height="600")]
     public class Away3DTerrainTest extends Sprite
     {
-		[Embed(source="assets/hightmap3.jpg")]
+		[Embed(source="res/hightmap3.jpg")]
         public var TERRIAN_MAP:Class;
 		
         public var view:View3D;
@@ -59,8 +60,8 @@
 			mylight = new PointLight();
 			view.scene.addChild(mylight);
 			mylight.color = 0xffffff;
-			mylight.y = 700;
-			mylight.z = -700;
+			mylight.y = 800;
+			mylight.z = -800;
 			
 			view.camera.y = mylight.y;
 			view.camera.z = mylight.z;
@@ -68,14 +69,14 @@
 			
 			JConfig.solverType="FAST";
 			physics = new Away3D4Physics(view, 8);
+			physics.engine.setCollisionSystem(true, -500, -500, -500, 20, 20, 20, 100, 100, 100);
 			
 			materia1 = new ColorMaterial(0x77ee77);
 			materia1.lights = [mylight];
 			
 			//create terrain
 			var terrainBMD:Bitmap = new TERRIAN_MAP;
-			terrain = physics.createTerrain(terrainBMD.bitmapData,materia1,800,800,50,50,300);
-			terrain.friction = 0.1;
+			terrain = physics.createTerrain(terrainBMD.bitmapData,materia1,1000,1000,50,50,300);
 			
 			materia1 = new ColorMaterial(0xeeee00);
 			materia1.lights = [mylight];

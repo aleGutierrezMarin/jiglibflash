@@ -12,7 +12,6 @@ package jiglib.collision
 	public class CollisionSystemGrid extends CollisionSystemAbstract
 	{
 		private var gridEntries 	: Vector.<CollisionSystemGridEntry>;		
-		//private var gridBoxes:Vector.<JAABox>;
 		
 		private var overflowEntries	: CollisionSystemGridEntry;
 		
@@ -34,7 +33,9 @@ package jiglib.collision
 		/*
 		* Initializes a new CollisionSystem which uses a grid to speed up collision detection.
 		* Use this system for larger scenes with many objects.
-		*
+		* @param sx start point of grid in X axis.
+		* @param sy start point of grid in Y axis.
+		* @param sz start point of grid in Z axis.
 		* @param nx Number of GridEntries in X Direction.
 		* @param ny Number of GridEntries in Y Direction.
 		* @param nz Number of GridEntries in Z Direction.
@@ -42,10 +43,10 @@ package jiglib.collision
 		* @param dy Size of a single GridEntry in Y Direction.
 		* @param dz Size of a single GridEntry in Z Direction.
 		*/
-		public function CollisionSystemGrid(nx:int, ny:int, nz:int, dx:Number, dy:Number, dz:Number)
+		public function CollisionSystemGrid(sx:Number = 0, sy:Number = 0, sz:Number = 0, nx:int = 20, ny:int = 20, nz:int = 20, dx:Number = 200, dy:Number = 200, dz:Number = 200)
 		{
 			super();
-
+			
 			this.nx = nx; this.ny = ny; this.nz = nz;
 			this.dx = dx; this.dy = dy; this.dz = dz;
 			this.sizeX = nx * dx;
@@ -53,8 +54,9 @@ package jiglib.collision
 			this.sizeZ = nz * dz;
 			this.minDelta = Math.min(dx, dy, dz);
 			
+			startPoint = new Vector3D(sx, sy, sz);
+			
 			gridEntries = new Vector.<CollisionSystemGridEntry>(nx*ny*nz,true);
-			//gridBoxes = new Vector.<JAABox>(nx*ny*nz,true);
 			
 			var len:int=gridEntries.length;
 			for (var j:int = 0; j < len; ++j)
@@ -66,22 +68,7 @@ package jiglib.collision
 			
 			overflowEntries = new CollisionSystemGridEntry(null);
 			overflowEntries.gridIndex = -1;
-			/*
-			for(var ix:int=0;ix<nx;ix++){
-				for(var iy:int;iy<ny;iy++){
-					for(var iz:int;iz<nz;iz++){
-						var index:int=calcIndex(ix,iy,iz);
-						if(index<gridBoxes.length){
-							gridBoxes[index]=new JAABox();
-							var vc:Vector3D=new Vector3D(ix * dx, iy * dy, iz * dz);
-							gridBoxes[index].addPoint(vc);
-							gridBoxes[index].addPoint(vc.add(new Vector3D(dx, dy, dz)));
-						}
-					}
-				}
-			}*/
 		}
-		
 		
 		private function calcIndex(i:int, j:int, k:int):int
 		{
@@ -91,7 +78,6 @@ package jiglib.collision
 			
 			return (_i + nx * _j + (nx + ny) * _k);
 		}
-
 		
 		private function calcGridForSkin3(colBody:RigidBody):Vector3D
 		{
@@ -100,20 +86,18 @@ package jiglib.collision
 			
 			if ((sides.x > dx) || (sides.y > dy) || (sides.z > dz))
 			{
-				//trace("calcGridForSkin3 -- Rigidbody to big for gridsystem - putting it into overflow list (lengths,type,id):", sides.x,sides.y,sides.z,colBody.type,colBody.id,colBody.boundingBox.minPos,colBody.boundingBox.maxPos);
 				i = j = k = -1;
 				return new Vector3D(i,j,k);
 			}
-			//trace(sides.x,sides.y,sides.z);
 			
-			var min:Vector3D = colBody.boundingBox.minPos;
-			min.x = JMath3D.wrap(min.x, 0, sizeX);
-			min.y = JMath3D.wrap(min.y, 0, sizeY);
-			min.z = JMath3D.wrap(min.z, 0, sizeZ);
+			var min:Vector3D = colBody.boundingBox.minPos.clone();
+			min.x = JMath3D.getLimiteNumber(min.x, startPoint.x, startPoint.x + sizeX);
+			min.y = JMath3D.getLimiteNumber(min.y, startPoint.y, startPoint.y + sizeY);
+			min.z = JMath3D.getLimiteNumber(min.z, startPoint.z, startPoint.z + sizeZ);
 			
-			i = int( (min.x / dx) % nx);
-			j = int( (min.y / dy) % ny);
-			k = int( (min.z / dz) % nz);
+			i = int( ((min.x - startPoint.x) / dx) % nx);
+			j = int( ((min.y - startPoint.y) / dy) % ny);
+			k = int( ((min.z - startPoint.z) / dz) % nz);
 			
 			return new Vector3D(i,j,k);
 		}
@@ -136,15 +120,15 @@ package jiglib.collision
 				return tempStoreObject;
 			}
 			
-			var min:Vector3D = colBody.boundingBox.minPos;
+			var min:Vector3D = colBody.boundingBox.minPos.clone();
 
-			min.x = JMath3D.wrap(min.x, 0, sizeX);
-			min.y = JMath3D.wrap(min.y, 0, sizeY);
-			min.z = JMath3D.wrap(min.z, 0, sizeZ);
+			min.x = JMath3D.getLimiteNumber(min.x, startPoint.x, startPoint.x + sizeX);
+			min.y = JMath3D.getLimiteNumber(min.y, startPoint.y, startPoint.y + sizeY);
+			min.z = JMath3D.getLimiteNumber(min.z, startPoint.z, startPoint.z + sizeZ);
 			
-			fi = min.x / dx;
-			fj = min.y / dy;
-			fk = min.z / dz;
+			fi = (min.x - startPoint.x) / dx;
+			fj = (min.y - startPoint.y) / dy;
+			fk = (min.z - startPoint.z) / dz;
 			
 			i = int(fi);
 			j = int(fj);

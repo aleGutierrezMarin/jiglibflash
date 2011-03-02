@@ -6,6 +6,7 @@ package jiglib.geometry
 	import jiglib.data.OctreeCell;
 	import jiglib.data.TriangleVertexIndices;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	
 	public class JOctree
 	{
@@ -60,7 +61,7 @@ package jiglib.geometry
 			
 			_vertices = vertices.concat();
 			
-			var NLen:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var NLen:Number,tiny:Number=JMath3D.NUM_TINY;
 			var i0:uint,i1:uint,i2:uint;
 			var dr1:Vector3D,dr2:Vector3D,N:Vector3D;
 			var indexedTriangle:JIndexedTriangle;

@@ -60,7 +60,7 @@ package jiglib.geometry{
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
 			
-			var kss:Number,radiusSq:Number,kee:Number,kes:Number,kgs:Number,keg:Number,kgg:Number,distSq:Number,a:Number,b:Number,c:Number,blah:Number,t:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var kss:Number,radiusSq:Number,kee:Number,kes:Number,kgs:Number,keg:Number,kgg:Number,distSq:Number,a:Number,b:Number,c:Number,blah:Number,t:Number,tiny:Number=JMath3D.NUM_TINY;
 			var Ks:Vector3D,Ke:Vector3D,Kg:Vector3D;
 			Ks = seg.delta;
 			kss = Ks.dotProduct(Ks);

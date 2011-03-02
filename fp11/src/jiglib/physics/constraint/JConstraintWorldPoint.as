@@ -65,7 +65,7 @@ package jiglib.physics.constraint {
 			tempV = _body.worldInvInertia.transformVector(tempV);
 			denominator = _body.invMass + N.dotProduct(tempV.crossProduct(R));
 			 
-			if (denominator < JNumber3D.NUM_TINY) {
+			if (denominator < JMath3D.NUM_TINY) {
 				return false;
 			}
 			 

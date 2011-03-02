@@ -8,6 +8,7 @@ package jiglib.collision
 	import jiglib.geometry.JTriangle;
 	import jiglib.geometry.JTriangleMesh;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.MaterialProperties;
 	import jiglib.physics.RigidBody;
 	
@@ -34,7 +35,7 @@ package jiglib.collision
 			var potentialTriangles:Vector.<uint> = new Vector.<uint>();
 			var numTriangles:uint = mesh.octree.getTrianglesIntersectingtAABox(potentialTriangles, sphere.boundingBox);
 			
-			var newD2:Number,distToCentre:Number,oldD2:Number,dist:Number,depth:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var newD2:Number,distToCentre:Number,oldD2:Number,dist:Number,depth:Number,tiny:Number=JMath3D.NUM_TINY;
 			var meshTriangle:JIndexedTriangle;
 			var vertexIndices:Vector.<uint>;
 			var arr:Vector.<Number>;

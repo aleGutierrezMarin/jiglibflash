@@ -13,6 +13,7 @@ package jiglib.collision
 	import jiglib.geometry.JTriangle;
 	import jiglib.geometry.JTriangleMesh;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.MaterialProperties;
 	import jiglib.physics.RigidBody;
 	
@@ -29,7 +30,7 @@ package jiglib.collision
 		{
 			var obj0:SpanData = box.getSpan(axis);
 			var obj1:SpanData = triangle.getSpan(axis);
-			var obj0Min:Number=obj0.min,obj0Max:Number=obj0.max,obj1Min:Number=obj1.min,obj1Max:Number=obj1.max,tiny:Number=JNumber3D.NUM_TINY;
+			var obj0Min:Number=obj0.min,obj0Max:Number=obj0.max,obj1Min:Number=obj1.min,obj1Max:Number=obj1.max,tiny:Number=JMath3D.NUM_TINY;
 			
 			if (obj0Min > (obj1Max + JConfig.collToll + tiny) || obj1Min > (obj0Max + JConfig.collToll + tiny))
 			{
@@ -135,7 +136,7 @@ package jiglib.collision
 			}
 			
 			var minAxis:int=-1;
-			var tiny:Number=JNumber3D.NUM_TINY,minDepth:Number=JNumber3D.NUM_HUGE,l2:Number,invl:Number,depth:Number,combinationDist:Number,oldDepth:Number;
+			var tiny:Number=JMath3D.NUM_TINY,minDepth:Number=JMath3D.NUM_HUGE,l2:Number,invl:Number,depth:Number,combinationDist:Number,oldDepth:Number;
 
 			for(i = 0; i < numAxes; i++){
 				l2=axes[i].lengthSquared;

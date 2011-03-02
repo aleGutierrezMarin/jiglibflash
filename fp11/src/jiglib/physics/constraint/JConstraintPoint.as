@@ -40,9 +40,9 @@ package jiglib.physics.constraint
 			_body1Pos = body1Pos;
 			_allowedDistance = allowedDistance;
 			_timescale = timescale;
-			if (_timescale < JNumber3D.NUM_TINY)
+			if (_timescale < JMath3D.NUM_TINY)
 			{
-				_timescale = JNumber3D.NUM_TINY;
+				_timescale = JMath3D.NUM_TINY;
 			}
 			body0.addConstraint(this);
 			body1.addConstraint(this);
@@ -105,7 +105,7 @@ package jiglib.physics.constraint
 			tempVec2 = r1.crossProduct(N);
 			tempVec2 = _body1.worldInvInertia.transformVector(tempVec2);
 			denominator = _body0.invMass + _body1.invMass + N.dotProduct(tempVec1.crossProduct(r0)) + N.dotProduct(tempVec2.crossProduct(r1));
-			if (denominator < JNumber3D.NUM_TINY)
+			if (denominator < JMath3D.NUM_TINY)
 			{
 				return false;
 			}

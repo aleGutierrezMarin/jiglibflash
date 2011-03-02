@@ -4,9 +4,6 @@
 
 	public class JNumber3D
 	{
-		public static const NUM_TINY:Number = 0.000001;
-		public static const NUM_HUGE:Number = 1000000;
-
 		public static function toArray(v:Vector3D):Vector.<Number>
 		{
 			var arr:Vector.<Number>=new Vector.<Number>(3,true);
@@ -14,6 +11,16 @@
 			arr[1]=v.y;
 			arr[2]=v.z;
 			return arr;
+		}
+		
+		public static function copyFromArray(v:Vector3D, arr:Vector.<Number>):void
+		{
+			if (arr.length >= 3)
+			{
+				v.x = arr[0];
+				v.y = arr[1];
+				v.z = arr[2];
+			}
 		}
 		
 		public static function getScaleVector(v:Vector3D, s:Number):Vector3D
@@ -41,30 +48,6 @@
 			N.normalize();
 
 			return N;
-		}
-
-		public static function copyFromArray(v:Vector3D, arr:Vector.<Number>):void
-		{
-			if (arr.length >= 3)
-			{
-				v.x = arr[0];
-				v.y = arr[1];
-				v.z = arr[2];
-			}
-		}
-
-		public static function getLimiteNumber(num:Number, min:Number, max:Number):Number
-		{
-			var n:Number = num;
-			if (n < min)
-			{
-				n = min;
-			}
-			else if (n > max)
-			{
-				n = max;
-			}
-			return n;
 		}
 	}
 }

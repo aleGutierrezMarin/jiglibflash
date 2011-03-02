@@ -10,8 +10,7 @@
 	import jiglib.data.CollOutData;
 	import jiglib.geometry.JAABox;
 	import jiglib.geometry.JSegment;
-	import jiglib.math.JMatrix3D;
-	import jiglib.math.JNumber3D;
+	import jiglib.math.*;
 	import jiglib.physics.constraint.JConstraint;
 	import jiglib.plugin.ISkin3D;
 
@@ -108,8 +107,8 @@
 			_invOrientation = JMatrix3D.getInverseMatrix(_currState.orientation);
 			_linVelDamping = new Vector3D(0.999, 0.999, 0.999);
 			_rotVelDamping = new Vector3D(0.999, 0.999, 0.999);
-			_maxLinVelocities = new Vector3D(JNumber3D.NUM_HUGE,JNumber3D.NUM_HUGE,JNumber3D.NUM_HUGE);
-			_maxRotVelocities = new Vector3D(JNumber3D.NUM_HUGE,JNumber3D.NUM_HUGE,JNumber3D.NUM_HUGE);
+			_maxLinVelocities = new Vector3D(JMath3D.NUM_HUGE,JMath3D.NUM_HUGE,JMath3D.NUM_HUGE);
+			_maxRotVelocities = new Vector3D(JMath3D.NUM_HUGE,JMath3D.NUM_HUGE,JMath3D.NUM_HUGE);
 
 			doShockProcessing = true;
 			_velChanged = false;
@@ -129,7 +128,7 @@
 			_lastOrientationForDeactivation = _currState.orientation.clone();
 
 			_type = "Object3D";
-			_boundingSphere = JNumber3D.NUM_HUGE;
+			_boundingSphere = JMath3D.NUM_HUGE;
 			_boundingBox = new JAABox();
 			
 			externalData=null;
@@ -951,9 +950,9 @@
 		//every dimension should be set to 0-1;
 		public function set linVelocityDamping(vel:Vector3D):void
 		{
-			_linVelDamping.x = JNumber3D.getLimiteNumber(vel.x, 0, 1);
-			_linVelDamping.y = JNumber3D.getLimiteNumber(vel.y, 0, 1);
-			_linVelDamping.z = JNumber3D.getLimiteNumber(vel.z, 0, 1);
+			_linVelDamping.x = JMath3D.getLimiteNumber(vel.x, 0, 1);
+			_linVelDamping.y = JMath3D.getLimiteNumber(vel.y, 0, 1);
+			_linVelDamping.z = JMath3D.getLimiteNumber(vel.z, 0, 1);
 		}
 
 		public function get linVelocityDamping():Vector3D
@@ -964,9 +963,9 @@
 		//every dimension should be set to 0-1;
 		public function set rotVelocityDamping(vel:Vector3D):void
 		{
-			_rotVelDamping.x = JNumber3D.getLimiteNumber(vel.x, 0, 1);
-			_rotVelDamping.y = JNumber3D.getLimiteNumber(vel.y, 0, 1);
-			_rotVelDamping.z = JNumber3D.getLimiteNumber(vel.z, 0, 1);
+			_rotVelDamping.x = JMath3D.getLimiteNumber(vel.x, 0, 1);
+			_rotVelDamping.y = JMath3D.getLimiteNumber(vel.y, 0, 1);
+			_rotVelDamping.z = JMath3D.getLimiteNumber(vel.z, 0, 1);
 		}
 
 		public function get rotVelocityDamping():Vector3D
@@ -998,9 +997,9 @@
 
 		private function limitVel():void
 		{
-			_currState.linVelocity.x = JNumber3D.getLimiteNumber(_currState.linVelocity.x, -_maxLinVelocities.x, _maxLinVelocities.x);
-			_currState.linVelocity.y = JNumber3D.getLimiteNumber(_currState.linVelocity.y, -_maxLinVelocities.y, _maxLinVelocities.y);
-			_currState.linVelocity.z = JNumber3D.getLimiteNumber(_currState.linVelocity.z, -_maxLinVelocities.z, _maxLinVelocities.z);
+			_currState.linVelocity.x = JMath3D.getLimiteNumber(_currState.linVelocity.x, -_maxLinVelocities.x, _maxLinVelocities.x);
+			_currState.linVelocity.y = JMath3D.getLimiteNumber(_currState.linVelocity.y, -_maxLinVelocities.y, _maxLinVelocities.y);
+			_currState.linVelocity.z = JMath3D.getLimiteNumber(_currState.linVelocity.z, -_maxLinVelocities.z, _maxLinVelocities.z);
 		}
 
 		private function limitAngVel():void
@@ -1041,7 +1040,7 @@
 
 		public function set restitution(restitution:Number):void
 		{
-			_material.restitution = JNumber3D.getLimiteNumber(restitution, 0, 1);
+			_material.restitution = JMath3D.getLimiteNumber(restitution, 0, 1);
 		}
 
 		//coefficient of friction
@@ -1052,7 +1051,7 @@
 
 		public function set friction(friction:Number):void
 		{
-			_material.friction = JNumber3D.getLimiteNumber(friction, 0, 1);
+			_material.friction = JMath3D.getLimiteNumber(friction, 0, 1);
 		}
 	}
 }

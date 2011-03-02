@@ -27,7 +27,7 @@
 		{
 			var obj0:SpanData = box0.getSpan(axis);
 			var obj1:SpanData = box1.getSpan(axis);
-			var obj0Min:Number=obj0.min,obj0Max:Number=obj0.max,obj1Min:Number=obj1.min,obj1Max:Number=obj1.max,tiny:Number=JNumber3D.NUM_TINY;
+			var obj0Min:Number=obj0.min,obj0Max:Number=obj0.max,obj1Min:Number=obj1.min,obj1Max:Number=obj1.max,tiny:Number=JMath3D.NUM_TINY;
 
 			if (obj0Min > (obj1Max + JConfig.collToll + tiny) || obj1Min > (obj0Max + JConfig.collToll + tiny))
 			{
@@ -67,7 +67,7 @@
 		
 		private function getSupportPoint(box:JBox, axis:Vector3D):Vector3D {
 			var orientationCol:Vector.<Vector3D> = box.currentState.getOrientationCols();
-			var _as:Number=axis.dotProduct(orientationCol[0]),_au:Number=axis.dotProduct(orientationCol[1]),_ad:Number=axis.dotProduct(orientationCol[2]),tiny:Number=JNumber3D.NUM_TINY;
+			var _as:Number=axis.dotProduct(orientationCol[0]),_au:Number=axis.dotProduct(orientationCol[1]),_ad:Number=axis.dotProduct(orientationCol[2]),tiny:Number=JMath3D.NUM_TINY;
 			
 			var p:Vector3D = box.currentState.position.clone();
   
@@ -93,7 +93,7 @@
 
 		private function getAABox2EdgeIntersectionPoints(contactPoint:Vector.<Vector3D>, origBoxSides:Vector3D, origBoxState:PhysicsState, edgePt0:Vector3D, edgePt1:Vector3D):int {
 			var jDir:int,kDir:int,num:int=0,iDir:int,iFace:int;
-			var dist0:Number,dist1:Number,frac:Number,tiny:Number=JNumber3D.NUM_TINY;
+			var dist0:Number,dist1:Number,frac:Number,tiny:Number=JMath3D.NUM_TINY;
 			var pt:Vector3D,edgeDir:Vector3D;
 			
 			edgeDir = edgePt1.subtract(edgePt0);
@@ -178,7 +178,7 @@
 			if (!box0.boundingBox.overlapTest(box1.boundingBox))
 				return;
 
-			var numTiny:Number = JNumber3D.NUM_TINY,numHuge:Number = JNumber3D.NUM_HUGE;
+			var numTiny:Number = JMath3D.NUM_TINY,numHuge:Number = JMath3D.NUM_HUGE;
 
 			var dirs0Arr:Vector.<Vector3D> = box0.currentState.getOrientationCols();
 			var dirs1Arr:Vector.<Vector3D> = box1.currentState.getOrientationCols();
