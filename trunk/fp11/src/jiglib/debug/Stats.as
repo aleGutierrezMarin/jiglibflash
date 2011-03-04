@@ -103,6 +103,10 @@ package jiglib.debug
 			addEventListener(Event.ENTER_FRAME, update);
 		}
 		
+		public function disableSkin():void {
+			removeChild(statsSkinBm);
+		}
+		
 		private function update(e : Event) : void
 		{
 			timer = getTimer();
