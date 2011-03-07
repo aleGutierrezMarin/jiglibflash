@@ -175,7 +175,7 @@ package jiglib.collision
 			delta=boxNewPos.subtract(boxOldPos);
 			oldDepth=depth+delta.dotProduct(N);
 			
-			var numPts:uint=pts.length;
+			var numPts:uint = pts.length;
 			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>(numPts,true);
 			if(numPts>0){
 				var cpInfo:CollPointInfo;
@@ -199,9 +199,12 @@ package jiglib.collision
 				collArr.push(collInfo);
 				info.body0.collisions.push(collInfo);
 				info.body1.collisions.push(collInfo);
-				
+				info.body0.addCollideBody(info.body1);
+				info.body1.addCollideBody(info.body0);
 				return true;
-			}else{
+			}else {
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 				return false;
 			}
 		}

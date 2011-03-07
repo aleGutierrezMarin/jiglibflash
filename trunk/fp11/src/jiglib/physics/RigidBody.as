@@ -1,5 +1,6 @@
 ﻿package jiglib.physics
 {
+	import flash.events.EventDispatcher;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	
@@ -11,20 +12,21 @@
 	import jiglib.geometry.JAABox;
 	import jiglib.geometry.JSegment;
 	import jiglib.math.*;
+	import jiglib.events.JCollisionEvent;
 	import jiglib.physics.constraint.JConstraint;
 	import jiglib.plugin.ISkin3D;
 
-	public class RigidBody
+	public class RigidBody extends EventDispatcher
 	{
 		private static var idCounter:int = 0;
-
+		
 		private var _id:int;
 		private var _skin:ISkin3D;
-
+		
 		protected var _type:String;
 		protected var _boundingSphere:Number;
 		protected var _boundingBox:JAABox;
-
+		
 		protected var _currState:PhysicsState;
 		
 		private var _oldState:PhysicsState;
@@ -32,43 +34,44 @@
 		private var _invOrientation:Matrix3D;
 		private var _currLinVelocityAux:Vector3D;
 		private var _currRotVelocityAux:Vector3D;
-
+		
 		private var _mass:Number;
 		private var _invMass:Number;
 		private var _bodyInertia:Matrix3D;
 		private var _bodyInvInertia:Matrix3D;
 		private var _worldInertia:Matrix3D;
 		private var _worldInvInertia:Matrix3D;
-
+		
 		private var _force:Vector3D;
 		private var _torque:Vector3D;
-
+		
 		private var _linVelDamping:Vector3D;
 		private var _rotVelDamping:Vector3D;
 		private var _maxLinVelocities:Vector3D;
 		private var _maxRotVelocities:Vector3D;
-
+		
 		private var _velChanged:Boolean;
 		private var _activity:Boolean;
 		private var _movable:Boolean;
 		private var _origMovable:Boolean;
 		private var _inactiveTime:Number;
-
+		
 		// The list of bodies that need to be activated when we move away from our stored position
 		private var _bodiesToBeActivatedOnMovement:Vector.<RigidBody>;
-
+		
 		private var _storedPositionForActivation:Vector3D; // The position stored when we need to notify other bodies
 		private var _lastPositionForDeactivation:Vector3D; // last position for when trying the deactivate
 		private var _lastOrientationForDeactivation:Matrix3D; // last orientation for when trying to deactivate
-
+		
 		private var _material:MaterialProperties;
-
+		
 		private var _rotationX:Number = 0;
 		private var _rotationY:Number = 0;
 		private var _rotationZ:Number = 0;
 		private var _useDegrees:Boolean;
-
+		
 		private var _nonCollidables:Vector.<RigidBody>;
+		private var _collideBodies:Vector.<RigidBody>;
 		private var _constraints:Vector.<JConstraint>;
 		
 		// Bypass rapid call to PhysicsSystem, will update only when dirty.
@@ -77,9 +80,8 @@
 		// Calculate only when gravity is dirty or mass is dirty.
 		private var _gravityForce:Vector3D;
 		
-		
 		public var doShockProcessing:Boolean;
-		public var collisions:Vector.<CollisionInfo>;
+		public var collisions:Vector.<CollisionInfo>;//store all collision info of this body
 		public var externalData:CollisionSystemGridEntry; // used when collision system is grid 
 		public var collisionSystem:CollisionSystemAbstract;
 		
@@ -121,6 +123,7 @@
 			collisions = new Vector.<CollisionInfo>();
 			_constraints = new Vector.<JConstraint>();
 			_nonCollidables = new Vector.<RigidBody>();
+			_collideBodies = new Vector.<RigidBody>();
 
 			_storedPositionForActivation = new Vector3D();
 			_bodiesToBeActivatedOnMovement = new Vector.<RigidBody>();
@@ -443,33 +446,7 @@
 
 			_velChanged = true;
 		}
-
-		public function addConstraint(constraint:JConstraint):void
-		{
-			if (!findConstraint(constraint))
-			{
-				_constraints.push(constraint);
-			}
-		}
-
-		public function removeConstraint(constraint:JConstraint):void
-		{
-			if (findConstraint(constraint))
-			{
-				_constraints.splice(_constraints.indexOf(constraint), 1);
-			}
-		}
-
-		public function removeAllConstraints():void
-		{
-			_constraints.splice(0, _constraints.length);
-		}
-
-		private function findConstraint(constraint:JConstraint):Boolean
-		{
-			return _constraints.indexOf(constraint) > -1;
-		}
-
+		
 		// implementation updates the velocity/angular rotation with the force/torque.
 		public function updateVelocity(dt:Number):void
 		{
@@ -831,18 +808,73 @@
 			return _nonCollidables.indexOf(body) > -1;
 		}
 
+		//disable the collision between two bodies
 		public function disableCollisions(body:RigidBody):void
 		{
 			if (!findNonCollidablesBody(body))
 				_nonCollidables.push(body);
 		}
-
+		
+		//enable the collision between disabled bodies
 		public function enableCollisions(body:RigidBody):void
 		{
 			if (findNonCollidablesBody(body))
 				_nonCollidables.splice(_nonCollidables.indexOf(body), 1);
 		}
-
+		
+		
+		//do not call this function youself, this just used in collision system.
+		public function addCollideBody(body:RigidBody):void {
+			if (_collideBodies.indexOf(body) < 0) {
+				
+				_collideBodies.push(body);
+				
+				var event:JCollisionEvent = new JCollisionEvent(JCollisionEvent.COLLISION_START);
+				event.body = body;
+				this.dispatchEvent(event);
+			}
+		}
+		
+		//do not call this function youself, this just used in collision system.
+		public function removeCollideBodies(body:RigidBody):void {
+			var i:int = _collideBodies.indexOf(body);
+			if (i >= 0) {
+				
+				_collideBodies.splice(i, 1);
+				
+				var event:JCollisionEvent = new JCollisionEvent(JCollisionEvent.COLLISION_END);
+				event.body = body;
+				this.dispatchEvent(event);
+			}
+		}
+		
+		
+		private function findConstraint(constraint:JConstraint):Boolean
+		{
+			return _constraints.indexOf(constraint) > -1;
+		}
+		
+		//add a constraint to this rigid body, do not need call this function yourself,
+		//this just used in constraint system
+		public function addConstraint(constraint:JConstraint):void
+		{
+			if (!findConstraint(constraint))
+			{
+				_constraints.push(constraint);
+			}
+		}
+		
+		//remove a constraint from this rigid body, do not need call this function yourself,
+		//this just used in constraint system
+		public function removeConstraint(constraint:JConstraint):void
+		{
+			if (findConstraint(constraint))
+			{
+				_constraints.splice(_constraints.indexOf(constraint), 1);
+			}
+		}
+		
+		
 		// copies the current position etc to old - normally called only by physicsSystem.
 		public function copyCurrentStateToOld():void
 		{

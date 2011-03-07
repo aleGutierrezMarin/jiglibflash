@@ -215,8 +215,11 @@
 				
 				ax = axes[i].clone();
 				ax.normalize();
-				if (disjoint(overlapDepths[i], ax, box0, box1))
+				if (disjoint(overlapDepths[i], ax, box0, box1)) {
+					info.body0.removeCollideBodies(info.body1);
+					info.body1.removeCollideBodies(info.body0);
 					return;
+				}
 			}
 
 			// The box overlap, find the separation depth closest to 0.
@@ -237,8 +240,11 @@
 				}
 			}
 			
-			if (minAxis == -1)
+			if (minAxis == -1) {
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 				return;
+			}
 			
 			// Make sure the axis is facing towards the box0. if not, invert it
 			var N:Vector3D = axes[minAxis].clone();
@@ -411,7 +417,7 @@
 			collInfo.objInfo = info;
 			collInfo.dirToBody = N;
 			collInfo.pointInfo = collPts;
-				
+			
 			var mat:MaterialProperties = new MaterialProperties();
 			mat.restitution = 0.5*(box0.material.restitution + box1.material.restitution);
 			mat.friction = 0.5*(box0.material.friction + box1.material.friction);
@@ -419,6 +425,8 @@
 			collArr.push(collInfo);
 			info.body0.collisions.push(collInfo);
 			info.body1.collisions.push(collInfo);
+			info.body0.addCollideBody(info.body1);
+			info.body1.addCollideBody(info.body0);
 		}
 	}
 }

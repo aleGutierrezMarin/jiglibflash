@@ -4,7 +4,7 @@ package jiglib.physics
 	public class PhysicsController
 	{
 
-		private var _controllerEnabled:Boolean;
+		protected var _controllerEnabled:Boolean;
 
 		public function PhysicsController()
 		{
@@ -19,23 +19,11 @@ package jiglib.physics
 		// register with the physics system
 		public function enableController():void
 		{
-			if (_controllerEnabled)
-			{
-				return;
-			}
-			_controllerEnabled = true;
-			PhysicsSystem.getInstance().addController(this);
 		}
 
 		// deregister from the physics system
 		public function disableController():void
 		{
-			if (!_controllerEnabled)
-			{
-				return;
-			}
-			_controllerEnabled = false;
-			PhysicsSystem.getInstance().removeController(this);
 		}
 
 		// are we registered with the physics system?
