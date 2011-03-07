@@ -142,16 +142,23 @@ package jiglib.physics
 			return _gravityAxis;
 		}
 		
+		//get all rigid bodies in the simulation
 		public function get bodies():Vector.<RigidBody>
 		{
 			return _bodies;
 		}
 
+		//get all activated rigid bodies in the simulation
 		public function get activeBodies():Vector.<RigidBody>
 		{
 			return _activeBodies;
 		}
 		
+		//get all constraints in the simulation
+		public function get constraints():Vector.<JConstraint>
+		{
+			return _constraints;
+		}
 		
 		// Add a rigid body to the simulation
 		public function addBody(body:RigidBody):void
@@ -166,6 +173,7 @@ package jiglib.physics
 			}
 		}
 		
+		//remove a rigid body from the simulation
 		public function removeBody(body:RigidBody):void
 		{
 			if (findBody(body))
@@ -175,45 +183,59 @@ package jiglib.physics
 			}
 		}
 		
+		//remove all rigid bodies from the simulation
 		public function removeAllBodies():void
 		{
 			_bodies.length=0;
 			_collisionSystem.removeAllCollisionBodies();
 		}
 		
-		// Add a constraint to the simulation
+		// add a constraint to the simulation, do not need call this function yourself,
+		// this just used in constraint system
 		public function addConstraint(constraint:JConstraint):void
 		{
 			if (!findConstraint(constraint))
 				_constraints.push(constraint);
 		}
 		
+		//remove a constraint from the simulation, do not need call this function yourself,
+		//this just used in constraint system
 		public function removeConstraint(constraint:JConstraint):void
 		{
 			if (findConstraint(constraint))
 				_constraints.splice(_constraints.indexOf(constraint), 1);
 		}
 		
-		public function removeAllConstraints():void
-		{
-			_constraints.length=0;
+		//remove all constraints from the simulation
+		public function removeAllConstraints():void {
+			for each(var constraint:JConstraint in _constraints) {
+				constraint.disableConstraint();
+			}
+			_constraints.length = 0;
 		}
 		
-		// Add a physics controlled to the simulation
+		// Add a physics controlled to the simulation,do not need call this function yourself,
+		//this just used in PhysicsController
 		public function addController(controller:PhysicsController):void
 		{
 			if (!findController(controller))
 				_controllers.push(controller);
 		}
 		
+		// Remove a physics controlled from the simulation,do not need call this function yourself,
+		//this just used in PhysicsController
 		public function removeController(controller:PhysicsController):void
 		{
 			if (findController(controller))
 				_controllers.splice(_controllers.indexOf(controller), 1);
 		}
 		
+		//remove all controllers from the simulation
 		public function removeAllControllers():void
 		{
+			for each(var controller:PhysicsController in _controllers) {
+				controller.disableController();
+			}
 			_controllers.length=0;
 		}
 		
@@ -1037,7 +1059,7 @@ package jiglib.physics
 				
 			}
 		}
-				
+		
 		private function tryToActivateAllFrozenObjects():void
 		{
 			for each (var body:RigidBody in _bodies)

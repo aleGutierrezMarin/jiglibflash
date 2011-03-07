@@ -38,6 +38,8 @@ package jiglib.collision
 
 			if (Math.min(newDist, oldDist) > sphere.boundingSphere + JConfig.collToll)
 			{
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 				return;
 			}
 
@@ -64,6 +66,8 @@ package jiglib.collision
 			collArr.push(collInfo);
 			info.body0.collisions.push(collInfo);
 			info.body1.collisions.push(collInfo);
+			info.body0.addCollideBody(info.body1);
+			info.body1.addCollideBody(info.body0);
 		}
 	}
 }

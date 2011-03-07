@@ -70,19 +70,25 @@ package jiglib.collision
 					collNormal.normalize();
 				}
 			}
-			
-			var collInfo:CollisionInfo = new CollisionInfo();
-			collInfo.objInfo = info;
-			collInfo.dirToBody = collNormal;
-			collInfo.pointInfo = collPts;
-			
-			var mat:MaterialProperties = new MaterialProperties();
-			mat.restitution = 0.5*(sphere.material.restitution + mesh.material.restitution);
-			mat.friction = 0.5*(sphere.material.friction + mesh.material.friction);
-			collInfo.mat = mat;
-			collArr.push(collInfo);
-			info.body0.collisions.push(collInfo);
-			info.body1.collisions.push(collInfo);
+			if(collPts.length>0){
+				var collInfo:CollisionInfo = new CollisionInfo();
+				collInfo.objInfo = info;
+				collInfo.dirToBody = collNormal;
+				collInfo.pointInfo = collPts;
+				
+				var mat:MaterialProperties = new MaterialProperties();
+				mat.restitution = 0.5*(sphere.material.restitution + mesh.material.restitution);
+				mat.friction = 0.5*(sphere.material.friction + mesh.material.friction);
+				collInfo.mat = mat;
+				collArr.push(collInfo);
+				info.body0.collisions.push(collInfo);
+				info.body1.collisions.push(collInfo);
+				info.body0.addCollideBody(info.body1);
+				info.body1.addCollideBody(info.body0);
+			}else {
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
+			}
 		}
 		
 		override public function collDetect(info:CollDetectInfo, collArr:Vector.<CollisionInfo>):void

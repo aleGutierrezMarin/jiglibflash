@@ -16,7 +16,6 @@ package jiglib.physics
 		private var _body0:RigidBody;
 		private var _body1:RigidBody;
 		private var _usingLimit:Boolean;
-		private var _hingeEnabled:Boolean;
 		private var _broken:Boolean;
 		private var _damping:Number;
 		private var _extraTorque:Number;
@@ -35,7 +34,7 @@ package jiglib.physics
 			_hingeAxis = hingeAxis.clone();
 			_hingePosRel0 = hingePosRel0.clone();
 			_usingLimit = false;
-			_hingeEnabled = false;
+			_controllerEnabled = false;
 			_broken = false;
 			_damping = damping;
 			_extraTorque = 0;
@@ -96,12 +95,12 @@ package jiglib.physics
 				_damping = JMath3D.getLimiteNumber(_damping, 0, 1);
 			}
 
-			enableHinge();
+			enableController();
 		}
 
-		public function enableHinge():void
+		override public function enableController():void
 		{
-			if (_hingeEnabled)
+			if (_controllerEnabled)
 			{
 				return;
 			}
@@ -112,13 +111,13 @@ package jiglib.physics
 			{
 				maxDistanceConstraint.enableConstraint();
 			}
-			enableController();
-			_hingeEnabled = true;
+			_controllerEnabled = true;
+			PhysicsSystem.getInstance().addController(this);
 		}
 
-		public function disableHinge():void
+		override public function disableController():void
 		{
-			if (!_hingeEnabled)
+			if (!_controllerEnabled)
 			{
 				return;
 			}
@@ -129,8 +128,8 @@ package jiglib.physics
 			{
 				maxDistanceConstraint.disableConstraint();
 			}
-			disableController();
-			_hingeEnabled = false;
+			_controllerEnabled = false;
+			PhysicsSystem.getInstance().removeController(this);
 		}
 
 		public function breakHinge():void
@@ -162,11 +161,6 @@ package jiglib.physics
 		public function setExtraTorque(torque:Number):void
 		{
 			_extraTorque = torque;
-		}
-
-		public function getHingeEnabled():Boolean
-		{
-			return _hingeEnabled;
 		}
 
 		public function isBroken():Boolean

@@ -5,6 +5,7 @@ package jiglib.physics.constraint
 	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
+	import jiglib.physics.PhysicsSystem;
 
 	// Constraints a point on one body to be fixed to a point on another body
 	public class JConstraintPoint extends JConstraint
@@ -44,8 +45,33 @@ package jiglib.physics.constraint
 			{
 				_timescale = JMath3D.NUM_TINY;
 			}
-			body0.addConstraint(this);
-			body1.addConstraint(this);
+			
+			_constraintEnabled = false;
+			enableConstraint();
+		}
+		
+		override public function enableConstraint():void
+		{
+			if (_constraintEnabled)
+			{
+				return;
+			}
+			_constraintEnabled = true;
+			_body0.addConstraint(this);
+			_body1.addConstraint(this);
+			PhysicsSystem.getInstance().addConstraint(this);
+		}
+		
+		override public function disableConstraint():void
+		{
+			if (!_constraintEnabled)
+			{
+				return;
+			}
+			_constraintEnabled = false;
+			_body0.removeConstraint(this);
+			_body1.removeConstraint(this);
+			PhysicsSystem.getInstance().removeConstraint(this);
 		}
 
 		override public function preApply(dt:Number):void

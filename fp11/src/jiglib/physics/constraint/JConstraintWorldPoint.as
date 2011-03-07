@@ -2,9 +2,10 @@ package jiglib.physics.constraint {
 
 	import flash.geom.Vector3D;
 	
-	import jiglib.collision.CollisionInfo;
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
+	import jiglib.physics.PhysicsSystem;
+	import jiglib.collision.CollisionInfo;
 	
 	// Constrains a point within a rigid body to remain at a fixed world point
 	public class JConstraintWorldPoint extends JConstraint {
@@ -23,7 +24,9 @@ package jiglib.physics.constraint {
 			_body = body;
 			_pointOnBody = pointOnBody;
 			_worldPosition = worldPosition;
-			body.addConstraint(this);
+			
+			_constraintEnabled = false;
+			enableConstraint();
 		}
 		
 		public function set worldPosition(pos:Vector3D):void {
@@ -32,6 +35,28 @@ package jiglib.physics.constraint {
 		
 		public function get worldPosition():Vector3D {
 			return _worldPosition;
+		}
+		
+		override public function enableConstraint():void
+		{
+			if (_constraintEnabled)
+			{
+				return;
+			}
+			_constraintEnabled = true;
+			_body.addConstraint(this);
+			PhysicsSystem.getInstance().addConstraint(this);
+		}
+		
+		override public function disableConstraint():void
+		{
+			if (!_constraintEnabled)
+			{
+				return;
+			}
+			_constraintEnabled = false;
+			_body.removeConstraint(this);
+			PhysicsSystem.getInstance().removeConstraint(this);
 		}
 		
 		override public function apply(dt:Number):Boolean {
