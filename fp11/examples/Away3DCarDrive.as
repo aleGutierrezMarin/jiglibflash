@@ -18,6 +18,7 @@ package
 	import flash.geom.Vector3D;
 	import flash.ui.Keyboard;
 	
+	import jiglib.cof.JConfig;
 	import jiglib.debug.Stats;
 	import jiglib.math.*;
 	import jiglib.physics.*;
@@ -85,7 +86,7 @@ package
 			for (var i:int = 0; i < 3; i++)
 			{
 				boxBody[i] = physics.createCube(materia, 60, 50, 80 );
-				boxBody[i].moveTo(new Vector3D(0, 10 + (30 * i + 30), 0));
+				boxBody[i].moveTo(new Vector3D(0, 10 + (50 * i + 50), 0));
 			}
 			
 			ResourceManager.instance.addEventListener(ResourceEvent.RESOURCE_RETRIEVED, onResourceRetrieved);

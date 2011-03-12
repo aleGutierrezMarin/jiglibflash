@@ -137,8 +137,8 @@ package jiglib.physics.constraint
 			}
 
 			normalImpulse = JNumber3D.getScaleVector(N, -normalVel / denominator);
-			_body0.applyWorldImpulse(normalImpulse, _worldPos);
-			_body1.applyWorldImpulse(JNumber3D.getScaleVector(normalImpulse, -1), _worldPos);
+			_body0.applyWorldImpulse(normalImpulse, _worldPos, false);
+			_body1.applyWorldImpulse(JNumber3D.getScaleVector(normalImpulse, -1), _worldPos, false);
 
 			_body0.setConstraintsAndCollisionsUnsatisfied();
 			_body1.setConstraintsAndCollisionsUnsatisfied();

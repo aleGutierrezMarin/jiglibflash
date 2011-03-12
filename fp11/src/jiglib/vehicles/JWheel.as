@@ -334,7 +334,7 @@
 			_angVelForGrip = wheelCentreVel.dotProduct(groundFwd) / _radius;
 			_torque += (-fwdForce * _radius);
 
-			carBody.addWorldForce(force, groundPos);
+			carBody.addWorldForce(force, groundPos, false);
 			if (otherBody.movable)
 			{
 				var maxOtherBodyAcc:Number = 500;
@@ -343,7 +343,7 @@
 				{
 					force = JNumber3D.getScaleVector(force, maxOtherBodyForce / force.length);
 				}
-				otherBody.addWorldForce(JNumber3D.getScaleVector(force, -1), groundPos);
+				otherBody.addWorldForce(JNumber3D.getScaleVector(force, -1), groundPos, false);
 			}
 			return true;
 		}

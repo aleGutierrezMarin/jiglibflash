@@ -50,13 +50,13 @@
 
 		public function addCollisionBody(body:RigidBody):void
 		{
-			if (!findBody(body))
+			if (collBody.indexOf(body) < 0)
 				collBody.push(body);
 		}
 		
 		public function removeCollisionBody(body:RigidBody):void
 		{
-			if (findBody(body))
+			if (collBody.indexOf(body) >= 0)
 				collBody.splice(collBody.indexOf(body), 1);
 		}
 
@@ -157,11 +157,6 @@
 		public function get numCollisionsChecks():uint
 		{
 			return _numCollisionsChecks;	
-		}
-
-		protected function findBody(body:RigidBody):Boolean
-		{
-			return collBody.indexOf(body) > -1;
 		}
 		
 		protected function checkCollidables(body0:RigidBody, body1:RigidBody):Boolean
