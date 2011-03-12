@@ -50,8 +50,6 @@
 		private var _maxLinVelocities:Vector3D;
 		private var _maxRotVelocities:Vector3D;
 		
-		private var _velChanged:Boolean;
-		private var _activity:Boolean;
 		private var _movable:Boolean;
 		private var _origMovable:Boolean;
 		private var _inactiveTime:Number;
@@ -80,7 +78,6 @@
 		// Calculate only when gravity is dirty or mass is dirty.
 		private var _gravityForce:Vector3D;
 		
-		public var doShockProcessing:Boolean;
 		public var collisions:Vector.<CollisionInfo>;//store all collision info of this body
 		public var externalData:CollisionSystemGridEntry; // used when collision system is grid 
 		public var collisionSystem:CollisionSystemAbstract;
@@ -112,11 +109,8 @@
 			_maxLinVelocities = new Vector3D(JMath3D.NUM_HUGE,JMath3D.NUM_HUGE,JMath3D.NUM_HUGE);
 			_maxRotVelocities = new Vector3D(JMath3D.NUM_HUGE,JMath3D.NUM_HUGE,JMath3D.NUM_HUGE);
 
-			doShockProcessing = true;
-			_velChanged = false;
 			_inactiveTime = 0;
-
-			isActive = _activity = true;
+			isActive = true;
 			_movable = true;
 			_origMovable = true;
 
@@ -336,46 +330,46 @@
 			_gravityForce = JNumber3D.getScaleVector(_gravity, _mass);
 		}
 
-		public function addWorldTorque(t:Vector3D):void
+		public function addWorldTorque(t:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 			{
 				return;
 			}
 			_torque = _torque.add(t);
-			_velChanged = true;
-			setActive();
+			
+			if (active) setActive();
 		}
 
-		public function addBodyTorque(t:Vector3D):void
+		public function addBodyTorque(t:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 				return;
 
-			addWorldTorque(_currState.orientation.transformVector(t));
+			addWorldTorque(_currState.orientation.transformVector(t), active);
 		}
 
 		// functions to add forces in the world coordinate frame
-		public function addWorldForce(f:Vector3D, p:Vector3D):void
+		public function addWorldForce(f:Vector3D, p:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 				return;
 
 			_force = _force.add(f);
 			addWorldTorque(p.subtract(_currState.position).crossProduct(f));
-			_velChanged = true;
-			setActive();
+			
+			if (active) setActive();
 		}
 
 		// functions to add forces in the body coordinate frame
-		public function addBodyForce(f:Vector3D, p:Vector3D):void
+		public function addBodyForce(f:Vector3D, p:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 				return;
 
 			f = _currState.orientation.transformVector(f);
 			p = _currState.orientation.transformVector(p);
-			addWorldForce(f, _currState.position.add(p));
+			addWorldForce(f, _currState.position.add(p), active);
 		}
 
 		// This just sets all forces etc to zero.
@@ -386,7 +380,7 @@
 		}
 
 		// functions to add impulses in the world coordinate frame
-		public function applyWorldImpulse(impulse:Vector3D, pos:Vector3D):void
+		public function applyWorldImpulse(impulse:Vector3D, pos:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 			{
@@ -398,10 +392,10 @@
 			rotImpulse = _worldInvInertia.transformVector(rotImpulse);
 			_currState.rotVelocity = _currState.rotVelocity.add(rotImpulse);
 
-			_velChanged = true;
+			if (active) setActive();
 		}
 
-		public function applyWorldImpulseAux(impulse:Vector3D, pos:Vector3D):void
+		public function applyWorldImpulseAux(impulse:Vector3D, pos:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 			{
@@ -413,11 +407,11 @@
 			rotImpulse = _worldInvInertia.transformVector(rotImpulse);
 			_currRotVelocityAux = _currRotVelocityAux.add(rotImpulse);
 
-			_velChanged = true;
+			if (active) setActive();
 		}
 
 		// functions to add impulses in the body coordinate frame
-		public function applyBodyWorldImpulse(impulse:Vector3D, delta:Vector3D):void
+		public function applyBodyWorldImpulse(impulse:Vector3D, delta:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 			{
@@ -429,10 +423,10 @@
 			rotImpulse = _worldInvInertia.transformVector(rotImpulse);
 			_currState.rotVelocity = _currState.rotVelocity.add(rotImpulse);
 
-			_velChanged = true;
+			if (active) setActive();
 		}
 
-		public function applyBodyWorldImpulseAux(impulse:Vector3D, delta:Vector3D):void
+		public function applyBodyWorldImpulseAux(impulse:Vector3D, delta:Vector3D, active:Boolean = true):void
 		{
 			if (!_movable)
 			{
@@ -444,13 +438,13 @@
 			rotImpulse = _worldInvInertia.transformVector(rotImpulse);
 			_currRotVelocityAux = _currRotVelocityAux.add(rotImpulse);
 
-			_velChanged = true;
+			if (active) setActive();
 		}
 		
 		// implementation updates the velocity/angular rotation with the force/torque.
 		public function updateVelocity(dt:Number):void
 		{
-			if (!_movable || !_activity)
+			if (!_movable || !isActive)
 				return;
 
 			_currState.linVelocity = _currState.linVelocity.add(JNumber3D.getScaleVector(_force, _invMass * dt));
@@ -464,7 +458,7 @@
 		   // implementation updates the position/orientation with the current velocties.
 		   public function updatePosition(dt:Number):void
 		   {
-		   if (!_movable || !_activity)
+		   if (!_movable || !isActive)
 		   {
 		   return;
 		   }
@@ -493,7 +487,7 @@
 		// Updates the position with the auxiliary velocities, and zeros them
 		public function updatePositionWithAux(dt:Number):void
 		{
-			if (!_movable || !_activity)
+			if (!_movable || !isActive)
 			{
 				_currLinVelocityAux.setTo(0,0,0);
 				_currRotVelocityAux.setTo(0,0,0);
@@ -533,7 +527,7 @@
 		// function provided for the use of Physics system
 		public function tryToFreeze(dt:Number):void
 		{
-			if (!_movable || !_activity)
+			if (!_movable || !isActive)
 			{
 				return;
 			}
@@ -573,7 +567,7 @@
 		
 		public function postPhysics(dt:Number):void
 		{
-			if (!_movable || !_activity)
+			if (!_movable || !isActive)
 			{
 				return;
 			}
@@ -638,7 +632,7 @@
 				return;
 			
 			_movable = mov;
-			isActive = _activity = mov;
+			isActive = mov;
 			_origMovable = mov;
 		}
 
@@ -653,29 +647,22 @@
 			_movable = _origMovable;
 		}
 
-		public function getVelChanged():Boolean
-		{
-			return _velChanged;
-		}
-
-		public function clearVelChanged():void
-		{
-			_velChanged = false;
-		}
-
-		public function setActive(activityFactor:Number = 1):void
+		public function setActive():void
 		{
 			if (_movable)
 			{
-				isActive = _activity = true;
-				_inactiveTime = (1 - activityFactor) * JConfig.deactivationTime;
+				if (isActive) return;
+				_inactiveTime = 0;
+				isActive = true;
 			}
 		}
 
 		public function setInactive():void
 		{
-			if (_movable)
-				isActive = _activity = false;
+			if (_movable) {
+				_inactiveTime = JConfig.deactivationTime;
+				isActive = false;
+			}
 		}
 
 		// Returns the velocity of a point at body-relative position
@@ -736,7 +723,7 @@
 			_currState.linVelocity.scaleBy(scale);
 			_currState.rotVelocity.scaleBy(scale);
 		}
-
+		
 		// function provided for use of physics system. Activates any
 		// body in its list if it's moved more than a certain distance,
 		// in which case it also clears its list.
@@ -802,23 +789,18 @@
 
 			return false;
 		}
-
-		private function findNonCollidablesBody(body:RigidBody):Boolean
-		{
-			return _nonCollidables.indexOf(body) > -1;
-		}
-
+		
 		//disable the collision between two bodies
 		public function disableCollisions(body:RigidBody):void
 		{
-			if (!findNonCollidablesBody(body))
+			if (_nonCollidables.indexOf(body) < 0)
 				_nonCollidables.push(body);
 		}
 		
 		//enable the collision between disabled bodies
 		public function enableCollisions(body:RigidBody):void
 		{
-			if (findNonCollidablesBody(body))
+			if (_nonCollidables.indexOf(body) >= 0)
 				_nonCollidables.splice(_nonCollidables.indexOf(body), 1);
 		}
 		
@@ -848,17 +830,11 @@
 			}
 		}
 		
-		
-		private function findConstraint(constraint:JConstraint):Boolean
-		{
-			return _constraints.indexOf(constraint) > -1;
-		}
-		
 		//add a constraint to this rigid body, do not need call this function yourself,
 		//this just used in constraint system
 		public function addConstraint(constraint:JConstraint):void
 		{
-			if (!findConstraint(constraint))
+			if (_constraints.indexOf(constraint) < 0)
 			{
 				_constraints.push(constraint);
 			}
@@ -868,7 +844,7 @@
 		//this just used in constraint system
 		public function removeConstraint(constraint:JConstraint):void
 		{
-			if (findConstraint(constraint))
+			if (_constraints.indexOf(constraint) >= 0)
 			{
 				_constraints.splice(_constraints.indexOf(constraint), 1);
 			}

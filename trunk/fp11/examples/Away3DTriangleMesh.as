@@ -116,14 +116,14 @@ package
 				materia = new ColorMaterial(0xeeee00);
 				materia.lights=[mylight];
 				ballBodies = new Vector.<RigidBody>();
-				for (var i:int = 0; i < 10; i++)
+				for (var i:int = 0; i < 15; i++)
 				{
 					ballBodies[i] = physics.createSphere(materia, 50);
 					ballBodies[i].moveTo(new Vector3D( -1000+2500*Math.random(),1000+1000*Math.random(), -1000+2500*Math.random()));
 				}
 				
 				boxBodies = new Vector.<RigidBody>();
-				for (i = 0; i < 10; i++)
+				for (i = 0; i < 15; i++)
 				{
 					boxBodies[i] = physics.createCube(materia, 100, 80, 60 );
 					boxBodies[i].moveTo(new Vector3D(-1000+2500*Math.random(), 1000+1000*Math.random(), -1000+2500*Math.random()));

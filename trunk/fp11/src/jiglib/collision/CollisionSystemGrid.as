@@ -163,7 +163,7 @@ package jiglib.collision
 		
 		override public function addCollisionBody(body:RigidBody):void
 		{
-			if (!findBody(body))
+			if (collBody.indexOf(body) < 0)
 				collBody.push(body);
 			
 			body.collisionSystem = this;
@@ -187,7 +187,7 @@ package jiglib.collision
 				body.externalData = null;
 			}
 
-			if (findBody(body))
+			if (collBody.indexOf(body) >= 0)
 				collBody.splice(collBody.indexOf(body), 1);
 		}
 		
