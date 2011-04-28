@@ -90,7 +90,6 @@ package jiglib.collision
 				return new Vector3D(i,j,k);
 			}
 			
-			//var min:Vector3D = colBody.currentState.position.clone();
 			var min:Vector3D = colBody.boundingBox.minPos.clone();
 			min.x = JMath3D.getLimiteNumber(min.x, startPoint.x, startPoint.x + sizeX);
 			min.y = JMath3D.getLimiteNumber(min.y, startPoint.y, startPoint.y + sizeY);
@@ -121,7 +120,6 @@ package jiglib.collision
 				return tempStoreObject;
 			}
 			
-			//var min:Vector3D = colBody.currentState.position.clone();
 			var min:Vector3D = colBody.boundingBox.minPos.clone();
 
 			min.x = JMath3D.getLimiteNumber(min.x, startPoint.x, startPoint.x + sizeX);
