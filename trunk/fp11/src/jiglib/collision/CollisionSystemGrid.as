@@ -90,6 +90,7 @@ package jiglib.collision
 				return new Vector3D(i,j,k);
 			}
 			
+			//var min:Vector3D = colBody.currentState.position.clone();
 			var min:Vector3D = colBody.boundingBox.minPos.clone();
 			min.x = JMath3D.getLimiteNumber(min.x, startPoint.x, startPoint.x + sizeX);
 			min.y = JMath3D.getLimiteNumber(min.y, startPoint.y, startPoint.y + sizeY);
@@ -120,6 +121,7 @@ package jiglib.collision
 				return tempStoreObject;
 			}
 			
+			//var min:Vector3D = colBody.currentState.position.clone();
 			var min:Vector3D = colBody.boundingBox.minPos.clone();
 
 			min.x = JMath3D.getLimiteNumber(min.x, startPoint.x, startPoint.x + sizeX);
@@ -156,7 +158,7 @@ package jiglib.collision
 		private function calcGridIndexForBody(colBody:RigidBody):int
 		{
 			var tempStoreVector:Vector3D = calcGridForSkin3(colBody);
-			//trace(tempStoreVector.x,tempStoreVector.y,tempStoreVector.z);
+			
 			if (tempStoreVector.x == -1) return -1;
 			return calcIndex(tempStoreVector.x, tempStoreVector.y, tempStoreVector.z);
 		}
@@ -245,8 +247,8 @@ package jiglib.collision
 			}
 			
 			// todo - work back from the mGridIndex rather than calculating it again...
-			var i:int; var j:int; var k:int;
-			var fi:Number; var fj:Number; var fk:Number;
+			var i:int, j:int, k:int;
+			var fi:Number, fj:Number, fk:Number;
 			var tempStoreObject:Object = calcGridForSkin6(colBody);
 			i = tempStoreObject.i; j = tempStoreObject.j; k = tempStoreObject.k; fi = tempStoreObject.fi; fj = tempStoreObject.fj; fk = tempStoreObject.fk;
 			
@@ -277,11 +279,11 @@ package jiglib.collision
 				{
 					for (var dk:int = -1; dk <= maxK; ++dk)
 					{
-						var thisIndex:int = calcIndex(nx + i + di, ny + j + dj, nz + k + dk); // + ((nx*ny*nz)*0.5);
+						var thisIndex:int = calcIndex(i + di, j + dj, k + dk); // + ((nx*ny*nz)*0.5);
 						//trace("ge", gridEntries.length);
 						if (gridEntries.length-1 > thisIndex && thisIndex >=0) {
 							var start:CollisionSystemGridEntry = gridEntries[thisIndex];
-						
+						 
 							//trace(thisIndex,gridEntries.length);
 							if (start != null && start.next != null)
 							{
@@ -321,7 +323,7 @@ package jiglib.collision
 						if (body == entry.collisionBody)
 							continue;
 						
-						if (entry.collisionBody && entry.collisionBody.isActive && bodyID > entry.collisionBody.id)
+						if (entry.collisionBody.isActive && bodyID > entry.collisionBody.id)
 							continue;
 						
 						if (checkCollidables(body, entry.collisionBody) && detectionFunctors[bodyType + "_" + entry.collisionBody.type] != undefined)

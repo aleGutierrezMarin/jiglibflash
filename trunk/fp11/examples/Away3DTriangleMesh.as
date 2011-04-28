@@ -135,7 +135,7 @@ package
 				for (i = 0; i < 5; i++)
 				{
 					bridgeBodies[i] = physics.createCube(materia, 260, 30, 200);
-					bridgeBodies[i].moveTo(new Vector3D(265 * i-50, 900, 1500));
+					bridgeBodies[i].moveTo(new Vector3D(265 * i-1100, 900, 1500));
 					bridgeBodies[i].disableCollisions(triangleMesh);
 					for each(var other:RigidBody in bridgeBodies){
 						//disable collisions between each chainBodies
@@ -150,10 +150,10 @@ package
 					bridges[i-1] = new HingeJoint(bridgeBodies[i - 1], bridgeBodies[i], Vector3D.Z_AXIS, new Vector3D(130, 0, 0), 100, 50, 50, 0.1, 0.5);
 				}
 				
-				new JConstraintWorldPoint(bridgeBodies[0],new Vector3D(-120,0,100),new Vector3D(-100,950,1600));
-				new JConstraintWorldPoint(bridgeBodies[0],new Vector3D(-120,0,-100),new Vector3D(-100,950,1400));
-				new JConstraintWorldPoint(bridgeBodies[4],new Vector3D(120,0,100),new Vector3D(1200,920,1600));
-				new JConstraintWorldPoint(bridgeBodies[4],new Vector3D(120,0,-100),new Vector3D(1200,920,1400));
+				new JConstraintWorldPoint(bridgeBodies[0],new Vector3D(-120,0,100),new Vector3D(-1200,920,1600));
+				new JConstraintWorldPoint(bridgeBodies[0],new Vector3D(-120,0,-100),new Vector3D(-1200,920,1400));
+				new JConstraintWorldPoint(bridgeBodies[4],new Vector3D(120,0,100),new Vector3D(100,950,1600));
+				new JConstraintWorldPoint(bridgeBodies[4],new Vector3D(120,0,-100),new Vector3D(100,950,1400));
 				
 			}else if(event.uri=="res/car.obj"){
 				for (i = 0; i < containerCar.numChildren; ++i) {

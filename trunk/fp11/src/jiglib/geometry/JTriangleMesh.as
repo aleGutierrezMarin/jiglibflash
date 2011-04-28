@@ -33,7 +33,6 @@ package jiglib.geometry
 				createMesh(_skinVertices,skin.indices);
 				
 				_boundingBox=_octree.boundingBox().clone();
-				_boundingSphere=_boundingBox.getRadiusAboutCentre();
 			}
 			
 			_type = "TRIANGLEMESH";
