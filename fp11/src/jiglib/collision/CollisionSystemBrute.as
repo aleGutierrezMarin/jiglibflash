@@ -36,7 +36,7 @@ package jiglib.collision
 						continue;
 					}
 					
-					if (_collBody && _collBody.isActive && bodyID > _collBody.id)
+					if (_collBody.isActive && bodyID > _collBody.id)
 					{
 						continue;
 					}

@@ -1,7 +1,7 @@
 # Blender v2.55 (sub 0) OBJ File: 'untitled.blend'
 # www.blender.org
-#mtllib scene.mtl
-o Plane
+mtllib scene.mtl
+g Scene_Plane
 v 7.869715 0.032318 -8.494053
 v 8.095808 0.032318 7.819860
 v -7.819616 0.032318 8.040428
