@@ -2,10 +2,9 @@ package
 {
 	import away3d.containers.View3D;
 	import away3d.events.LoaderEvent;
-	import away3d.events.ResourceEvent;
 	import away3d.lights.PointLight;
-	import away3d.loading.ResourceManager;
-	import away3d.loading.parsers.OBJParser;
+	import away3d.loaders.Loader3D;
+	import away3d.loaders.parsers.OBJParser;
 	import away3d.materials.BitmapMaterial;
 	import away3d.materials.ColorMaterial;
 	import away3d.primitives.Cube;
@@ -16,6 +15,7 @@ package
 	import flash.events.*;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import flash.net.URLRequest;
 	import flash.ui.Keyboard;
 	
 	import jiglib.cof.JConfig;
@@ -89,14 +89,16 @@ package
 				boxBody[i].moveTo(new Vector3D(0, 10 + (50 * i + 50), 0));
 			}
 			
-			ResourceManager.instance.addEventListener(ResourceEvent.RESOURCE_RETRIEVED, onResourceRetrieved);
-			container=ObjectContainer3D(ResourceManager.instance.getResource("res/car.obj"));
+			var _loader:Loader3D = new Loader3D();
+			_loader.load(new URLRequest('res/car.obj'), new OBJParser());
+			_loader.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onResourceComplete);
+			container = ObjectContainer3D(_loader);
 			view.scene.addChild(container);
 			
 			carMaterial = new BitmapMaterial(new CarSkin().bitmapData);
 			carMaterial.lights = [mylight];
 		}
-		private function onResourceRetrieved(event : ResourceEvent) : void
+		private function onResourceComplete(event : LoaderEvent) : void
 		{
 			var mesh : Mesh;
 			for (var i : int = 0; i < container.numChildren; ++i) {
