@@ -32,7 +32,7 @@ package jiglib.collision
 				return;
 			}
 
-			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>(1,true);
+			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
 			var cpInfo:CollPointInfo;
 
 			var averageNormal:Vector3D = new Vector3D();
