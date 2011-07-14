@@ -6,9 +6,6 @@ package jiglib.plugin.papervision3d {
 	import org.papervision3d.core.math.Matrix3D;
 	import org.papervision3d.objects.DisplayObject3D;	
 
-	/**
-	 * @author bartekd
-	 */
 	public class Pv3dMesh implements ISkin3D{
 		
 		private var do3d:DisplayObject3D;
@@ -66,5 +63,12 @@ package jiglib.plugin.papervision3d {
 		public function get mesh():DisplayObject3D {
 			return do3d;
 		}
+		
+		public function get vertices():Vector.<Vector3D> { 
+			return null;
+		}
+		public function get indices():Vector.<TriangleVertexIndices> { 
+			return null;
+		} 
 	}
 }

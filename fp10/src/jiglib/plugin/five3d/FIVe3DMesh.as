@@ -4,9 +4,6 @@ package jiglib.plugin.five3d {
 	import flash.geom.Matrix3D;
 	import net.badimon.five3D.display.Sprite3D;
 
-	/**
-	 * @author Devin Reimer (blog.almostlogical.com), based on class Pv3dMesh written by bartekd
-	 * */
 	public class FIVe3DMesh implements ISkin3D
 	{	
 		private var sprite3D:Sprite3D;

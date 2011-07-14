@@ -1,28 +1,3 @@
-/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
 package jiglib.collision
 {
 
@@ -53,7 +28,7 @@ package jiglib.collision
 				return;
 			}
 			
-			if (JConfig.aabbDetection && !capsule0.boundingBox.overlapTest(capsule1.boundingBox)) {
+			if (!capsule0.boundingBox.overlapTest(capsule1.boundingBox)) {
 				return;
 			}
 
@@ -61,10 +36,11 @@ package jiglib.collision
 			var cpInfo:CollPointInfo;
 
 			var averageNormal:Vector3D = new Vector3D();
-			var oldSeg0:JSegment = new JSegment(capsule0.getEndPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], -capsule0.length));
-			var newSeg0:JSegment = new JSegment(capsule0.getEndPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], -capsule0.length));
-			var oldSeg1:JSegment = new JSegment(capsule1.getEndPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], -capsule1.length));
-			var newSeg1:JSegment = new JSegment(capsule1.getEndPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], -capsule1.length));
+			var oldSeg0:JSegment,newSeg0:JSegment,oldSeg1:JSegment,newSeg1:JSegment;
+			oldSeg0 = new JSegment(capsule0.getEndPos(capsule0.oldState), JNumber3D.getScaleVector(capsule0.oldState.getOrientationCols()[1], -capsule0.length));
+			newSeg0 = new JSegment(capsule0.getEndPos(capsule0.currentState), JNumber3D.getScaleVector(capsule0.currentState.getOrientationCols()[1], -capsule0.length));
+			oldSeg1 = new JSegment(capsule1.getEndPos(capsule1.oldState), JNumber3D.getScaleVector(capsule1.oldState.getOrientationCols()[1], -capsule1.length));
+			newSeg1 = new JSegment(capsule1.getEndPos(capsule1.currentState), JNumber3D.getScaleVector(capsule1.currentState.getOrientationCols()[1], -capsule1.length));
 
 			var radSum:Number = capsule0.radius + capsule1.radius;
 
@@ -82,7 +58,7 @@ package jiglib.collision
 				var dist:Number = Math.sqrt(oldDistSq);
 				var depth:Number = radSum - dist;
 
-				if (dist > JNumber3D.NUM_TINY)
+				if (dist > JMath3D.NUM_TINY)
 				{
 					delta = JNumber3D.getDivideVector(delta, dist);
 				}
@@ -98,7 +74,7 @@ package jiglib.collision
 				cpInfo.r0 = worldPos.subtract(capsule0.oldState.position);
 				cpInfo.r1 = worldPos.subtract(capsule1.oldState.position);
 				cpInfo.initialPenetration = depth;
-				collPts.push(cpInfo);
+				collPts[0]=cpInfo;
 			}
 
 			if (collPts.length > 0)
@@ -107,15 +83,19 @@ package jiglib.collision
 				collInfo.objInfo = info;
 				collInfo.dirToBody = averageNormal;
 				collInfo.pointInfo = collPts;
-
+				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.restitution = Math.sqrt(capsule0.material.restitution * capsule1.material.restitution);
-				mat.friction = Math.sqrt(capsule0.material.friction * capsule1.material.friction);
+				mat.restitution = 0.5*(capsule0.material.restitution + capsule1.material.restitution);
+				mat.friction = 0.5*(capsule0.material.friction + capsule1.material.friction);
 				collInfo.mat = mat;
 				collArr.push(collInfo);
-
 				info.body0.collisions.push(collInfo);
 				info.body1.collisions.push(collInfo);
+				info.body0.addCollideBody(info.body1);
+				info.body1.addCollideBody(info.body0);
+			}else {
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 			}
 		}
 	}

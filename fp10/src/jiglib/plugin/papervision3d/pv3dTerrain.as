@@ -16,9 +16,6 @@ package jiglib.plugin.papervision3d {
 	
 	import jiglib.plugin.ITerrain;
 
-	/**
-	* Terrain Class
-	*/
 	public class pv3dTerrain extends TriangleMesh3D implements ITerrain
 	{
 		//Min of coordinate horizontally;
@@ -224,6 +221,9 @@ package jiglib.plugin.papervision3d {
 		}
 		public function get heights():Array {
 			return _heights;
+		}
+		public function get maxHeight():Number{
+			return 1000000;
 		}
 	}
 }

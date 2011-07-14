@@ -1,9 +1,5 @@
 ﻿package jiglib.plugin
 {
-	/**
-	 * ...
-	 * @author Muzer
-	 */
 	public interface ITerrain
 	{
 		//Min of coordinate horizontally;
@@ -32,6 +28,7 @@
 		
 		//the heights of all vertices
 		function get heights():Array;
+		
+		function get maxHeight():Number;
 	}
-
 }

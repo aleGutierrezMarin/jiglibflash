@@ -5,10 +5,6 @@ package jiglib.physics
 	
 	import jiglib.math.*;
 
-	/**
-	 * @author katopz
-	 * 		   Devin Reimer (blog.almostlogical.com)
-	 */
 	public class PhysicsState
 	{
 		public var position:Vector3D = new Vector3D();

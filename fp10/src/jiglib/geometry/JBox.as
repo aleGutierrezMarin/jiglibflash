@@ -11,10 +11,6 @@ package jiglib.geometry
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.ISkin3D;
 
-	/**
-	 * @author Muzer(muzerly@gmail.com)
-	 * @link http://code.google.com/p/jiglibflash
-	 */
 	public class JBox extends RigidBody
 	{
 		private var _sideLengths:Vector3D;
@@ -96,13 +92,14 @@ package jiglib.geometry
 		// Gets the minimum and maximum extents of the box along the axis, relative to the centre of the box.
 		public function getSpan(axis:Vector3D):SpanData
 		{
+			var s:Number,u:Number,d:Number,r:Number,p:Number;
 			var cols:Vector.<Vector3D> = currentState.getOrientationCols();
 			var obj:SpanData = new SpanData();
-			var s:Number = Math.abs(axis.dotProduct(cols[0])) * (0.5 * _sideLengths.x);
-			var u:Number = Math.abs(axis.dotProduct(cols[1])) * (0.5 * _sideLengths.y);
-			var d:Number = Math.abs(axis.dotProduct(cols[2])) * (0.5 * _sideLengths.z);
-			var r:Number = s + u + d;
-			var p:Number = currentState.position.dotProduct(axis);
+			s = Math.abs(axis.dotProduct(cols[0])) * (0.5 * _sideLengths.x);
+			u = Math.abs(axis.dotProduct(cols[1])) * (0.5 * _sideLengths.y);
+			d = Math.abs(axis.dotProduct(cols[2])) * (0.5 * _sideLengths.z);
+			r = s + u + d;
+			p = currentState.position.dotProduct(axis);
 			obj.min = p - r;
 			obj.max = p + r;
 
@@ -117,46 +114,47 @@ package jiglib.geometry
 
 			var transform:Matrix3D = JMatrix3D.getTranslationMatrix(state.position.x, state.position.y, state.position.z);
 			transform = JMatrix3D.getAppendMatrix3D(state.orientation, transform);
-
-			var i:int = 0;
-			while (i < _points_length)
-			{
-				arr[i] = transform.transformVector(_points[i]);
-				i = int(i + 1);
+			
+			var i:int=0;
+			for each (var _point:Vector3D in _points){
+				arr[i++] = transform.transformVector(_point);
 			}
-
+			
 			return arr;
 		}
 		
 		// Gets the corner points in another box space
 		public function getCornerPointsInBoxSpace(thisState:PhysicsState, boxState:PhysicsState):Vector.<Vector3D> {
 			
-			var max:Matrix3D = JMatrix3D.getTransposeMatrix(boxState.orientation);
+			var max:Matrix3D,orient:Matrix3D,transform:Matrix3D;
+			
+			max = JMatrix3D.getTransposeMatrix(boxState.orientation);
 			var pos:Vector3D = thisState.position.subtract(boxState.position);
 			pos = max.transformVector(pos);
 			
-			var orient:Matrix3D = JMatrix3D.getAppendMatrix3D(thisState.orientation, max);
+			orient = JMatrix3D.getAppendMatrix3D(thisState.orientation, max);
 			
 			var arr:Vector.<Vector3D> = new Vector.<Vector3D>(_points.length, true);
 			
-			var transform:Matrix3D = JMatrix3D.getTranslationMatrix(pos.x, pos.y, pos.z);
+			transform = JMatrix3D.getTranslationMatrix(pos.x, pos.y, pos.z);
 			transform = JMatrix3D.getAppendMatrix3D(orient, transform);
 			
 			var i:int = 0;
 			for each (var _point:Vector3D in _points)
-				arr[int(i++)] = transform.transformVector(_point);
+				arr[i++] = transform.transformVector(_point);
 			
 			return arr;
 		}
 		
 		public function getSqDistanceToPoint(state:PhysicsState, closestBoxPoint:Vector.<Vector3D>, point:Vector3D):Number
 		{
-			var _closestBoxPoint:Vector3D = point.subtract(state.position);
+			var _closestBoxPoint:Vector3D,halfSideLengths:Vector3D;
+			var delta:Number=0,sqDistance:Number=0;
+			
+			_closestBoxPoint = point.subtract(state.position);
 			_closestBoxPoint = JMatrix3D.getTransposeMatrix(state.orientation).transformVector(_closestBoxPoint);
 
-			var delta:Number = 0;
-			var sqDistance:Number = 0;
-			var halfSideLengths:Vector3D = getHalfSideLengths();
+			halfSideLengths = getHalfSideLengths();
 
 			if (_closestBoxPoint.x < -halfSideLengths.x)
 			{
@@ -210,15 +208,17 @@ package jiglib.geometry
 
 		public function pointIntersect(pos:Vector3D):Boolean
 		{
-			var p:Vector3D = pos.subtract(currentState.position);
-			var h:Vector3D = JNumber3D.getScaleVector(_sideLengths, 0.5);
-			var dirVec:Vector3D;
+			var p:Vector3D,h:Vector3D,dirVec:Vector3D;
+			
+			p = pos.subtract(currentState.position);
+			h = JNumber3D.getScaleVector(_sideLengths, 0.5);
+			
 			var cols:Vector.<Vector3D> = currentState.getOrientationCols();
 			for (var dir:int; dir < 3; dir++)
 			{
 				dirVec = cols[dir].clone();
 				dirVec.normalize();
-				if (Math.abs(dirVec.dotProduct(p)) > JNumber3D.toArray(h)[dir] + JNumber3D.NUM_TINY)
+				if (Math.abs(dirVec.dotProduct(p)) > JNumber3D.toArray(h)[dir] + JMath3D.NUM_TINY)
 				{
 					return false;
 				}
@@ -231,32 +231,24 @@ package jiglib.geometry
 			out.frac = 0;
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
+			
+			var tiny:Number=JMath3D.NUM_TINY,huge:Number=JMath3D.NUM_HUGE,frac:Number,min:Number,max:Number,dirMin:Number=0,dirMax:Number=0,dir:Number=0,e:Number,f:Number,t:Number,t1:Number,t2:Number,directionVectorNumber:Number;
+			var p:Vector3D,h:Vector3D;
 
-			var frac:Number = JNumber3D.NUM_HUGE;
-			var min:Number = -JNumber3D.NUM_HUGE;
-			var max:Number = JNumber3D.NUM_HUGE;
-			var dirMin:Number = 0;
-			var dirMax:Number = 0;
-			var dir:Number = 0;
-			var p:Vector3D = state.position.subtract(seg.origin);
-			var h:Vector3D = JNumber3D.getScaleVector(_sideLengths, 0.5);
-
-			//var tempV:Vector3D;
-			var e:Number;
-			var f:Number;
-			var t:Number;
-			var t1:Number;
-			var t2:Number;
+			frac = huge;
+			min = -huge;
+			max = huge;
+			p = state.position.subtract(seg.origin);
+			h = JNumber3D.getScaleVector(_sideLengths, 0.5);
 			
 			var orientationCol:Vector.<Vector3D> = state.getOrientationCols();
-			var directionVectorArray:Array = JNumber3D.toArray(h);
-			var directionVectorNumber:Number;
+			var directionVectorArray:Vector.<Number> = JNumber3D.toArray(h);
 			for (dir = 0; dir < 3; dir++)
 			{
 				directionVectorNumber = directionVectorArray[dir];
 				e = orientationCol[dir].dotProduct(p);
 				f = orientationCol[dir].dotProduct(seg.delta);
-				if (Math.abs(f) > JNumber3D.NUM_TINY)
+				if (Math.abs(f) > tiny)
 				{
 					t1 = (e + directionVectorNumber) / f;
 					t2 = (e - directionVectorNumber) / f;
@@ -301,7 +293,7 @@ package jiglib.geometry
 				frac = 0;
 			/*if (frac > 1)
 				frac = 1;*/
-			if (frac > 1 - JNumber3D.NUM_TINY)
+			if (frac > 1 - tiny)
 			{
 				return false;
 			}

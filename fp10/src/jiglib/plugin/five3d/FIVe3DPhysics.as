@@ -14,8 +14,6 @@ package jiglib.plugin.five3d {
 	import almostlogical.five3d.primitives.Cube;
 
 	/**
-	 * @author Devin Reimer (blog.almostlogical.com), based on class Papervision3DPhysics written by bartekd
-	 * 
 	 * Important Note: You must have the AlmostLogical FIVe3D Additional Files Package (contains a modified version of Sprite3D (fully backwards compatible) and FIVe3D primitives(ex:Cube)) to use this plugin, 
 	 *   you can download this package directly from http://blog.almostlogical.com/resources/AlmostLogical_FIVe3D_Additional_Files_PackageFP10.zip (these classes are also released under the MIT License)
 	 * */

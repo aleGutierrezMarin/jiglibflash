@@ -2,9 +2,6 @@ package jiglib.plugin.away3dlite
 {
 	import flash.display.BitmapData;
 	
-	/**
-	 * @author katopz
-	 */
     public class HeightMapData
     {
 		public var bitmapData:BitmapData;

@@ -1,28 +1,3 @@
-/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
 package jiglib.collision
 {
 
@@ -57,36 +32,42 @@ package jiglib.collision
 			var sphere:JSphere = info.body0 as JSphere;
 			var plane:JPlane = info.body1 as JPlane;
 
-			var oldDist:Number = plane.pointPlaneDistance(sphere.oldState.position);
-			var newDist:Number = plane.pointPlaneDistance(sphere.currentState.position);
+			var oldDist:Number,newDist:Number,depth:Number;
+			oldDist = plane.pointPlaneDistance(sphere.oldState.position);
+			newDist = plane.pointPlaneDistance(sphere.currentState.position);
 
 			if (Math.min(newDist, oldDist) > sphere.boundingSphere + JConfig.collToll)
 			{
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 				return;
 			}
 
-			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
+			var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>(1,true);
 			var cpInfo:CollPointInfo;
-			var depth:Number = sphere.radius - oldDist;
+			depth = sphere.radius - oldDist;
 
 			var worldPos:Vector3D = sphere.oldState.position.subtract(JNumber3D.getScaleVector(plane.normal, sphere.radius));
 			cpInfo = new CollPointInfo();
 			cpInfo.r0 = worldPos.subtract(sphere.oldState.position);
 			cpInfo.r1 = worldPos.subtract(plane.oldState.position);
 			cpInfo.initialPenetration = depth;
-			collPts.push(cpInfo);
-
+			collPts[0]=cpInfo;
+			
 			var collInfo:CollisionInfo = new CollisionInfo();
 			collInfo.objInfo = info;
-			collInfo.dirToBody = plane.normal;
+			collInfo.dirToBody = plane.normal.clone();
 			collInfo.pointInfo = collPts;
+			
 			var mat:MaterialProperties = new MaterialProperties();
-			mat.restitution = Math.sqrt(sphere.material.restitution * plane.material.restitution);
-			mat.friction = Math.sqrt(sphere.material.friction * plane.material.friction);
+			mat.restitution = 0.5*(sphere.material.restitution + plane.material.restitution);
+			mat.friction = 0.5*(sphere.material.friction + plane.material.friction);
 			collInfo.mat = mat;
 			collArr.push(collInfo);
 			info.body0.collisions.push(collInfo);
 			info.body1.collisions.push(collInfo);
+			info.body0.addCollideBody(info.body1);
+			info.body1.addCollideBody(info.body0);
 		}
 	}
 }

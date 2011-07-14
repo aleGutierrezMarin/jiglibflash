@@ -1,92 +1,89 @@
-﻿/*
-Copyright (c) 2007 Danny Chapman 
-http://www.rowlhouse.co.uk
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-1. The origin of this software must not be misrepresented; you must not
-claim that you wrote the original software. If you use this software
-in a product, an acknowledgment in the product documentation would be
-appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-3. This notice may not be removed or altered from any source
-distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
-package jiglib.geometry {
+﻿package jiglib.geometry {
 	import flash.geom.Vector3D;
 	
+	import jiglib.data.EdgeData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	
 	// An axis-aligned box
 	public class JAABox {
 		
-		private var _minPos:Vector3D;
-		private var _maxPos:Vector3D;
+		public var minPos:Vector3D;
+		public var maxPos:Vector3D;
 		
-		public function JAABox(minPos:Vector3D, maxPos:Vector3D) {
-			_minPos = minPos.clone();
-			_maxPos = maxPos.clone();
-		}
-		
-		public function get minPos():Vector3D {
-			return _minPos;
-		}
-		public function set minPos(pos:Vector3D):void {
-			_minPos = pos.clone();
-		}
-		
-		public function get maxPos():Vector3D {
-			return _maxPos;
-		}
-		public function set maxPos(pos:Vector3D):void {
-			_maxPos = pos.clone();
+		public function JAABox() {
+			clear();
 		}
 		
 		public function get sideLengths():Vector3D {
-			var pos:Vector3D = _maxPos.clone();
-			pos.subtract(_minPos);
+			var pos:Vector3D = maxPos.clone();
+			pos = pos.subtract( minPos ); 
 			return pos;
 		}
 		
 		public function get centrePos():Vector3D {
-			var pos:Vector3D = _minPos.clone();
-			return JNumber3D.getScaleVector(pos.add(_maxPos), 0.5);
+			var pos:Vector3D = minPos.clone();
+			return JNumber3D.getScaleVector(pos.add(maxPos), 0.5);
+		}
+		
+		public function getAllPoints():Vector.<Vector3D> {
+			var center:Vector3D,halfSide:Vector3D;
+			var points:Vector.<Vector3D>;
+			center = this.centrePos;
+			halfSide = JNumber3D.getScaleVector(this.sideLengths, 0.5);
+			points = new Vector.<Vector3D>(8, true);
+			points[0] = center.add(new Vector3D(halfSide.x, -halfSide.y, halfSide.z));
+			points[1] = center.add(new Vector3D(halfSide.x, halfSide.y, halfSide.z));
+			points[2] = center.add(new Vector3D(-halfSide.x, -halfSide.y, halfSide.z));
+			points[3] = center.add(new Vector3D(-halfSide.x, halfSide.y, halfSide.z));
+			points[4] = center.add(new Vector3D(-halfSide.x, -halfSide.y, -halfSide.z));
+			points[5] = center.add(new Vector3D(-halfSide.x, halfSide.y, -halfSide.z));
+			points[6] = center.add(new Vector3D(halfSide.x, -halfSide.y, -halfSide.z));
+			points[7] = center.add(new Vector3D(halfSide.x, halfSide.y, -halfSide.z));
+			
+			return points;
+		}
+		
+		public function get edges():Vector.<EdgeData> {
+			return Vector.<EdgeData>([
+			new EdgeData( 0, 1 ), new EdgeData( 0, 2 ), new EdgeData( 0, 6 ),
+			new EdgeData( 2, 3 ), new EdgeData( 2, 4 ), new EdgeData( 6, 7 ),
+			new EdgeData( 6, 4 ), new EdgeData( 1, 3 ), new EdgeData( 1, 7 ),
+			new EdgeData( 3, 5 ), new EdgeData( 7, 5 ), new EdgeData( 4, 5 )]);
+		}
+		
+		public function getRadiusAboutCentre():Number {
+			return 0.5 * (maxPos.subtract(minPos).length);
 		}
 		
 		public function move(delta:Vector3D):void {
-			_minPos.add(delta);
-			_maxPos.add(delta);
+			minPos.add(delta);
+			maxPos.add(delta);
 		}
 		
 		public function clear():void {
-			_minPos = new Vector3D(JNumber3D.NUM_HUGE, JNumber3D.NUM_HUGE, JNumber3D.NUM_HUGE);
-			_maxPos = new Vector3D( -JNumber3D.NUM_HUGE, -JNumber3D.NUM_HUGE, -JNumber3D.NUM_HUGE);
+			var huge:Number=JMath3D.NUM_HUGE;
+			minPos = new Vector3D(huge, huge, huge);
+			maxPos = new Vector3D( -huge, -huge, -huge);
 		}
 		
 		public function clone():JAABox {
-			return new JAABox(_minPos, _maxPos);
+			var aabb:JAABox = new JAABox();
+			aabb.minPos = this.minPos.clone();
+			aabb.maxPos = this.maxPos.clone();
+			return aabb;
 		}
 		
 		
 		
 		public function addPoint(pos:Vector3D):void {
-			if (pos.x < _minPos.x) _minPos.x = pos.x - JNumber3D.NUM_TINY;
-			if (pos.x > _maxPos.x) _maxPos.x = pos.x + JNumber3D.NUM_TINY;
-			if (pos.y < _minPos.y) _minPos.y = pos.y - JNumber3D.NUM_TINY;
-			if (pos.y > _maxPos.y) _maxPos.y = pos.y + JNumber3D.NUM_TINY;
-			if (pos.z < _minPos.z) _minPos.z = pos.z - JNumber3D.NUM_TINY;
-			if (pos.z > _maxPos.z) _maxPos.z = pos.z + JNumber3D.NUM_TINY;
+			var tiny:Number=JMath3D.NUM_TINY;
+			if (pos.x < minPos.x) minPos.x = pos.x - tiny;
+			if (pos.x > maxPos.x) maxPos.x = pos.x + tiny;
+			if (pos.y < minPos.y) minPos.y = pos.y - tiny;
+			if (pos.y > maxPos.y) maxPos.y = pos.y + tiny;
+			if (pos.z < minPos.z) minPos.z = pos.z - tiny;
+			if (pos.z > maxPos.z) maxPos.z = pos.z + tiny;
 		}
 		
 		public function addBox(box:JBox):void {
@@ -101,72 +98,89 @@ package jiglib.geometry {
 			addPoint(pts[7]);
 		}
 		
+		
+		// todo: the extra if doesn't make sense and bugs the size, also shouldn't this called once and if scaled? 
 		public function addSphere(sphere:JSphere):void {
-			if (sphere.currentState.position.x - sphere.radius < _minPos.x) {
-				_minPos.x = (sphere.currentState.position.x - sphere.radius) - 1;
-			}
-			if (sphere.currentState.position.x + sphere.radius > _maxPos.x) {
-				_maxPos.x = (sphere.currentState.position.x + sphere.radius) + 1;
-			}
+			//if (sphere.currentState.position.x - sphere.radius < _minPos.x) {
+				minPos.x = (sphere.currentState.position.x - sphere.radius) - 1;
+			//}
+			//if (sphere.currentState.position.x + sphere.radius > _maxPos.x) {
+				maxPos.x = (sphere.currentState.position.x + sphere.radius) + 1;
+			//}
 			
-			if (sphere.currentState.position.y - sphere.radius < _minPos.y) {
-				_minPos.y = (sphere.currentState.position.y - sphere.radius) - 1;
-			}
-			if (sphere.currentState.position.y + sphere.radius > _maxPos.y) {
-				_maxPos.y = (sphere.currentState.position.y + sphere.radius) + 1;
-			}
+			//if (sphere.currentState.position.y - sphere.radius < _minPos.y) {
+				minPos.y = (sphere.currentState.position.y - sphere.radius) - 1;
+			//}
+			//if (sphere.currentState.position.y + sphere.radius > _maxPos.y) {
+				maxPos.y = (sphere.currentState.position.y + sphere.radius) + 1;
+			//}
 			
-			if (sphere.currentState.position.z - sphere.radius < _minPos.z) {
-				_minPos.z = (sphere.currentState.position.z - sphere.radius) - 1;
+			//if (sphere.currentState.position.z - sphere.radius < _minPos.z) {
+				minPos.z = (sphere.currentState.position.z - sphere.radius) - 1;
+			//}
+			//if (sphere.currentState.position.z + sphere.radius > _maxPos.z) {
+				maxPos.z = (sphere.currentState.position.z + sphere.radius) + 1;
+			//}
+			//trace("jaabox - add sphere:", _minPos.x,_minPos.y,_minPos.z,_maxPos.x,_maxPos.y,_maxPos.z);
+			
+			// todo: remove this code
+				/*
+			if (_minPos.x > _maxPos.x) {
+				trace("minpos x ouch");
 			}
-			if (sphere.currentState.position.z + sphere.radius > _maxPos.z) {
-				_maxPos.z = (sphere.currentState.position.z + sphere.radius) + 1;
+			if (_minPos.y > _maxPos.y) {
+				trace("minpos y ouch");
 			}
+			if (_minPos.z > _maxPos.z) {
+				trace("minpos z ouch");
+			}
+			*/
+
 		}
 		
 		public function addCapsule(capsule:JCapsule):void {
 			var pos:Vector3D = capsule.getBottomPos(capsule.currentState);
-			if (pos.x - capsule.radius < _minPos.x) {
-				_minPos.x = (pos.x - capsule.radius) - 1;
+			if (pos.x - capsule.radius < minPos.x) {
+				minPos.x = (pos.x - capsule.radius) - 1;
 			}
-			if (pos.x + capsule.radius > _maxPos.x) {
-				_maxPos.x = (pos.x + capsule.radius) + 1;
-			}
-			
-			if (pos.y - capsule.radius < _minPos.y) {
-				_minPos.y = (pos.y - capsule.radius) - 1;
-			}
-			if (pos.y + capsule.radius > _maxPos.y) {
-				_maxPos.y = (pos.y + capsule.radius) + 1;
+			if (pos.x + capsule.radius > maxPos.x) {
+				maxPos.x = (pos.x + capsule.radius) + 1;
 			}
 			
-			if (pos.z - capsule.radius < _minPos.z) {
-				_minPos.z = (pos.z - capsule.radius) - 1;
+			if (pos.y - capsule.radius < minPos.y) {
+				minPos.y = (pos.y - capsule.radius) - 1;
 			}
-			if (pos.z + capsule.radius > _maxPos.z) {
-				_maxPos.z = (pos.z + capsule.radius) + 1;
+			if (pos.y + capsule.radius > maxPos.y) {
+				maxPos.y = (pos.y + capsule.radius) + 1;
+			}
+			
+			if (pos.z - capsule.radius < minPos.z) {
+				minPos.z = (pos.z - capsule.radius) - 1;
+			}
+			if (pos.z + capsule.radius > maxPos.z) {
+				maxPos.z = (pos.z + capsule.radius) + 1;
 			}
 			
 			pos = capsule.getEndPos(capsule.currentState);
-			if (pos.x - capsule.radius < _minPos.x) {
-				_minPos.x = (pos.x - capsule.radius) - 1;
+			if (pos.x - capsule.radius < minPos.x) {
+				minPos.x = (pos.x - capsule.radius) - 1;
 			}
-			if (pos.x + capsule.radius > _maxPos.x) {
-				_maxPos.x = (pos.x + capsule.radius) + 1;
-			}
-			
-			if (pos.y - capsule.radius < _minPos.y) {
-				_minPos.y = (pos.y - capsule.radius) - 1;
-			}
-			if (pos.y + capsule.radius > _maxPos.y) {
-				_maxPos.y = (pos.y + capsule.radius) + 1;
+			if (pos.x + capsule.radius > maxPos.x) {
+				maxPos.x = (pos.x + capsule.radius) + 1;
 			}
 			
-			if (pos.z - capsule.radius < _minPos.z) {
-				_minPos.z = (pos.z - capsule.radius) - 1;
+			if (pos.y - capsule.radius < minPos.y) {
+				minPos.y = (pos.y - capsule.radius) - 1;
 			}
-			if (pos.z + capsule.radius > _maxPos.z) {
-				_maxPos.z = (pos.z + capsule.radius) + 1;
+			if (pos.y + capsule.radius > maxPos.y) {
+				maxPos.y = (pos.y + capsule.radius) + 1;
+			}
+			
+			if (pos.z - capsule.radius < minPos.z) {
+				minPos.z = (pos.z - capsule.radius) - 1;
+			}
+			if (pos.z + capsule.radius > maxPos.z) {
+				maxPos.z = (pos.z + capsule.radius) + 1;
 			}
 		}
 		
@@ -177,21 +191,60 @@ package jiglib.geometry {
 		
 		public function overlapTest(box:JAABox):Boolean {
 			return (
-				(_minPos.z >= box.maxPos.z) ||
-				(_maxPos.z <= box.minPos.z) ||
-				(_minPos.y >= box.maxPos.y) ||
-				(_maxPos.y <= box.minPos.y) ||
-				(_minPos.x >= box.maxPos.x) ||
-				(_maxPos.x <= box.minPos.x) ) ? false : true;
+				(minPos.z >= box.maxPos.z) ||
+				(maxPos.z <= box.minPos.z) ||
+				(minPos.y >= box.maxPos.y) ||
+				(maxPos.y <= box.minPos.y) ||
+				(minPos.x >= box.maxPos.x) ||
+				(maxPos.x <= box.minPos.x) ) ? false : true;
 		}
 		
 		public function isPointInside(pos:Vector3D):Boolean {
-			return ((pos.x >= _minPos.x) && 
-				    (pos.x <= _maxPos.x) && 
-				    (pos.y >= _minPos.y) && 
-				    (pos.y <= _maxPos.y) && 
-				    (pos.z >= _minPos.z) && 
-				    (pos.z <= _maxPos.z));
+			return ((pos.x >= minPos.x) && 
+				    (pos.x <= maxPos.x) && 
+				    (pos.y >= minPos.y) && 
+				    (pos.y <= maxPos.y) && 
+				    (pos.z >= minPos.z) && 
+				    (pos.z <= maxPos.z));
+		}
+		
+		public function segmentAABoxOverlap(seg:JSegment):Boolean {
+			var jDir:int,kDir:int,i:int,iFace:int;
+			var frac:Number,dist0:Number,dist1:Number,tiny:Number=JMath3D.NUM_TINY;
+			
+			var pt:Vector.<Number>,minPosArr:Vector.<Number>,maxPosArr:Vector.<Number>,p0:Vector.<Number>,p1:Vector.<Number>,faceOffsets:Vector.<Number>;
+			minPosArr = JNumber3D.toArray(minPos);
+			maxPosArr = JNumber3D.toArray(maxPos);
+			p0 = JNumber3D.toArray(seg.origin);
+			p1 = JNumber3D.toArray(seg.getEnd());
+			for (i = 0; i < 3; i++ ) {
+				jDir = (i + 1) % 3;
+				kDir = (i + 2) % 3;
+				faceOffsets = Vector.<Number>([minPosArr[i], maxPosArr[i]]);
+				
+				for (iFace = 0 ; iFace < 2 ; iFace++) {
+					dist0 = p0[i] - faceOffsets[iFace];
+				    dist1 = p1[i] - faceOffsets[iFace];
+				    frac = -1;
+					if (dist0 * dist1 < -tiny)
+						frac = -dist0 / (dist1 - dist0);
+				    else if (Math.abs(dist0) < tiny)
+						frac = 0;
+				    else if (Math.abs(dist1) < tiny)
+						frac = 1;
+						
+					if (frac >= 0) {
+						pt = JNumber3D.toArray(seg.getPoint(frac));
+						if((pt[jDir] > minPosArr[jDir] - tiny) && 
+						(pt[jDir] < maxPosArr[jDir] + tiny) && 
+						(pt[kDir] > minPosArr[kDir] - tiny) && 
+						(pt[kDir] < maxPosArr[kDir] + tiny)) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
 		}
 	}
 }

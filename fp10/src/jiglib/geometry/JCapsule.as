@@ -1,28 +1,3 @@
-/*
-Copyright (c) 2007 Danny Chapman 
-http://www.rowlhouse.co.uk
-
-This software is provided 'as-is', without any express or implied
-warranty. In no event will the authors be held liable for any damages
-arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-1. The origin of this software must not be misrepresented; you must not
-claim that you wrote the original software. If you use this software
-in a product, an acknowledgment in the product documentation would be
-appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-misrepresented as being the original software.
-3. This notice may not be removed or altered from any source
-distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
 package jiglib.geometry{
 
 	import flash.geom.Matrix3D;
@@ -70,7 +45,7 @@ package jiglib.geometry{
 		public function get length():Number {
 			return _length;
 		}
-		 
+		
 		public function getBottomPos(state:PhysicsState):Vector3D {
 			return state.position.add(JNumber3D.getScaleVector(state.getOrientationCols()[1], -_length / 2));
 		}
@@ -84,27 +59,29 @@ package jiglib.geometry{
 			out.frac = 0;
 			out.position = new Vector3D();
 			out.normal = new Vector3D();
-
-			var Ks:Vector3D = seg.delta;
-			var kss:Number = Ks.dotProduct(Ks);
-			var radiusSq:Number = _radius * _radius;
+			
+			var kss:Number,radiusSq:Number,kee:Number,kes:Number,kgs:Number,keg:Number,kgg:Number,distSq:Number,a:Number,b:Number,c:Number,blah:Number,t:Number,tiny:Number=JMath3D.NUM_TINY;
+			var Ks:Vector3D,Ke:Vector3D,Kg:Vector3D;
+			Ks = seg.delta;
+			kss = Ks.dotProduct(Ks);
+			radiusSq = _radius * _radius;
 
 			var cols:Vector.<Vector3D> = state.getOrientationCols();
 			var cylinderAxis:JSegment = new JSegment(getBottomPos(state), cols[1]);
-			var Ke:Vector3D = cylinderAxis.delta;
-			var Kg:Vector3D = cylinderAxis.origin.subtract(seg.origin);
-			var kee:Number = Ke.dotProduct(Ke);
-			if (Math.abs(kee) < JNumber3D.NUM_TINY)
+			Ke = cylinderAxis.delta;
+			Kg = cylinderAxis.origin.subtract(seg.origin);
+			kee = Ke.dotProduct(Ke);
+			if (Math.abs(kee) < tiny)
 			{
 				return false;
 			}
 
-			var kes:Number = Ke.dotProduct(Ks);
-			var kgs:Number = Kg.dotProduct(Ks);
-			var keg:Number = Ke.dotProduct(Kg);
-			var kgg:Number = Kg.dotProduct(Kg);
+			kes = Ke.dotProduct(Ks);
+			kgs = Kg.dotProduct(Ks);
+			keg = Ke.dotProduct(Kg);
+			kgg = Kg.dotProduct(Kg);
 
-			var distSq:Number = Kg.subtract(JNumber3D.getDivideVector(JNumber3D.getScaleVector(Ke, keg), kee)).lengthSquared;
+			distSq = Kg.subtract(JNumber3D.getDivideVector(JNumber3D.getScaleVector(Ke, keg), kee)).lengthSquared;
 			if (distSq < radiusSq)
 			{
 				out.frac = 0;
@@ -115,19 +92,19 @@ package jiglib.geometry{
 				return true;
 			}
 
-			var a:Number = kee * kss - (kes * kes);
-			if (Math.abs(a) < JNumber3D.NUM_TINY)
+			a = kee * kss - (kes * kes);
+			if (Math.abs(a) < tiny)
 			{
 				return false;
 			}
-			var b:Number = 2 * (keg * kes - kee * kgs);
-			var c:Number = kee * (kgg - radiusSq) - (keg * keg);
-			var blah:Number = (b * b) - 4 * a * c;
+			b = 2 * (keg * kes - kee * kgs);
+			c = kee * (kgg - radiusSq) - (keg * keg);
+			blah = (b * b) - 4 * a * c;
 			if (blah < 0)
 			{
 				return false;
 			}
-			var t:Number = (-b - Math.sqrt(blah)) / (2 * a);
+			t = (-b - Math.sqrt(blah)) / (2 * a);
 			if (t < 0 || t > 1)
 			{
 				return false;
@@ -141,16 +118,17 @@ package jiglib.geometry{
 		}
 		
 		override public function getInertiaProperties(m:Number):Matrix3D {
-			var cylinderMass:Number = m * Math.PI * _radius * _radius * _length / getVolume();
-			var Ixx:Number = 0.25 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
-			var Iyy:Number = 0.5 * cylinderMass * _radius * _radius;
-			var Izz:Number = Ixx;
+			var cylinderMass:Number,Ixx:Number,Iyy:Number,Izz:Number,endMass:Number;
+			cylinderMass = m * Math.PI * _radius * _radius * _length / getVolume();
+			Ixx = 0.25 * cylinderMass * _radius * _radius + (1 / 12) * cylinderMass * _length * _length;
+			Iyy = 0.5 * cylinderMass * _radius * _radius;
+			Izz = Ixx;
 			 
-			var endMass:Number = m - cylinderMass;
+			endMass = m - cylinderMass;
 			Ixx += (0.4 * endMass * _radius * _radius + endMass * Math.pow(0.5 * _length, 2));
 			Iyy += (0.2 * endMass * _radius * _radius);
 			Izz += (0.4 * endMass * _radius * _radius + endMass * Math.pow(0.5 * _length, 2));
-			 
+			
 			return JMatrix3D.getScaleMatrix(Ixx, Iyy, Izz);
 		}
 		

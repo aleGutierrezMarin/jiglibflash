@@ -6,9 +6,6 @@ package jiglib.plugin.away3dlite
 
 	import jiglib.plugin.ISkin3D;
 
-	/**
-	 * @author katopz
-	 */
 	public class Away3DLiteMesh implements ISkin3D
 	{
 		public function get transform():Matrix3D

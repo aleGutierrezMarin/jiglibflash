@@ -19,10 +19,16 @@ distribution.
 */
 
 /**
- * @author Muzer(muzerly@gmail.com), speedok(speedok@gmail.com)
- * @link http://code.google.com/p/jiglibflash
+ * @authors Ringo (http://www.ringo.nl/)
+ * 			Muzer(http://www.muzerly.com/)
+ * 			Devin Reimer (blog.almostlogical.com)
+ * 			Bartek (http://www.everyday3d.com/)
+ * 			Katopz (http://www.sleepydesign.com/)
+ 
+ * 			 
+ * @link 	http://www.jiglibflash.com
+ * @contact	jiglibflash at ringo.nl
  */
-
 
 package jiglib.physics
 {
@@ -32,47 +38,50 @@ package jiglib.physics
 	import jiglib.collision.CollDetectInfo;
 	import jiglib.collision.CollPointInfo;
 	import jiglib.collision.CollisionInfo;
-	import jiglib.collision.CollisionSystem;
+	import jiglib.collision.CollisionSystemAbstract;
+	import jiglib.collision.CollisionSystemBrute;
+	import jiglib.collision.CollisionSystemGrid;
 	import jiglib.data.ContactData;
 	import jiglib.math.JNumber3D;
+	import jiglib.math.JMath3D;
 	import jiglib.physics.constraint.JConstraint;
 	
 	public class PhysicsSystem
 	{
-		private static var _currentPhysicsSystem:PhysicsSystem;
+		private static var _currentPhysicsSystem	: PhysicsSystem;
 		
-		private const _maxVelMag:Number = 0.5;
-		private const _minVelForProcessing:Number = 0.001;
+		private const _maxVelMag					: Number = 0.5;
+		private const _minVelForProcessing			: Number = 0.001;
 		
-		private var _bodies:Vector.<RigidBody>;
-		private var _activeBodies:Vector.<RigidBody>;
-		private var _collisions:Vector.<CollisionInfo>;
-		private var _constraints:Vector.<JConstraint>;
-		private var _controllers:Vector.<PhysicsController>;
+		private var _bodies							: Vector.<RigidBody>;
+		private var _activeBodies					: Vector.<RigidBody>;
+		private var _collisions						: Vector.<CollisionInfo>;
+		private var _constraints					: Vector.<JConstraint>;
+		private var _controllers					: Vector.<PhysicsController>;
 		
-		private var _gravityAxis:int;
-		private var _gravity:Vector3D;
+		private var _gravityAxis					: int;
+		private var _gravity						: Vector3D;
 		
-		private var _doingIntegration:Boolean;
+		private var _doingIntegration				: Boolean;
 		
-		private var preProcessCollisionFn:Function;
-		private var preProcessContactFn:Function;
-		private var processCollisionFn:Function;
-		private var processContactFn:Function;
+		private var preProcessCollisionFn			: Function;
+		private var preProcessContactFn				: Function;
+		private var processCollisionFn				: Function;
+		private var processContactFn				: Function;
 		
-		private var _cachedContacts:Vector.<ContactData>;
-		private var _collisionSystem:CollisionSystem;
+		private var _cachedContacts					: Vector.<ContactData>;
+		private var _collisionSystem				: CollisionSystemAbstract;
 		
 		public static function getInstance():PhysicsSystem
 		{
 			if (!_currentPhysicsSystem)
 			{
-				trace("version: JigLibFlash fp10 v0.50 (2010-8-12)");
+				trace("version: JigLibFlash fp10 (2011-7-14)");
 				_currentPhysicsSystem = new PhysicsSystem();
 			}
 			return _currentPhysicsSystem;
 		}
-		
+	
 		public function PhysicsSystem()
 		{
 			setSolverType(JConfig.solverType);
@@ -84,21 +93,22 @@ package jiglib.physics
 			_controllers = new Vector.<PhysicsController>();
 			
 			_cachedContacts = new Vector.<ContactData>();
-			_collisionSystem = new CollisionSystem();
 			
 			setGravity(JNumber3D.getScaleVector(Vector3D.Y_AXIS, -10));
 		}
 		
-		private function getAllExternalForces(dt:Number):void
-		{
-			for each (var body:RigidBody in _bodies)
-				body.addExternalForces(dt);
-			
-			for each (var controller:PhysicsController in _controllers)
-				controller.updateController(dt);
+		public function setCollisionSystem(collisionSystemGrid:Boolean = false, sx:Number = 0, sy:Number = 0, sz:Number = 0, nx:int = 20, ny:int = 20, nz:int = 20, dx:int = 200, dy:int = 200, dz:int = 200):void {
+			// which collisionsystem to use grid / brute
+			if (collisionSystemGrid)
+			{
+				_collisionSystem = new CollisionSystemGrid(sx, sy, sz, nx, ny, nz, dx, dy, dz);
+			}
+			else {
+				_collisionSystem = new CollisionSystemBrute(); // brute by default	
+			}
 		}
 		
-		public function getCollisionSystem():CollisionSystem
+		public function getCollisionSystem():CollisionSystemAbstract
 		{
 			return _collisionSystem;
 		}
@@ -132,15 +142,28 @@ package jiglib.physics
 			return _gravityAxis;
 		}
 		
+		//get all rigid bodies in the simulation
 		public function get bodies():Vector.<RigidBody>
 		{
 			return _bodies;
+		}
+
+		//get all activated rigid bodies in the simulation
+		public function get activeBodies():Vector.<RigidBody>
+		{
+			return _activeBodies;
+		}
+		
+		//get all constraints in the simulation
+		public function get constraints():Vector.<JConstraint>
+		{
+			return _constraints;
 		}
 		
 		// Add a rigid body to the simulation
 		public function addBody(body:RigidBody):void
 		{
-			if (!findBody(body))
+			if (_bodies.indexOf(body) < 0)
 			{
 				_bodies.push(body);
 				_collisionSystem.addCollisionBody(body);
@@ -150,55 +173,70 @@ package jiglib.physics
 			}
 		}
 		
+		//remove a rigid body from the simulation
 		public function removeBody(body:RigidBody):void
 		{
-			if (findBody(body))
+			if (_bodies.indexOf(body) >= 0)
 			{
 				_bodies.splice(_bodies.indexOf(body), 1);
 				_collisionSystem.removeCollisionBody(body);
 			}
 		}
 		
+		//remove all rigid bodies from the simulation
 		public function removeAllBodies():void
 		{
-			_bodies.splice(0, _bodies.length);
+			_bodies.length=0;
 			_collisionSystem.removeAllCollisionBodies();
 		}
 		
-		// Add a constraint to the simulation
+		// add a constraint to the simulation, do not need call this function yourself,
+		// this just used in constraint system
 		public function addConstraint(constraint:JConstraint):void
 		{
-			if (!findConstraint(constraint))
+			if (_constraints.indexOf(constraint) < 0)
 				_constraints.push(constraint);
 		}
 		
+		//remove a constraint from the simulation, do not need call this function yourself,
+		//this just used in constraint system
 		public function removeConstraint(constraint:JConstraint):void
 		{
-			if (findConstraint(constraint))
+			if (_constraints.indexOf(constraint) >= 0)
 				_constraints.splice(_constraints.indexOf(constraint), 1);
 		}
 		
-		public function removeAllConstraints():void
-		{
-			_constraints.splice(0, _constraints.length);
+		//remove all constraints from the simulation
+		public function removeAllConstraints():void {
+			for each(var constraint:JConstraint in _constraints) {
+				constraint.disableConstraint();
+			}
+			_constraints.length = 0;
 		}
 		
-		// Add a physics controlled to the simulation
+		// Add a physics controlled to the simulation,do not need call this function yourself,
+		//this just used in PhysicsController
 		public function addController(controller:PhysicsController):void
 		{
-			if (!findController(controller))
+			if (_controllers.indexOf(controller) < 0)
 				_controllers.push(controller);
 		}
 		
+		// Remove a physics controlled from the simulation,do not need call this function yourself,
+		//this just used in PhysicsController
 		public function removeController(controller:PhysicsController):void
 		{
-			if (findController(controller))
+			if (_controllers.indexOf(controller) >= 0)
 				_controllers.splice(_controllers.indexOf(controller), 1);
 		}
 		
+		//remove all controllers from the simulation
 		public function removeAllControllers():void
 		{
-			_controllers.splice(0, _controllers.length);
+			for each(var controller:PhysicsController in _controllers) {
+				controller.disableController();
+			}
+			_controllers.length=0;
 		}
 		
 		public function setSolverType(type:String):void
@@ -208,8 +246,8 @@ package jiglib.physics
 				case "FAST":
 					preProcessCollisionFn = preProcessCollisionFast;
 					preProcessContactFn = preProcessCollisionFast;
-					processCollisionFn = processCollisionFast;
-					processContactFn = processCollisionFast;
+					processCollisionFn = processCollisionNormal;
+					processContactFn = processCollisionNormal;
 					return;
 				case "NORMAL":
 					preProcessCollisionFn = preProcessCollisionNormal;
@@ -232,19 +270,14 @@ package jiglib.physics
 			}
 		}
 		
-		private function findBody(body:RigidBody):Boolean
+		private function moreCollPtPenetration(info0:CollPointInfo, info1:CollPointInfo):Number
 		{
-			return _bodies.indexOf(body) > -1;
-		}
-		
-		private function findConstraint(constraint:JConstraint):Boolean
-		{
-			return _constraints.indexOf(constraint) > -1;
-		}
-		
-		private function findController(controller:PhysicsController):Boolean
-		{
-			return _controllers.indexOf(controller) > -1;
+			if (info0.initialPenetration < info1.initialPenetration)
+				return 1;
+			else if (info0.initialPenetration > info1.initialPenetration)
+				return -1;
+			else
+				return 0;
 		}
 		
 		// fast-but-inaccurate pre-processor
@@ -252,39 +285,22 @@ package jiglib.physics
 		{
 			collision.satisfied = false;
 			
-			var body0:RigidBody = collision.objInfo.body0;
-			var body1:RigidBody = collision.objInfo.body1;
+			var body0:RigidBody,body1:RigidBody;
 			
-			var N:Vector3D = collision.dirToBody;
-			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt;
-			var approachScale:Number = 0;
+			body0 = collision.objInfo.body0;
+			body1 = collision.objInfo.body1;
+			
+			var N:Vector3D = collision.dirToBody,tempV:Vector3D;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,tiny:Number=JMath3D.NUM_TINY,allowedPenetration:Number=JConfig.allowedPenetration;
 			var ptInfo:CollPointInfo;
-			var tempV:Vector3D;
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
-			var ptNum:int = collision_pointInfo.length;
 			
-			if (ptNum > 1)
+			if (collision_pointInfo.length > 3)
 			{
-				var avR0:Vector3D = new Vector3D();
-				var avR1:Vector3D = new Vector3D();
-				var avDepth:Number = 0;
-				
-				for each (ptInfo in collision_pointInfo)
-				{
-					avR0 = avR0.add(ptInfo.r0);
-					avR1 = avR1.add(ptInfo.r1);
-					avDepth += ptInfo.initialPenetration;
-				}
-				
-				avR0 = JNumber3D.getDivideVector(avR0, Number(ptNum));
-				avR1 = JNumber3D.getDivideVector(avR1, Number(ptNum));
-				avDepth /= ptNum;
-				
-				collision_pointInfo = collision.pointInfo = new Vector.<CollPointInfo>(1, true);
-				collision_pointInfo[0] = new CollPointInfo();
-				collision_pointInfo[0].r0 = avR0;
-				collision_pointInfo[0].r1 = avR1;
-				collision_pointInfo[0].initialPenetration = avDepth;
+				collision_pointInfo=collision_pointInfo.sort(moreCollPtPenetration);
+				collision_pointInfo.fixed=false;
+				collision_pointInfo.length=3;
+				collision_pointInfo.fixed=true;
 			}
 			
 			for each (ptInfo in collision_pointInfo)
@@ -300,34 +316,34 @@ package jiglib.physics
 					ptInfo.denominator = body0.invMass + N.dotProduct(tempV.crossProduct(ptInfo.r0));
 				}
 				
-				if (body1.movable)
+				if (body1 && body1.movable)
 				{
 					tempV = ptInfo.r1.crossProduct(N);
 					tempV = body1.worldInvInertia.transformVector(tempV);
 					ptInfo.denominator += (body1.invMass + N.dotProduct(tempV.crossProduct(ptInfo.r1)));
 				}
 				
-				if (ptInfo.denominator < JNumber3D.NUM_TINY)
-					ptInfo.denominator = JNumber3D.NUM_TINY;
+				if (ptInfo.denominator < tiny)
+					ptInfo.denominator = tiny;
 				
-				if (ptInfo.initialPenetration > JConfig.allowedPenetration)
+				if (ptInfo.initialPenetration > allowedPenetration)
 				{
-					ptInfo.minSeparationVel = (ptInfo.initialPenetration - JConfig.allowedPenetration) / timescale;
+					ptInfo.minSeparationVel = (ptInfo.initialPenetration - allowedPenetration) / timescale;
 				}
 				else
 				{
-					approachScale = -0.1 * (ptInfo.initialPenetration - JConfig.allowedPenetration) / JConfig.allowedPenetration;
+					approachScale = -0.1 * (ptInfo.initialPenetration - allowedPenetration) / allowedPenetration;
 					
-					if (approachScale < JNumber3D.NUM_TINY)
+					if (approachScale < tiny)
 					{
-						approachScale = JNumber3D.NUM_TINY;
+						approachScale = tiny;
 					}
 					else if (approachScale > 1)
 					{
 						approachScale = 1;
 					}
 					
-					ptInfo.minSeparationVel = approachScale * (ptInfo.initialPenetration - JConfig.allowedPenetration) / Math.max(dt, JNumber3D.NUM_TINY);
+					ptInfo.minSeparationVel = approachScale * (ptInfo.initialPenetration - allowedPenetration) / dt;
 				}
 				
 				if (ptInfo.minSeparationVel > _maxVelMag)
@@ -340,14 +356,14 @@ package jiglib.physics
 		{
 			collision.satisfied = false;
 			
-			var body0:RigidBody = collision.objInfo.body0;
-			var body1:RigidBody = collision.objInfo.body1;
+			var body0:RigidBody,body1:RigidBody;
 			
-			var N:Vector3D = collision.dirToBody;
-			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt;
-			var approachScale:Number = 0;
+			body0 = collision.objInfo.body0;
+			body1 = collision.objInfo.body1;
+			
+			var N:Vector3D = collision.dirToBody,tempV:Vector3D;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,tiny:Number=JMath3D.NUM_TINY,allowedPenetration:Number=JConfig.allowedPenetration;
 			var ptInfo:CollPointInfo;
-			var tempV:Vector3D;
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
 			for each (ptInfo in collision_pointInfo)
@@ -363,33 +379,33 @@ package jiglib.physics
 					ptInfo.denominator = body0.invMass + N.dotProduct(tempV.crossProduct(ptInfo.r0));
 				}
 				
-				if (body1.movable)
+				if (body1 && body1.movable)
 				{
 					tempV = ptInfo.r1.crossProduct(N);
 					tempV = body1.worldInvInertia.transformVector(tempV);
 					ptInfo.denominator += (body1.invMass + N.dotProduct(tempV.crossProduct(ptInfo.r1)));
 				}
 				
-				if (ptInfo.denominator < JNumber3D.NUM_TINY)
-					ptInfo.denominator = JNumber3D.NUM_TINY;
+				if (ptInfo.denominator < tiny)
+					ptInfo.denominator = tiny;
 				
-				if (ptInfo.initialPenetration > JConfig.allowedPenetration)
+				if (ptInfo.initialPenetration > allowedPenetration)
 				{
-					ptInfo.minSeparationVel = (ptInfo.initialPenetration - JConfig.allowedPenetration) / timescale;
+					ptInfo.minSeparationVel = (ptInfo.initialPenetration - allowedPenetration) / timescale;
 				}
 				else
 				{
-					approachScale = -0.1 * (ptInfo.initialPenetration - JConfig.allowedPenetration) / JConfig.allowedPenetration;
+					approachScale = -0.1 * (ptInfo.initialPenetration - allowedPenetration) / allowedPenetration;
 					
-					if (approachScale < JNumber3D.NUM_TINY)
+					if (approachScale < tiny)
 					{
-						approachScale = JNumber3D.NUM_TINY;
+						approachScale = tiny;
 					}
 					else if (approachScale > 1)
 					{
 						approachScale = 1;
 					}
-					ptInfo.minSeparationVel = approachScale * (ptInfo.initialPenetration - JConfig.allowedPenetration) / Math.max(dt, JNumber3D.NUM_TINY);
+					ptInfo.minSeparationVel = approachScale * (ptInfo.initialPenetration - allowedPenetration) / dt;
 				}
 				
 				if (ptInfo.minSeparationVel > _maxVelMag)
@@ -401,17 +417,15 @@ package jiglib.physics
 		private function preProcessCollisionAccumulated(collision:CollisionInfo, dt:Number):void
 		{
 			collision.satisfied = false;
-			var body0:RigidBody = collision.objInfo.body0;
-			var body1:RigidBody = collision.objInfo.body1;
 			
-			var N:Vector3D = collision.dirToBody;
-			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt;
+			var body0:RigidBody,body1:RigidBody;
 			
-			var tempV:Vector3D;
+			body0 = collision.objInfo.body0;
+			body1 = collision.objInfo.body1;
+			
+			var N:Vector3D = collision.dirToBody,tempV:Vector3D;
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt,approachScale:Number = 0,numTiny:Number = JMath3D.NUM_TINY,allowedPenetration:Number = JConfig.allowedPenetration;
 			var ptInfo:CollPointInfo;
-			var approachScale:Number = 0;
-			var numTiny:Number = JNumber3D.NUM_TINY;
-			var allowedPenetration:Number = JConfig.allowedPenetration;
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
 			for each (ptInfo in collision_pointInfo)
@@ -427,7 +441,7 @@ package jiglib.physics
 					ptInfo.denominator = body0.invMass + N.dotProduct(tempV.crossProduct(ptInfo.r0));
 				}
 				
-				if (body1.movable)
+				if (body1 && body1.movable)
 				{
 					tempV = ptInfo.r1.crossProduct(N);
 					tempV = body1.worldInvInertia.transformVector(tempV);
@@ -489,106 +503,19 @@ package jiglib.physics
 				{
 					var impulse:Vector3D = JNumber3D.getScaleVector(N, ptInfo.accumulatedNormalImpulse);
 					impulse = impulse.add(ptInfo.accumulatedFrictionImpulse);
-					body0.applyBodyWorldImpulse(impulse, ptInfo.r0);
-					body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1);
+					body0.applyBodyWorldImpulse(impulse, ptInfo.r0, false);
+					if (body1)
+					body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1, false);
 				}
 				
 				if (ptInfo.accumulatedNormalImpulseAux != 0)
 				{
 					impulse = JNumber3D.getScaleVector(N, ptInfo.accumulatedNormalImpulseAux);
-					body0.applyBodyWorldImpulseAux(impulse, ptInfo.r0);
-					body1.applyBodyWorldImpulseAux(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1);
+					body0.applyBodyWorldImpulseAux(impulse, ptInfo.r0, false);
+					if (body1)
+					body1.applyBodyWorldImpulseAux(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1, false);
 				}
 			}
-		}
-		
-		private function processCollisionFast(collision:CollisionInfo, dt:Number):Boolean
-		{
-			collision.satisfied = true;
-			
-			var body0:RigidBody = collision.objInfo.body0;
-			var body1:RigidBody = collision.objInfo.body1;
-			
-			var gotOne:Boolean = false;
-			var N:Vector3D = collision.dirToBody;
-			
-			var deltaVel:Number = 0;
-			var normalVel:Number = 0;
-			var finalNormalVel:Number = 0;
-			var normalImpulse:Number = 0;
-			var impulse:Vector3D;
-			var Vr0:Vector3D;
-			var Vr1:Vector3D;
-			var ptInfo:CollPointInfo;
-			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
-			
-			for each (ptInfo in collision_pointInfo)
-			{
-				Vr0 = body0.getVelocity(ptInfo.r0);
-				Vr1 = body1.getVelocity(ptInfo.r1);
-				if (body1.movable) normalVel = Vr0.subtract(Vr1).dotProduct(N);
-				else normalVel = Vr0.dotProduct(N);
-				if (normalVel > ptInfo.minSeparationVel)
-					continue;
-				
-				finalNormalVel = -1 * collision.mat.restitution * normalVel;
-				
-				if (finalNormalVel < _minVelForProcessing)
-					finalNormalVel = ptInfo.minSeparationVel;
-				
-				deltaVel = finalNormalVel - normalVel;
-				
-				if (deltaVel <= _minVelForProcessing)
-					continue;
-				
-				normalImpulse = deltaVel / ptInfo.denominator;
-				
-				gotOne = true;
-				impulse = JNumber3D.getScaleVector(N, normalImpulse);
-				
-				body0.applyBodyWorldImpulse(impulse, ptInfo.r0);
-				body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1);
-				
-				var tempV:Vector3D;
-				var VR:Vector3D = Vr0.clone();
-				if (body1.movable) VR = VR.subtract(Vr1);
-				var tangent_vel:Vector3D = VR.subtract(JNumber3D.getScaleVector(N, VR.dotProduct(N)));
-				var tangent_speed:Number = tangent_vel.length;
-				if (tangent_speed > _minVelForProcessing)
-				{
-					var T:Vector3D = JNumber3D.getDivideVector(tangent_vel, -tangent_speed);
-					var denominator:Number = 0;
-					
-					if (body0.movable)
-					{
-						tempV = ptInfo.r0.crossProduct(T);
-						tempV = body0.worldInvInertia.transformVector(tempV);
-						denominator = body0.invMass + T.dotProduct(tempV.crossProduct(ptInfo.r0));
-					}
-					
-					if (body1.movable)
-					{
-						tempV = ptInfo.r1.crossProduct(T);
-						tempV = body1.worldInvInertia.transformVector(tempV);
-						denominator += (body1.invMass + T.dotProduct(tempV.crossProduct(ptInfo.r1)));
-					}
-					
-					if (denominator > JNumber3D.NUM_TINY)
-					{
-						var impulseToReverse:Number = tangent_speed / denominator;
-						
-						T = JNumber3D.getScaleVector(T, impulseToReverse);
-						body0.applyBodyWorldImpulse(T, ptInfo.r0);
-						body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(T, -1), ptInfo.r1);
-					}
-				}
-			}
-			if (gotOne)
-			{
-				body0.setConstraintsAndCollisionsUnsatisfied();
-				body1.setConstraintsAndCollisionsUnsatisfied();
-			}
-			return gotOne;
 		}
 		
 		/* Handle an individual collision by classifying it, calculating
@@ -600,28 +527,27 @@ package jiglib.physics
 		{
 			collision.satisfied = true;
 			
-			var body0:RigidBody = collision.objInfo.body0;
-			var body1:RigidBody = collision.objInfo.body1;
+			var body0:RigidBody,body1:RigidBody;
 			
-			var gotOne:Boolean = false;
-			var N:Vector3D = collision.dirToBody;
+			body0 = collision.objInfo.body0;
+			body1 = collision.objInfo.body1;
 			
-			var deltaVel:Number = 0;
-			var normalVel:Number = 0;
-			var finalNormalVel:Number = 0;
-			var normalImpulse:Number = 0;
-			var impulse:Vector3D;
-			var Vr0:Vector3D;
-			var Vr1:Vector3D;
+			var gotOne:Boolean=false;
+			var deltaVel:Number=0,normalVel:Number=0,finalNormalVel:Number=0,normalImpulse:Number=0,tangent_speed:Number,denominator:Number,impulseToReverse:Number,impulseFromNormalImpulse:Number,frictionImpulse:Number,tiny:Number=JMath3D.NUM_TINY;
+			var N:Vector3D = collision.dirToBody,impulse:Vector3D,Vr0:Vector3D,Vr1:Vector3D,tempV:Vector3D,VR:Vector3D,tangent_vel:Vector3D,T:Vector3D;
 			var ptInfo:CollPointInfo;
+			
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
 			for each (ptInfo in collision_pointInfo)
 			{
 				Vr0 = body0.getVelocity(ptInfo.r0);
-				Vr1 = body1.getVelocity(ptInfo.r1);
-				if (body1.movable) normalVel = Vr0.subtract(Vr1).dotProduct(N);
-				else normalVel = Vr0.dotProduct(N);
+				if (body1){
+					Vr1 = body1.getVelocity(ptInfo.r1);
+					normalVel = Vr0.subtract(Vr1).dotProduct(N);
+				}else{
+					normalVel = Vr0.dotProduct(N);
+				} 
 				if (normalVel > ptInfo.minSeparationVel)
 					continue;
 				
@@ -640,19 +566,18 @@ package jiglib.physics
 				gotOne = true;
 				impulse = JNumber3D.getScaleVector(N, normalImpulse);
 				
-				body0.applyBodyWorldImpulse(impulse, ptInfo.r0);
-				body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1);
+				body0.applyBodyWorldImpulse(impulse, ptInfo.r0, false);
+				if(body1)body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1, false);
 				
-				var tempV:Vector3D;
-				var VR:Vector3D = Vr0.clone();
-				if (body1.movable) VR = VR.subtract(Vr1);
-				var tangent_vel:Vector3D = VR.subtract(JNumber3D.getScaleVector(N, VR.dotProduct(N)));
-				var tangent_speed:Number = tangent_vel.length;
+				VR = Vr0.clone();
+				if (body1) VR = VR.subtract(Vr1);
+				tangent_vel = VR.subtract(JNumber3D.getScaleVector(N, VR.dotProduct(N)));
+				tangent_speed = tangent_vel.length;
 				
 				if (tangent_speed > _minVelForProcessing)
 				{
-					var T:Vector3D = JNumber3D.getScaleVector(JNumber3D.getDivideVector(tangent_vel, tangent_speed), -1);
-					var denominator:Number = 0;
+					T = JNumber3D.getDivideVector(tangent_vel, -tangent_speed);
+					denominator = 0;
 					
 					if (body0.movable)
 					{
@@ -661,27 +586,26 @@ package jiglib.physics
 						denominator = body0.invMass + T.dotProduct(tempV.crossProduct(ptInfo.r0));
 					}
 					
-					if (body1.movable)
+					if (body1 && body1.movable)
 					{
 						tempV = ptInfo.r1.crossProduct(T);
 						tempV = body1.worldInvInertia.transformVector(tempV);
 						denominator += (body1.invMass + T.dotProduct(tempV.crossProduct(ptInfo.r1)));
 					}
 					
-					if (denominator > JNumber3D.NUM_TINY)
+					if (denominator > tiny)
 					{
-						var impulseToReverse:Number = tangent_speed / denominator;
+						impulseToReverse = tangent_speed / denominator;
 						
-						var impulseFromNormalImpulse:Number = collision.mat.friction * normalImpulse;
-						var frictionImpulse:Number;
+						impulseFromNormalImpulse = collision.mat.friction * normalImpulse;
 						if (impulseToReverse < impulseFromNormalImpulse) {
 							frictionImpulse = impulseToReverse;
 						}else {
 							frictionImpulse = collision.mat.friction * normalImpulse;
 						}
-						T = JNumber3D.getScaleVector(T, frictionImpulse);
-						body0.applyBodyWorldImpulse(T, ptInfo.r0);
-						body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(T, -1), ptInfo.r1);
+						T.scaleBy(frictionImpulse);
+						body0.applyBodyWorldImpulse(T, ptInfo.r0, false);
+						if(body1)body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(T, -1), ptInfo.r1, false);
 					}
 				}
 			}
@@ -689,7 +613,7 @@ package jiglib.physics
 			if (gotOne)
 			{
 				body0.setConstraintsAndCollisionsUnsatisfied();
-				body1.setConstraintsAndCollisionsUnsatisfied();
+				if(body1)body1.setConstraintsAndCollisionsUnsatisfied();
 			}
 			
 			return gotOne;
@@ -699,30 +623,27 @@ package jiglib.physics
 		private function processCollisionAccumulated(collision:CollisionInfo, dt:Number):Boolean
 		{
 			collision.satisfied = true;
-			var gotOne:Boolean = false;
-			var N:Vector3D = collision.dirToBody;
-			var body0:RigidBody = collision.objInfo.body0;
-			var body1:RigidBody = collision.objInfo.body1;
 			
-			var deltaVel:Number = 0;
-			var normalVel:Number = 0;
-			var normalImpulse:Number = 0;
-			var impulse:Vector3D;
-			var Vr0:Vector3D;
-			var Vr1:Vector3D;
+			var body0:RigidBody,body1:RigidBody;
+			body0 = collision.objInfo.body0;
+			body1 = collision.objInfo.body1;
+			
+			var gotOne:Boolean=false;
+			var deltaVel:Number=0,normalVel:Number=0,finalNormalVel:Number=0,normalImpulse:Number=0,tangent_speed:Number,denominator:Number,impulseToReverse:Number,AFIMag:Number,maxAllowedAFIMag:Number,tiny:Number=JMath3D.NUM_TINY;
+			var N:Vector3D = collision.dirToBody,impulse:Vector3D,Vr0:Vector3D,Vr1:Vector3D,tempV:Vector3D,VR:Vector3D,tangent_vel:Vector3D,T:Vector3D,frictionImpulseVec:Vector3D,origAccumulatedFrictionImpulse:Vector3D,actualFrictionImpulse:Vector3D;
 			var ptInfo:CollPointInfo;
+			
 			var collision_pointInfo:Vector.<CollPointInfo> = collision.pointInfo;
 			
 			for each (ptInfo in collision_pointInfo)
 			{
 				Vr0 = body0.getVelocity(ptInfo.r0);
-				Vr1 = body1.getVelocity(ptInfo.r1);
-				
-				if (body1.movable) 
+				if (body1){
+					Vr1 = body1.getVelocity(ptInfo.r1);
 					normalVel = Vr0.subtract(Vr1).dotProduct(N);
-				else 
+				}else{
 					normalVel = Vr0.dotProduct(N);
-				
+				}
 				deltaVel = -normalVel;
 				
 				if (ptInfo.minSeparationVel < 0)
@@ -736,16 +657,19 @@ package jiglib.physics
 					var actualImpulse:Number = ptInfo.accumulatedNormalImpulse - origAccumulatedNormalImpulse;
 					
 					impulse = JNumber3D.getScaleVector(N, actualImpulse);
-					body0.applyBodyWorldImpulse(impulse, ptInfo.r0);
-					body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1);
+					body0.applyBodyWorldImpulse(impulse, ptInfo.r0, false);
+					if(body1)body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1, false);
 					
 					gotOne = true;
 				}
 				
 				Vr0 = body0.getVelocityAux(ptInfo.r0);
-				Vr1 = body1.getVelocityAux(ptInfo.r1);
-				if (body1.movable) normalVel = Vr0.subtract(Vr1).dotProduct(N);
-				else normalVel = Vr0.dotProduct(N);
+				if (body1){
+					Vr1 = body1.getVelocityAux(ptInfo.r1);
+					normalVel = Vr0.subtract(Vr1).dotProduct(N);
+				}else{
+					normalVel = Vr0.dotProduct(N);
+				}
 				
 				deltaVel = -normalVel;
 				
@@ -760,8 +684,8 @@ package jiglib.physics
 					actualImpulse = ptInfo.accumulatedNormalImpulseAux - origAccumulatedNormalImpulse;
 					
 					impulse = JNumber3D.getScaleVector(N, actualImpulse);
-					body0.applyBodyWorldImpulseAux(impulse, ptInfo.r0);
-					body1.applyBodyWorldImpulseAux(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1);
+					body0.applyBodyWorldImpulseAux(impulse, ptInfo.r0, false);
+					if(body1)body1.applyBodyWorldImpulseAux(JNumber3D.getScaleVector(impulse, -1), ptInfo.r1, false);
 					
 					gotOne = true;
 				}
@@ -769,18 +693,19 @@ package jiglib.physics
 				if (ptInfo.accumulatedNormalImpulse > 0)
 				{
 					Vr0 = body0.getVelocity(ptInfo.r0);
-					Vr1 = body1.getVelocity(ptInfo.r1);
-					var tempV:Vector3D;
-					var VR:Vector3D = Vr0.clone();
-					if (body1.movable) VR = VR.subtract(Vr1);
-					var tangent_vel:Vector3D = VR.subtract(JNumber3D.getScaleVector(N, VR.dotProduct(N)));
-					var tangent_speed:Number = tangent_vel.length;
+					VR = Vr0.clone();
+					if (body1){
+						Vr1 = body1.getVelocity(ptInfo.r1);
+						VR = VR.subtract(Vr1);
+					} 
+					tangent_vel = VR.subtract(JNumber3D.getScaleVector(N, VR.dotProduct(N)));
+					tangent_speed = tangent_vel.length;
 					
 					if (tangent_speed > _minVelForProcessing)
 					{
 						
-						var T:Vector3D = JNumber3D.getScaleVector(JNumber3D.getDivideVector(tangent_vel, tangent_speed), -1);
-						var denominator:Number = 0;
+						T = JNumber3D.getScaleVector(JNumber3D.getDivideVector(tangent_vel, tangent_speed), -1);
+						denominator = 0;
 						if (body0.movable)
 						{
 							tempV = ptInfo.r0.crossProduct(T);
@@ -788,31 +713,31 @@ package jiglib.physics
 							denominator = body0.invMass + T.dotProduct(tempV.crossProduct(ptInfo.r0));
 						}
 						
-						if (body1.movable)
+						if (body1 && body1.movable)
 						{
 							tempV = ptInfo.r1.crossProduct(T);
 							tempV = body1.worldInvInertia.transformVector(tempV);
 							denominator += (body1.invMass + T.dotProduct(tempV.crossProduct(ptInfo.r1)));
 						}
 						
-						if (denominator > JNumber3D.NUM_TINY)
+						if (denominator > tiny)
 						{
-							var impulseToReverse:Number = tangent_speed / denominator;
-							var frictionImpulseVec:Vector3D = JNumber3D.getScaleVector(T, impulseToReverse);
+							impulseToReverse = tangent_speed / denominator;
+							frictionImpulseVec = JNumber3D.getScaleVector(T, impulseToReverse);
 							
-							var origAccumulatedFrictionImpulse:Vector3D = ptInfo.accumulatedFrictionImpulse.clone();
+							origAccumulatedFrictionImpulse = ptInfo.accumulatedFrictionImpulse.clone();
 							ptInfo.accumulatedFrictionImpulse = ptInfo.accumulatedFrictionImpulse.add(frictionImpulseVec);
 							
-							var AFIMag:Number = ptInfo.accumulatedFrictionImpulse.length;
-							var maxAllowedAFIMag:Number = collision.mat.friction * ptInfo.accumulatedNormalImpulse;
+							AFIMag = ptInfo.accumulatedFrictionImpulse.length;
+							maxAllowedAFIMag = collision.mat.friction * ptInfo.accumulatedNormalImpulse;
 							
-							if (AFIMag > JNumber3D.NUM_TINY && AFIMag > maxAllowedAFIMag)
+							if (AFIMag > tiny && AFIMag > maxAllowedAFIMag)
 								ptInfo.accumulatedFrictionImpulse = JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, maxAllowedAFIMag / AFIMag);
 							
-							var actualFrictionImpulse:Vector3D = ptInfo.accumulatedFrictionImpulse.subtract(origAccumulatedFrictionImpulse);
+							actualFrictionImpulse = ptInfo.accumulatedFrictionImpulse.subtract(origAccumulatedFrictionImpulse);
 							
-							body0.applyBodyWorldImpulse(actualFrictionImpulse, ptInfo.r0);
-							body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(actualFrictionImpulse, -1), ptInfo.r1);
+							body0.applyBodyWorldImpulse(actualFrictionImpulse, ptInfo.r0, false);
+							if(body1)body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(actualFrictionImpulse, -1), ptInfo.r1, false);
 						}
 					}
 				}
@@ -821,10 +746,61 @@ package jiglib.physics
 			if (gotOne)
 			{
 				body0.setConstraintsAndCollisionsUnsatisfied();
-				body1.setConstraintsAndCollisionsUnsatisfied();
+				if(body1)body1.setConstraintsAndCollisionsUnsatisfied();
 			}
 			
 			return gotOne;
+		}
+		
+		private function processCollisionForShock(collision:CollisionInfo, dt:Number):Boolean {
+			
+			collision.satisfied = true;
+			var N:Vector3D = collision.dirToBody;
+			
+			var timescale:Number = JConfig.numPenetrationRelaxationTimesteps * dt;
+			var body0:RigidBody = collision.objInfo.body0;
+			var body1:RigidBody = collision.objInfo.body1;
+			
+			if (!body0.movable)
+				body0 = null;
+			if (body1 && !body1.movable)
+				body1 = null;
+			
+			if (!body0 && !body1) {
+				return false;
+			}
+			
+			var normalVel:Number=0;
+			var finalNormalVel:Number;
+			var impulse:Number;
+			var orig:Number;
+			var actualImpulse:Vector3D;
+			
+			for each(var ptInfo:CollPointInfo in collision.pointInfo) {
+				normalVel=0;
+				if (body0) {
+					normalVel = body0.getVelocity(ptInfo.r0).dotProduct(N) + body0.getVelocityAux(ptInfo.r0).dotProduct(N);
+				}
+				if (body1) {
+					normalVel -= (body1.getVelocity(ptInfo.r1).dotProduct(N) + body1.getVelocityAux(ptInfo.r1).dotProduct(N));
+				}
+				
+				finalNormalVel = (ptInfo.initialPenetration - JConfig.allowedPenetration) / timescale;
+				if (finalNormalVel < 0) {
+					continue;
+				}
+				impulse = (finalNormalVel - normalVel) / ptInfo.denominator;
+				orig = ptInfo.accumulatedNormalImpulseAux;
+				ptInfo.accumulatedNormalImpulseAux = Math.max(ptInfo.accumulatedNormalImpulseAux + impulse, 0);
+				actualImpulse = JNumber3D.getScaleVector(N, ptInfo.accumulatedNormalImpulseAux - orig);
+				
+				if (body0)body0.applyBodyWorldImpulse(actualImpulse, ptInfo.r0, false);
+				if (body1)body1.applyBodyWorldImpulse(JNumber3D.getScaleVector(actualImpulse, -1), ptInfo.r1, false);
+			}
+			
+			if (body0)body0.setConstraintsAndCollisionsUnsatisfied();
+			if (body1)body1.setConstraintsAndCollisionsUnsatisfied();
+			return true;
 		}
 		
 		private function sortPositionX(body0:RigidBody, body1:RigidBody):Number
@@ -875,47 +851,37 @@ package jiglib.physics
 				_collisionSystem.collBody = _collisionSystem.collBody.sort(sortPositionZ);
 			}
 			
+			var setImmovable:Boolean,gotOne:Boolean=true;
 			var info:CollisionInfo;
-			var setImmovable:Boolean;
-			var gotOne:Boolean = true;
-			var body_collisions:Vector.<CollisionInfo>;
-			
-			var body0:RigidBody;
-			var body1:RigidBody;
-			
-			while (gotOne)
+			var body0:RigidBody,body1:RigidBody;
+			 
+			for each (var body:RigidBody in _bodies)
 			{
-				gotOne = false;
-				for each (var body:RigidBody in _bodies)
+				if (body.movable)
 				{
-					if (body.movable && body.doShockProcessing)
+					if (body.collisions.length == 0 || !body.isActive)
 					{
-						if (body.collisions.length == 0 || !body.isActive)
+						body.internalSetImmovable();
+					}
+					else
+					{
+						setImmovable = false;
+						for each (info in body.collisions)
+						{
+							body0 = info.objInfo.body0;
+							body1 = info.objInfo.body1;
+							
+							if ((body0 == body && (!body1 || !body1.movable)) || (body1 == body && (!body0 || !body0.movable)))
+							{
+								preProcessCollisionFn(info, dt);
+								processCollisionForShock(info, dt);
+								setImmovable = true;
+							}
+						}
+						
+						if (setImmovable)
 						{
 							body.internalSetImmovable();
-						}
-						else
-						{
-							setImmovable = false;
-							body_collisions = body.collisions;
-							for each (info in body_collisions)
-							{
-								body0 = info.objInfo.body0;
-								body1 = info.objInfo.body1;
-								
-								if ((body0 == body && !body1.movable) || (body1 == body && !body0.movable))
-								{
-									preProcessCollisionFast(info, dt);
-									processCollisionNormal(info, dt);
-									setImmovable = true;
-								}
-							}
-							
-							if (setImmovable)
-							{
-								body.internalSetImmovable();
-								gotOne = true;
-							}
 						}
 					}
 				}
@@ -924,28 +890,15 @@ package jiglib.physics
 			for each (body in _bodies)
 			{
 				body.internalRestoreImmovable();
-				body_collisions = body.collisions;
-				for each (info in body_collisions)
-				{
-					preProcessCollisionFn(info, dt);
-					processCollisionFn(info, dt);
-				}
 			}
 		}
 		
 		private function updateContactCache():void
 		{
 			_cachedContacts = new Vector.<ContactData>(0, true);
-			var fricImpulse:Vector3D;
-			var contact:ContactData;
 			
-			var collInfo_objInfo:CollDetectInfo;
-			var collInfo_pointInfo:Vector.<CollPointInfo>;
-			
-			var body0:RigidBody;
-			var body1:RigidBody;
-			var i:int = 0;
-			
+			var fricImpulse:Vector3D,body0:RigidBody,body1:RigidBody,contact:ContactData,collInfo_objInfo:CollDetectInfo,collInfo_pointInfo:Vector.<CollPointInfo>;
+			var i:int = 0,id1:int;
 			for each (var collInfo:CollisionInfo in _collisions)
 			{
 				collInfo_objInfo = collInfo.objInfo;
@@ -959,7 +912,9 @@ package jiglib.physics
 				
 				for each (var ptInfo:CollPointInfo in collInfo_pointInfo)
 				{
-					fricImpulse = (body0.id > body1.id) ? ptInfo.accumulatedFrictionImpulse : JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, -1);
+					id1=-1;
+					if (body1) id1=body1.id;
+					fricImpulse = (body0.id > id1) ? ptInfo.accumulatedFrictionImpulse : JNumber3D.getScaleVector(ptInfo.accumulatedFrictionImpulse, -1);
 					
 					_cachedContacts[int(i++)] = contact = new ContactData();
 					contact.pair = new BodyPair(body0, body1, ptInfo.r0, ptInfo.r1);
@@ -970,17 +925,16 @@ package jiglib.physics
 		
 		private function handleAllConstraints(dt:Number, iter:int, forceInelastic:Boolean):void
 		{
-			var origNumCollisions:int = _collisions.length;
+			var origNumCollisions:int = _collisions.length, iteration:int = JConfig.numConstraintIterations, step:int, i:int, len:int;
 			var collInfo:CollisionInfo;
 			var constraint:JConstraint;
-			var step:int;
+			var flag:Boolean, gotOne:Boolean;
 			
 			if (_constraints.length > 0)
 			{
 				for each (constraint in _constraints)
 					constraint.preApply(dt);
 				
-				var iteration:int = JConfig.numConstraintIterations;
 				for (step = 0; step < iteration; step++)
 				{
 					gotOne = false;
@@ -1012,11 +966,10 @@ package jiglib.physics
 					preProcessCollisionFn(collInfo, dt);
 			}
 			
-			var flag:Boolean;
-			var gotOne:Boolean;
 			for (step = 0; step < iter; step++)
 			{
-				gotOne = false;
+				gotOne = true;
+				
 				for each (collInfo in _collisions)
 				{
 					if (!collInfo.satisfied)
@@ -1030,14 +983,12 @@ package jiglib.physics
 					}
 				}
 				
-				tryToActivateAllFrozenObjects();
-				
-				var len:int = _collisions.length;
+				len = _collisions.length;
 				if (forceInelastic)
 				{
-					for (var j:int = origNumCollisions; j < len; j++)
+					for (i = origNumCollisions; i < len; i++)
 					{
-						collInfo = _collisions[int(j)];
+						collInfo = _collisions[i];
 						collInfo.mat.restitution = 0;
 						collInfo.satisfied = false;
 						preProcessContactFn(collInfo, dt);
@@ -1045,11 +996,11 @@ package jiglib.physics
 				}
 				else
 				{
-					for (j = origNumCollisions; j < len; j++)
-						preProcessCollisionFn(_collisions[int(j)], dt);
+					for (i = origNumCollisions; i < len; i++)
+						preProcessCollisionFn(_collisions[i], dt);
 				}
 				
-				origNumCollisions = _collisions.length;
+				origNumCollisions = len;
 				
 				if (!gotOne)
 					break;
@@ -1058,39 +1009,14 @@ package jiglib.physics
 		
 		public function activateObject(body:RigidBody):void
 		{
-			if (!body.movable || body.isActive)
-				return;
+			if (!body.movable || body.isActive) return;
 			
-			body.setActive();
-			_activeBodies.fixed = false;
-			_activeBodies.push(body);
-			_activeBodies.fixed = true;
-			var orig_num:int = _collisions.length;
-			_collisionSystem.detectCollisions(body, _collisions);
-			var other_body:RigidBody;
-			var thisBody_normal:Vector3D;
-			var len:int = _collisions.length;
-			
-			for each (var collisionInfo:CollisionInfo in _collisions)
-			{
-				other_body = collisionInfo.objInfo.body0;
-				thisBody_normal = collisionInfo.dirToBody;
-				
-				if (other_body == body)
-				{
-					other_body = collisionInfo.objInfo.body1;
-					thisBody_normal = JNumber3D.getScaleVector(collisionInfo.dirToBody, -1);
-				}
-				
-				if (!other_body.isActive && other_body.force.dotProduct(thisBody_normal) < -JNumber3D.NUM_TINY)
-					activateObject(other_body);
+			if (_activeBodies.indexOf(body) < 0) {
+				body.setActive();
+				_activeBodies.fixed = false;
+				_activeBodies.push(body);
+				_activeBodies.fixed = true;
 			}
-		}
-		
-		private function dampAllActiveBodies():void
-		{
-			for each (var activeBody:RigidBody in _activeBodies)
-				activeBody.dampForDeactivation();
 		}
 		
 		private function tryToActivateAllFrozenObjects():void
@@ -1105,14 +1031,18 @@ package jiglib.physics
 					}
 					else
 					{
-						if (body.getVelChanged())
-						{
-							body.setVelocity(new Vector3D());
-							body.setAngVel(new Vector3D());
-							body.clearVelChanged();
-						}
+						body.setLineVelocity(new Vector3D());
+						body.setAngleVelocity(new Vector3D());
 					}
 				}
+			}
+		}
+		
+		private function tryToFreezeAllObjects(dt:Number):void
+		{
+			for each (var activeBody:RigidBody in _activeBodies){
+				activeBody.dampForDeactivation();
+				activeBody.tryToFreeze(dt);
 			}
 		}
 		
@@ -1121,26 +1051,29 @@ package jiglib.physics
 			var other_body:RigidBody;
 			var body_collisions:Vector.<CollisionInfo>;
 			
-			for each (var body:RigidBody in _bodies)
+			for each (var body:RigidBody in _activeBodies)
 			{
-				if (body.isActive)
+				body.doMovementActivations(this);
+				body_collisions = body.collisions;
+				if (body_collisions.length > 0)
 				{
-					body.doMovementActivations(this);
-					body_collisions = body.collisions;
-					if (body_collisions.length > 0)
+					for each(var collisionInfo:CollisionInfo in body_collisions)
 					{
-						for each(var collisionInfo:CollisionInfo in body_collisions)
-						{
-							other_body = collisionInfo.objInfo.body0;
-							if (other_body == body)
-								other_body = collisionInfo.objInfo.body1;
-							
-							if (!other_body.isActive)
-								body.addMovementActivation(body.currentState.position, other_body);
-						}
+						other_body = collisionInfo.objInfo.body0;
+						if (other_body == body)
+							other_body = collisionInfo.objInfo.body1;
+						
+						if (!other_body.isActive)
+							body.addMovementActivation(body.currentState.position, other_body);
 					}
 				}
 			}
+		}
+		
+		private function updateAllController(dt:Number):void
+		{
+			for each (var controller:PhysicsController in _controllers)
+			controller.updateController(dt);
 		}
 		
 		private function updateAllVelocities(dt:Number):void
@@ -1149,54 +1082,27 @@ package jiglib.physics
 				activeBody.updateVelocity(dt);
 		}
 		
-		private function updateAllPositions(dt:Number):void
-		{
-			for each (var activeBody:RigidBody in _activeBodies)
-				activeBody.updatePositionWithAux(dt);
-		}
-		
 		private function notifyAllPostPhysics(dt:Number):void
 		{
-			for each (var body:RigidBody in _bodies)
-				body.postPhysics(dt);
-		}
-		
-		private function updateAllObject3D():void
-		{
-			for each (var body:RigidBody in _bodies)
-				body.updateObject3D();
-		}
-		
-		private function limitAllVelocities():void
-		{
 			for each (var activeBody:RigidBody in _activeBodies)
-			{
-				activeBody.limitVel();
-				activeBody.limitAngVel();
-			}
-		}
-		
-		private function tryToFreezeAllObjects(dt:Number):void
-		{
-			for each (var activeBody:RigidBody in _activeBodies)
-				activeBody.tryToFreeze(dt);
+				activeBody.postPhysics(dt);
 		}
 		
 		private function detectAllCollisions(dt:Number):void
 		{
-			for each (var activeBody:RigidBody in _activeBodies)
-				activeBody.storeState();
+			for each (var body:RigidBody in _bodies) {
+				if (body.isActive) {
+					body.storeState();
+					body.updateVelocity(dt);
+					body.updatePositionWithAux(dt);
+				}
+				body.collisions.length = 0;
+			}
 			
-			updateAllVelocities(dt);
-			updateAllPositions(dt);
-			
-			for each (var body:RigidBody in _bodies)
-				body.collisions = new Vector.<CollisionInfo>();
-			
-			_collisions = new Vector.<CollisionInfo>();
+			_collisions.length=0;
 			_collisionSystem.detectAllCollisions(_activeBodies, _collisions);
 			
-			for each (activeBody in _activeBodies)
+			for each (var activeBody:RigidBody in _activeBodies)
 				activeBody.restoreState();
 		}
 		
@@ -1211,11 +1117,9 @@ package jiglib.physics
 				if (body.isActive)
 				{
 					_activeBodies[int(i++)] = body;
-					
-					// copyAllCurrentStatesToOld
-					if(body.getVelChanged())
-						body.copyCurrentStateToOld();
+					body.copyCurrentStateToOld();
 				}
+				
 			}
 			
 			// correct length
@@ -1234,33 +1138,22 @@ package jiglib.physics
 			_doingIntegration = true;
 			
 			findAllActiveBodiesAndCopyStates();
-			
-			getAllExternalForces(dt);
+			updateAllController(dt);
 			detectAllCollisions(dt);
 			handleAllConstraints(dt, JConfig.numCollisionIterations, false);
 			updateAllVelocities(dt);
 			handleAllConstraints(dt, JConfig.numContactIterations, true);
 			
-			if (JConfig.doShockStep) {
-				doShockStep(dt);
-			}
+			if (JConfig.doShockStep) doShockStep(dt);
 			
-			dampAllActiveBodies();
+			tryToActivateAllFrozenObjects();
 			tryToFreezeAllObjects(dt);
 			activateAllFrozenObjectsLeftHanging();
 			
-			limitAllVelocities();
-			
-			updateAllPositions(dt);
 			notifyAllPostPhysics(dt);
-			
-			updateAllObject3D();
 			
 			if (JConfig.solverType == "ACCUMULATED")
 				updateContactCache();
-			
-			for each (var body:RigidBody in _bodies)
-				body.clearForces();
 			
 			_doingIntegration = false;
 		}

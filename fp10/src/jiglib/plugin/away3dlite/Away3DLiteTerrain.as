@@ -13,9 +13,6 @@
 	import jiglib.plugin.ITerrain;
 	import away3dlite.primitives.Plane;
 
-	/**
-	 * @author katopz
-	 */
 	public class Away3DLiteTerrain extends Plane implements ITerrain
 	{
 		//Min of coordinate horizontally;
@@ -139,6 +136,9 @@
 		public function get heights():Array
 		{
 			return _heights;
+		}
+		public function get maxHeight():Number{
+			return 1000000;
 		}
 	}
 }
