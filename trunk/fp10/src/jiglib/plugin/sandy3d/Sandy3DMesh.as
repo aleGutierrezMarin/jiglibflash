@@ -7,9 +7,6 @@ package jiglib.plugin.sandy3d
 	import sandy.core.data.Matrix4;
 	import sandy.core.scenegraph.Shape3D;
 
-	/**
-	 * @author bartekd
-	 */
 	public class Sandy3DMesh implements ISkin3D
 	{
 		

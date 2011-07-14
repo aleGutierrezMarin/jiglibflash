@@ -1,8 +1,5 @@
 package jiglib.data
 {
-	/**
-	 * @author katopz
-	 */
 	public class EdgeData
 	{
 		public var ind0:int;

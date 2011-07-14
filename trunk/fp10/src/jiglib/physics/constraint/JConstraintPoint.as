@@ -1,28 +1,3 @@
-/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
 package jiglib.physics.constraint
 {
 
@@ -30,6 +5,7 @@ package jiglib.physics.constraint
 	
 	import jiglib.math.*;
 	import jiglib.physics.RigidBody;
+	import jiglib.physics.PhysicsSystem;
 
 	// Constraints a point on one body to be fixed to a point on another body
 	public class JConstraintPoint extends JConstraint
@@ -65,12 +41,37 @@ package jiglib.physics.constraint
 			_body1Pos = body1Pos;
 			_allowedDistance = allowedDistance;
 			_timescale = timescale;
-			if (_timescale < JNumber3D.NUM_TINY)
+			if (_timescale < JMath3D.NUM_TINY)
 			{
-				_timescale = JNumber3D.NUM_TINY;
+				_timescale = JMath3D.NUM_TINY;
 			}
-			body0.addConstraint(this);
-			body1.addConstraint(this);
+			
+			_constraintEnabled = false;
+			enableConstraint();
+		}
+		
+		override public function enableConstraint():void
+		{
+			if (_constraintEnabled)
+			{
+				return;
+			}
+			_constraintEnabled = true;
+			_body0.addConstraint(this);
+			_body1.addConstraint(this);
+			PhysicsSystem.getInstance().addConstraint(this);
+		}
+		
+		override public function disableConstraint():void
+		{
+			if (!_constraintEnabled)
+			{
+				return;
+			}
+			_constraintEnabled = false;
+			_body0.removeConstraint(this);
+			_body1.removeConstraint(this);
+			PhysicsSystem.getInstance().removeConstraint(this);
 		}
 
 		override public function preApply(dt:Number):void
@@ -80,12 +81,13 @@ package jiglib.physics.constraint
 			r0 = _body0.currentState.orientation.transformVector(_body0Pos);
 			r1 = _body1.currentState.orientation.transformVector(_body1Pos);
 
-			var worldPos0:Vector3D = _body0.currentState.position.add(r0);
-			var worldPos1:Vector3D = _body1.currentState.position.add(r1);
+			var worldPos0:Vector3D,worldPos1:Vector3D,deviation:Vector3D,deviationAmount:Number;
+			worldPos0 = _body0.currentState.position.add(r0);
+			worldPos1 = _body1.currentState.position.add(r1);
 			_worldPos = JNumber3D.getScaleVector(worldPos0.add(worldPos1), 0.5);
 
-			var deviation:Vector3D = worldPos0.subtract(worldPos1);
-			var deviationAmount:Number = deviation.length;
+			deviation = worldPos0.subtract(worldPos1);
+			deviationAmount = deviation.length;
 			if (deviationAmount > _allowedDistance)
 			{
 				_vrExtra = JNumber3D.getScaleVector(deviation, (deviationAmount - _allowedDistance) / (deviationAmount * Math.max(_timescale, dt)));
@@ -105,11 +107,13 @@ package jiglib.physics.constraint
 				return false;
 			}
 
-			var currentVel0:Vector3D = _body0.getVelocity(r0);
-			var currentVel1:Vector3D = _body1.getVelocity(r1);
-			var Vr:Vector3D = _vrExtra.add(currentVel0.subtract(currentVel1));
+			var normalVel:Number,denominator:Number;
+			var currentVel0:Vector3D,currentVel1:Vector3D,Vr:Vector3D,N:Vector3D,tempVec1:Vector3D,tempVec2:Vector3D,normalImpulse:Vector3D;
+			currentVel0 = _body0.getVelocity(r0);
+			currentVel1 = _body1.getVelocity(r1);
+			Vr = _vrExtra.add(currentVel0.subtract(currentVel1));
 
-			var normalVel:Number = Vr.length;
+			normalVel = Vr.length;
 			if (normalVel < _minVelForProcessing)
 			{
 				return false;
@@ -121,20 +125,20 @@ package jiglib.physics.constraint
 				normalVel = _maxVelMag;
 			}
 
-			var N:Vector3D = JNumber3D.getDivideVector(Vr, normalVel);
-			var tempVec1:Vector3D = r0.crossProduct(N);
+			N = JNumber3D.getDivideVector(Vr, normalVel);
+			tempVec1 = r0.crossProduct(N);
 			tempVec1 = _body0.worldInvInertia.transformVector(tempVec1);
-			var tempVec2:Vector3D = r1.crossProduct(N);
+			tempVec2 = r1.crossProduct(N);
 			tempVec2 = _body1.worldInvInertia.transformVector(tempVec2);
-			var denominator:Number = _body0.invMass + _body1.invMass + N.dotProduct(tempVec1.crossProduct(r0)) + N.dotProduct(tempVec2.crossProduct(r1));
-			if (denominator < JNumber3D.NUM_TINY)
+			denominator = _body0.invMass + _body1.invMass + N.dotProduct(tempVec1.crossProduct(r0)) + N.dotProduct(tempVec2.crossProduct(r1));
+			if (denominator < JMath3D.NUM_TINY)
 			{
 				return false;
 			}
 
-			var normalImpulse:Vector3D = JNumber3D.getScaleVector(N, -normalVel / denominator);
-			_body0.applyWorldImpulse(normalImpulse, _worldPos);
-			_body1.applyWorldImpulse(JNumber3D.getScaleVector(normalImpulse, -1), _worldPos);
+			normalImpulse = JNumber3D.getScaleVector(N, -normalVel / denominator);
+			_body0.applyWorldImpulse(normalImpulse, _worldPos, false);
+			_body1.applyWorldImpulse(JNumber3D.getScaleVector(normalImpulse, -1), _worldPos, false);
 
 			_body0.setConstraintsAndCollisionsUnsatisfied();
 			_body1.setConstraintsAndCollisionsUnsatisfied();

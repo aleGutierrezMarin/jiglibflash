@@ -1,29 +1,4 @@
-﻿/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
-package jiglib.collision
+﻿package jiglib.collision
 {
 	import flash.geom.Vector3D;
 	
@@ -52,12 +27,9 @@ package jiglib.collision
 		{
 			var obj0:SpanData = box0.getSpan(axis);
 			var obj1:SpanData = box1.getSpan(axis);
-			var obj0Min:Number = obj0.min;
-			var obj0Max:Number = obj0.max;
-			var obj1Min:Number = obj1.min;
-			var obj1Max:Number = obj1.max;
+			var obj0Min:Number=obj0.min,obj0Max:Number=obj0.max,obj1Min:Number=obj1.min,obj1Max:Number=obj1.max,tiny:Number=JMath3D.NUM_TINY;
 
-			if (obj0Min > (obj1Max + JConfig.collToll + JNumber3D.NUM_TINY) || obj1Min > (obj0Max + JConfig.collToll + JNumber3D.NUM_TINY))
+			if (obj0Min > (obj1Max + JConfig.collToll + tiny) || obj1Min > (obj0Max + JConfig.collToll + tiny))
 			{
 				out.flag = true;
 				return true;
@@ -85,7 +57,7 @@ package jiglib.collision
 			{
 				if (contactPoint.subtract(pt).lengthSquared < combinationDistanceSq)
 				{
-					contactPoint = JNumber3D.getDivideVector(contactPoint.add(pt), 2);
+					contactPoint = JNumber3D.getScaleVector(contactPoint.add(pt), 0.5);
 					return false;
 				}
 			}
@@ -95,70 +67,64 @@ package jiglib.collision
 		
 		private function getSupportPoint(box:JBox, axis:Vector3D):Vector3D {
 			var orientationCol:Vector.<Vector3D> = box.currentState.getOrientationCols();
-			var _as:Number = axis.dotProduct(orientationCol[0]);
-			var _au:Number = axis.dotProduct(orientationCol[1]);
-			var _ad:Number = axis.dotProduct(orientationCol[2]);
+			var _as:Number=axis.dotProduct(orientationCol[0]),_au:Number=axis.dotProduct(orientationCol[1]),_ad:Number=axis.dotProduct(orientationCol[2]),tiny:Number=JMath3D.NUM_TINY;
 			
 			var p:Vector3D = box.currentState.position.clone();
   
-			if (_as < -JNumber3D.NUM_TINY) {
+			if (_as < -tiny) {
 				p = p.add(JNumber3D.getScaleVector(orientationCol[0], 0.5 * box.sideLengths.x));
-			}else if (_as >= JNumber3D.NUM_TINY) {
+			}else if (_as >= tiny) {
 				p = p.subtract(JNumber3D.getScaleVector(orientationCol[0], 0.5 * box.sideLengths.x));
 			}
   
-			if (_au < -JNumber3D.NUM_TINY) {
+			if (_au < -tiny) {
 				p = p.add(JNumber3D.getScaleVector(orientationCol[1], 0.5 * box.sideLengths.y));
-			}else if (_au > JNumber3D.NUM_TINY) {
+			}else if (_au > tiny) {
 				p = p.subtract(JNumber3D.getScaleVector(orientationCol[1], 0.5 * box.sideLengths.y));
 			}
   
-			if (_ad < -JNumber3D.NUM_TINY) {
+			if (_ad < -tiny) {
 				p = p.add(JNumber3D.getScaleVector(orientationCol[2], 0.5 * box.sideLengths.z));
-			}else if (_ad > JNumber3D.NUM_TINY) {
+			}else if (_ad > tiny) {
 				p = p.subtract(JNumber3D.getScaleVector(orientationCol[2], 0.5 * box.sideLengths.z));
 			}
 			return p;
 		}
 
 		private function getAABox2EdgeIntersectionPoints(contactPoint:Vector.<Vector3D>, origBoxSides:Vector3D, origBoxState:PhysicsState, edgePt0:Vector3D, edgePt1:Vector3D):int {
-			var jDir:int;
-			var kDir:int;
-			var dist0:Number;
-			var dist1:Number;
-			var frac:Number;
-			var num:int = 0;
-			var pt:Vector3D;
-			var edgeDir:Vector3D = edgePt1.subtract(edgePt0);
+			var jDir:int,kDir:int,num:int=0,iDir:int,iFace:int;
+			var dist0:Number,dist1:Number,frac:Number,tiny:Number=JMath3D.NUM_TINY;
+			var pt:Vector3D,edgeDir:Vector3D;
+			
+			edgeDir = edgePt1.subtract(edgePt0);
 			edgeDir.normalize();
-			var ptArr:Array;
-			var faceOffsets:Array;
-			var edgePt0Arr:Array = JNumber3D.toArray(edgePt0);
-			var edgePt1Arr:Array = JNumber3D.toArray(edgePt1);
-			var edgeDirArr:Array = JNumber3D.toArray(edgeDir);
-			var sidesArr:Array = JNumber3D.toArray(JNumber3D.getScaleVector(origBoxSides, 0.5));
-			for (var iDir:int = 2; iDir >= 0; iDir--) {
+			var ptArr:Vector.<Number>,faceOffsets:Vector.<Number>,edgePt0Arr:Vector.<Number>,edgePt1Arr:Vector.<Number>,edgeDirArr:Vector.<Number>,sidesArr:Vector.<Number>;
+			edgePt0Arr = JNumber3D.toArray(edgePt0);
+			edgePt1Arr = JNumber3D.toArray(edgePt1);
+			edgeDirArr = JNumber3D.toArray(edgeDir);
+			sidesArr = JNumber3D.toArray(JNumber3D.getScaleVector(origBoxSides, 0.5));
+			for (iDir = 2; iDir >= 0; iDir--) {
 				if (Math.abs(edgeDirArr[iDir]) < 0.1) {
 					continue;
 				}
 				jDir = (iDir + 1) % 3;
 				kDir = (iDir + 2) % 3;
-				faceOffsets = [ -sidesArr[iDir], sidesArr[iDir]];
-				for (var iFace:int = 1; iFace >= 0; iFace-- ) {
+				faceOffsets = Vector.<Number>([ -sidesArr[iDir], sidesArr[iDir]]);
+				for (iFace = 1; iFace >= 0; iFace-- ) {
 					dist0 = edgePt0Arr[iDir] - faceOffsets[iFace];
 					dist1 = edgePt1Arr[iDir] - faceOffsets[iFace];
 					frac = -1;
-					if (dist0 * dist1 < -JNumber3D.NUM_TINY) {
+					if (dist0 * dist1 < -tiny) {
 						frac = -dist0 / (dist1 - dist0);
-					}else if (Math.abs(dist0) < JNumber3D.NUM_TINY) {
+					}else if (Math.abs(dist0) < tiny) {
 						frac = 0;
-					}else if (Math.abs(dist1) < JNumber3D.NUM_TINY) {
+					}else if (Math.abs(dist1) < tiny) {
 						frac = 1;
 					}
 					if (frac >= 0) {
 						pt = JNumber3D.getScaleVector(edgePt0, 1 - frac).add(JNumber3D.getScaleVector(edgePt1, frac));
 						ptArr = JNumber3D.toArray(pt);
-						if ((ptArr[jDir] > -sidesArr[jDir] - JNumber3D.NUM_TINY) && (ptArr[jDir] < sidesArr[jDir] + JNumber3D.NUM_TINY) && (ptArr[kDir] > -sidesArr[kDir] - JNumber3D.NUM_TINY) && (ptArr[kDir] < sidesArr[kDir] + JNumber3D.NUM_TINY) ) {
+						if ((ptArr[jDir] > -sidesArr[jDir] - tiny) && (ptArr[jDir] < sidesArr[jDir] + tiny) && (ptArr[kDir] > -sidesArr[kDir] - tiny) && (ptArr[kDir] < sidesArr[kDir] + tiny) ) {
 							pt = origBoxState.orientation.transformVector(pt);
 							pt = pt.add(origBoxState.position);
 							addPoint(contactPoint, pt, combinationDist);
@@ -181,8 +147,7 @@ package jiglib.collision
 			var boxPts:Vector.<Vector3D> = box1.getCornerPointsInBoxSpace(box1State, box0State);
 			
 			var boxEdges:Vector.<EdgeData> = box1.edges;
-			var edgePt0:Vector3D;
-			var edgePt1:Vector3D;
+			var edgePt0:Vector3D,edgePt1:Vector3D;
 			for each (var boxEdge:EdgeData in boxEdges)
 			{
 				edgePt0 = boxPts[boxEdge.ind0];
@@ -210,11 +175,10 @@ package jiglib.collision
 			if (!box0.hitTestObject3D(box1))
 				return;
 
-			if (JConfig.aabbDetection && !box0.boundingBox.overlapTest(box1.boundingBox))
+			if (!box0.boundingBox.overlapTest(box1.boundingBox))
 				return;
 
-			var numTiny:Number = JNumber3D.NUM_TINY;
-			var numHuge:Number = JNumber3D.NUM_HUGE;
+			var numTiny:Number = JMath3D.NUM_TINY,numHuge:Number = JMath3D.NUM_HUGE;
 
 			var dirs0Arr:Vector.<Vector3D> = box0.currentState.getOrientationCols();
 			var dirs1Arr:Vector.<Vector3D> = box1.currentState.getOrientationCols();
@@ -240,19 +204,22 @@ package jiglib.collision
 
 			// see if the boxes are separate along any axis, and if not keep a 
 			// record of the depths along each axis
+			var ax:Vector3D;
 			for (i = 0; i < axesLength; i++)
 			{
-				var _overlapDepth:SpanData = overlapDepths[i] = new SpanData();
-				_overlapDepth.depth = numHuge;
+				overlapDepths[i] = new SpanData();
 
 				l2 = axes[i].lengthSquared;
 				if (l2 < numTiny)
 					continue;
 				
-				var ax:Vector3D = axes[i].clone();
+				ax = axes[i].clone();
 				ax.normalize();
-				if (disjoint(overlapDepths[i], ax, box0, box1))
+				if (disjoint(overlapDepths[i], ax, box0, box1)) {
+					info.body0.removeCollideBodies(info.body1);
+					info.body1.removeCollideBodies(info.body0);
 					return;
+				}
 			}
 
 			// The box overlap, find the separation depth closest to 0.
@@ -273,13 +240,16 @@ package jiglib.collision
 				}
 			}
 			
-			if (minAxis == -1)
+			if (minAxis == -1) {
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 				return;
+			}
 			
 			// Make sure the axis is facing towards the box0. if not, invert it
 			var N:Vector3D = axes[minAxis].clone();
 			if (box1.currentState.position.subtract(box0.currentState.position).dotProduct(N) > 0)
-				N = JNumber3D.getScaleVector(N, -1);
+				N.negate();
 			
 			var contactPointsFromOld:Boolean = true;
 			var contactPoints:Vector.<Vector3D> = new Vector.<Vector3D>();
@@ -287,7 +257,7 @@ package jiglib.collision
 			combinationDist += (JConfig.collToll * 3.464);
 			combinationDist *= combinationDist;
 
-			if (minDepth > -JNumber3D.NUM_TINY)
+			if (minDepth > -numTiny)
 				getBoxBoxIntersectionPoints(contactPoints, box0, box1, false);
 			
 			if (contactPoints.length == 0)
@@ -371,7 +341,7 @@ package jiglib.collision
 				//-----------------------------------------------------------------
 				// plane and ray colinear, skip the intersection.
 				//-----------------------------------------------------------------
-				if (Math.abs(div) < JNumber3D.NUM_TINY)
+				if (Math.abs(div) < numTiny)
 					return;
       
 				var t:Number = (planeD - P0.dotProduct(planeNormal)) / div;
@@ -390,11 +360,8 @@ package jiglib.collision
 			{
 				collPts = new Vector.<CollPointInfo>(contactPoints.length, true);
 
-				var minDist:Number = JNumber3D.NUM_HUGE;
-				var maxDist:Number = -JNumber3D.NUM_HUGE;
-				var dist:Number;
-				var depth:Number;
-				var depthScale:Number;
+				var minDist:Number = numHuge,maxDist:Number = -numHuge,dist:Number,depth:Number,depthScale:Number;
+				
 				var cpInfo:CollPointInfo;
 				var contactPoint:Vector3D;
 
@@ -409,8 +376,8 @@ package jiglib.collision
 						maxDist = dist;
 				}
 
-				if (maxDist < minDist + JNumber3D.NUM_TINY)
-					maxDist = minDist + JNumber3D.NUM_TINY;
+				if (maxDist < minDist + numTiny)
+					maxDist = minDist + numTiny;
 
 				i = 0;
 				for each (contactPoint in contactPoints)
@@ -450,15 +417,16 @@ package jiglib.collision
 			collInfo.objInfo = info;
 			collInfo.dirToBody = N;
 			collInfo.pointInfo = collPts;
-
+			
 			var mat:MaterialProperties = new MaterialProperties();
-			mat.restitution = Math.sqrt(box0.material.restitution * box1.material.restitution);
-			mat.friction = Math.sqrt(box0.material.friction * box1.material.friction);
+			mat.restitution = 0.5*(box0.material.restitution + box1.material.restitution);
+			mat.friction = 0.5*(box0.material.friction + box1.material.friction);
 			collInfo.mat = mat;
 			collArr.push(collInfo);
-
 			info.body0.collisions.push(collInfo);
 			info.body1.collisions.push(collInfo);
+			info.body0.addCollideBody(info.body1);
+			info.body1.addCollideBody(info.body0);
 		}
 	}
 }

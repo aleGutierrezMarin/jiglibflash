@@ -2,9 +2,6 @@ package jiglib.data
 {
 	import flash.geom.Vector3D;
 
-	/**
-	 * @author katopz
-	 */
 	public class TerrainData
 	{
 		public var height:Number;

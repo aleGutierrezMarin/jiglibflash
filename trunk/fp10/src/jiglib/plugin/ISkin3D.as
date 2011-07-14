@@ -1,6 +1,9 @@
 package jiglib.plugin
 {
 	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
+	
+	import jiglib.data.TriangleVertexIndices;
 
 	/**
 	 * Represents a mesh from a 3D engine inside JigLib.
@@ -9,8 +12,6 @@ package jiglib.plugin
 	 *
 	 * In the implementation, JMatrix3D should be translated into
 	 * the type proper for a given engine.
-	 *
-	 * @author bartekd
 	 */
 	public interface ISkin3D
 	{
@@ -24,5 +25,9 @@ package jiglib.plugin
 		 * Apply a matrix to the mesh.
 		 */
 		function set transform(m:Matrix3D):void;
+		
+		
+		function get vertices():Vector.<Vector3D>;
+		function get indices():Vector.<TriangleVertexIndices>;
 	}
 }

@@ -18,10 +18,6 @@ package jiglib.plugin.away3dlite
 	import jiglib.physics.RigidBody;
 	import jiglib.plugin.AbstractPhysics;
 
-	/**
-	 * @author bartekd
-	 * @author katopz
-	 */
 	public class Away3DLitePhysics extends AbstractPhysics
 	{
 		private var _scene:Scene3D;

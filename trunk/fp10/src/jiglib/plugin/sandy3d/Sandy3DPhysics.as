@@ -15,9 +15,6 @@ package jiglib.plugin.sandy3d
 	import sandy.primitive.Sphere;
 	
 
-	/**
-	 * @author bartekd
-	 */
 	public class Sandy3DPhysics extends AbstractPhysics
 	{
 		private var scene:Scene3D;

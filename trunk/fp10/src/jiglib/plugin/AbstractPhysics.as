@@ -4,21 +4,21 @@
 	import jiglib.physics.PhysicsSystem;
 	import jiglib.physics.RigidBody;
 
-	/**
-	 * @author bartekd and Ringo
-	 */
 	public class AbstractPhysics {
 		
-		private var initTime:int;
-		private var stepTime:int;
-		private var speed:Number;
-		private var deltaTime:Number = 0;
-		private var physicsSystem:PhysicsSystem;
+		private var initTime		: int;
+		private var stepTime		: int;
+		private var speed			: Number;
+		private var deltaTime		: Number = 0;
+		private var physicsSystem	: PhysicsSystem;
+		private var _frameTime		: uint = 0; // time need for one frame physics step
 		
 		public function AbstractPhysics(speed:Number = 5) {
 			this.speed = speed;
 			initTime = getTimer();
 			physicsSystem = PhysicsSystem.getInstance();
+			physicsSystem.setCollisionSystem(false); // bruteforce
+			//physicsSystem.setCollisionSystem(true,20,20,20,200,200,200); // grid
 		}
 		
 		public function addBody(body:RigidBody):void {
@@ -32,16 +32,22 @@
 		public function get engine():PhysicsSystem {
 			return physicsSystem ;
 		}
+		
+		public function get frameTime():uint {
+			return _frameTime;
+		}
 
 		public function afterPause():void {
 			initTime = getTimer();
 		}
 
-		public function step():void {
-			stepTime = getTimer();
-	        deltaTime = ((stepTime - initTime) / 1000) * speed;
-	        initTime = stepTime;
-	        physicsSystem.integrate(deltaTime);
+		//if dt>0 use the static time step,otherwise use the dynamic time step
+		public function step(dt:Number=0):void {
+				stepTime = getTimer();
+				deltaTime = ((stepTime - initTime) / 1000) * speed;
+				initTime = stepTime;
+				physicsSystem.integrate((dt>0)?dt:deltaTime);
+				_frameTime = getTimer()-initTime;
 		}
 	}
 }

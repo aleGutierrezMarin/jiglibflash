@@ -1,28 +1,3 @@
-/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
 package jiglib.collision
 {
 
@@ -52,15 +27,16 @@ package jiglib.collision
 			var oldDelta:Vector3D = sphere0.oldState.position.subtract(sphere1.oldState.position);
 			var newDelta:Vector3D = sphere0.currentState.position.subtract(sphere1.currentState.position);
 
-			var oldDistSq:Number = oldDelta.lengthSquared;
-			var newDistSq:Number = newDelta.lengthSquared;
-			var radSum:Number = sphere0.radius + sphere1.radius;
+			var oldDistSq:Number,newDistSq:Number,radSum:Number,oldDist:Number,depth:Number;
+			oldDistSq = oldDelta.lengthSquared;
+			newDistSq = newDelta.lengthSquared;
+			radSum = sphere0.radius + sphere1.radius;
 
 			if (Math.min(oldDistSq, newDistSq) < Math.pow(radSum + JConfig.collToll, 2))
 			{
-				var oldDist:Number = Math.sqrt(oldDistSq);
-				var depth:Number = radSum - oldDist;
-				if (oldDist > JNumber3D.NUM_TINY)
+				oldDist = Math.sqrt(oldDistSq);
+				depth = radSum - oldDist;
+				if (oldDist > JMath3D.NUM_TINY)
 				{
 					oldDelta = JNumber3D.getDivideVector(oldDelta, oldDist);
 				}
@@ -68,32 +44,34 @@ package jiglib.collision
 				{
 					oldDelta = JMatrix3D.getRotationMatrix(0, 0, 1, 360 * Math.random()).transformVector(Vector3D.Y_AXIS);
 				}
-
+				
 				var worldPos:Vector3D = sphere1.oldState.position.add(JNumber3D.getScaleVector(oldDelta, sphere1.radius - 0.5 * depth));
 
-				var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>();
+				var collPts:Vector.<CollPointInfo> = new Vector.<CollPointInfo>(1,true);
 				var cpInfo:CollPointInfo = new CollPointInfo();
 				cpInfo.r0 = worldPos.subtract(sphere0.oldState.position);
 				cpInfo.r1 = worldPos.subtract(sphere1.oldState.position);
 				cpInfo.initialPenetration = depth;
-				collPts.push(cpInfo);
-
+				collPts[0]=cpInfo;
+				
 				var collInfo:CollisionInfo = new CollisionInfo();
 				collInfo.objInfo = info;
 				collInfo.dirToBody = oldDelta;
 				collInfo.pointInfo = collPts;
-
+				
 				var mat:MaterialProperties = new MaterialProperties();
-				mat.restitution = Math.sqrt(sphere0.material.restitution * sphere1.material.restitution);
-				mat.friction = Math.sqrt(sphere0.material.friction * sphere1.material.friction);
+				mat.restitution = 0.5*(sphere0.material.restitution + sphere1.material.restitution);
+				mat.friction = 0.5*(sphere0.material.friction + sphere1.material.friction);
 				collInfo.mat = mat;
 				collArr.push(collInfo);
-
 				info.body0.collisions.push(collInfo);
 				info.body1.collisions.push(collInfo);
+				info.body0.addCollideBody(info.body1);
+				info.body1.addCollideBody(info.body0);
+			}else {
+				info.body0.removeCollideBodies(info.body1);
+				info.body1.removeCollideBodies(info.body0);
 			}
 		}
-
 	}
-
 }

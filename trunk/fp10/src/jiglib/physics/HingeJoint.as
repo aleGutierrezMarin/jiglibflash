@@ -1,28 +1,3 @@
-/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
 package jiglib.physics
 {
 
@@ -41,7 +16,6 @@ package jiglib.physics
 		private var _body0:RigidBody;
 		private var _body1:RigidBody;
 		private var _usingLimit:Boolean;
-		private var _hingeEnabled:Boolean;
 		private var _broken:Boolean;
 		private var _damping:Number;
 		private var _extraTorque:Number;
@@ -60,7 +34,7 @@ package jiglib.physics
 			_hingeAxis = hingeAxis.clone();
 			_hingePosRel0 = hingePosRel0.clone();
 			_usingLimit = false;
-			_hingeEnabled = false;
+			_controllerEnabled = false;
 			_broken = false;
 			_damping = damping;
 			_extraTorque = 0;
@@ -118,15 +92,15 @@ package jiglib.physics
 			}
 			else
 			{
-				_damping = JNumber3D.getLimiteNumber(_damping, 0, 1);
+				_damping = JMath3D.getLimiteNumber(_damping, 0, 1);
 			}
 
-			enableHinge();
+			enableController();
 		}
 
-		public function enableHinge():void
+		override public function enableController():void
 		{
-			if (_hingeEnabled)
+			if (_controllerEnabled)
 			{
 				return;
 			}
@@ -137,13 +111,13 @@ package jiglib.physics
 			{
 				maxDistanceConstraint.enableConstraint();
 			}
-			enableController();
-			_hingeEnabled = true;
+			_controllerEnabled = true;
+			PhysicsSystem.getInstance().addController(this);
 		}
 
-		public function disableHinge():void
+		override public function disableController():void
 		{
-			if (!_hingeEnabled)
+			if (!_controllerEnabled)
 			{
 				return;
 			}
@@ -154,8 +128,8 @@ package jiglib.physics
 			{
 				maxDistanceConstraint.disableConstraint();
 			}
-			disableController();
-			_hingeEnabled = false;
+			_controllerEnabled = false;
+			PhysicsSystem.getInstance().removeController(this);
 		}
 
 		public function breakHinge():void
@@ -189,11 +163,6 @@ package jiglib.physics
 			_extraTorque = torque;
 		}
 
-		public function getHingeEnabled():Boolean
-		{
-			return _hingeEnabled;
-		}
-
 		public function isBroken():Boolean
 		{
 			return _broken;
@@ -208,22 +177,25 @@ package jiglib.physics
 		{
 			if (_damping > 0)
 			{
-				var hingeAxis:Vector3D = _body1.currentState.rotVelocity.subtract(_body0.currentState.rotVelocity);
+				var hingeAxis:Vector3D,newAngVel1:Vector3D,newAngVel2:Vector3D;
+				var angRot1:Number,angRot2:Number,avAngRot:Number,frac:Number,newAngRot1:Number,newAngRot2:Number;
+				
+				hingeAxis = _body1.currentState.rotVelocity.subtract(_body0.currentState.rotVelocity);
 				hingeAxis.normalize();
 
-				var angRot1:Number = _body0.currentState.rotVelocity.dotProduct(hingeAxis);
-				var angRot2:Number = _body1.currentState.rotVelocity.dotProduct(hingeAxis);
+				angRot1 = _body0.currentState.rotVelocity.dotProduct(hingeAxis);
+				angRot2 = _body1.currentState.rotVelocity.dotProduct(hingeAxis);
 
-				var avAngRot:Number = 0.5 * (angRot1 + angRot2);
-				var frac:Number = 1 - _damping;
-				var newAngRot1:Number = avAngRot + (angRot1 - avAngRot) * frac;
-				var newAngRot2:Number = avAngRot + (angRot2 - avAngRot) * frac;
+				avAngRot = 0.5 * (angRot1 + angRot2);
+				frac = 1 - _damping;
+				newAngRot1 = avAngRot + (angRot1 - avAngRot) * frac;
+				newAngRot2 = avAngRot + (angRot2 - avAngRot) * frac;
 
-				var newAngVel1:Vector3D = _body0.currentState.rotVelocity.add(JNumber3D.getScaleVector(hingeAxis, newAngRot1 - angRot1));
-				var newAngVel2:Vector3D = _body1.currentState.rotVelocity.add(JNumber3D.getScaleVector(hingeAxis, newAngRot2 - angRot2));
+				newAngVel1 = _body0.currentState.rotVelocity.add(JNumber3D.getScaleVector(hingeAxis, newAngRot1 - angRot1));
+				newAngVel2 = _body1.currentState.rotVelocity.add(JNumber3D.getScaleVector(hingeAxis, newAngRot2 - angRot2));
 
-				_body0.setAngVel(newAngVel1);
-				_body1.setAngVel(newAngVel2);
+				_body0.setAngleVelocity(newAngVel1);
+				_body1.setAngleVelocity(newAngVel2);
 			}
 
 			if (_extraTorque != 0)

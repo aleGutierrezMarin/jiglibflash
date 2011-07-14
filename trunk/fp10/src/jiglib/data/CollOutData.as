@@ -4,9 +4,6 @@ package jiglib.data
 
 	import jiglib.physics.RigidBody;
 
-	/**
-	 * @author katopz
-	 */
 	public class CollOutData
 	{
 		public var frac:Number;

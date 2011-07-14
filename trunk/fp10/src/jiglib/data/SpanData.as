@@ -1,8 +1,5 @@
 package jiglib.data
 {
-	/**
-	 * @author katopz
-	 */
 	public class SpanData
 	{
 		public var min:Number;

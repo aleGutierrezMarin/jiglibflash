@@ -18,9 +18,6 @@ package jiglib.plugin.papervision3d {
 	import org.papervision3d.objects.primitives.Plane;
 	import org.papervision3d.objects.primitives.Sphere;		
 
-	/**
-	 * @author bartekd
-	 */
 	public class Papervision3DPhysics extends AbstractPhysics {
 
 		private var scene:DisplayObjectContainer3D;

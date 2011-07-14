@@ -1,32 +1,5 @@
-﻿/*
-   Copyright (c) 2007 Danny Chapman
-   http://www.rowlhouse.co.uk
-
-   This software is provided 'as-is', without any express or implied
-   warranty. In no event will the authors be held liable for any damages
-   arising from the use of this software.
-   Permission is granted to anyone to use this software for any purpose,
-   including commercial applications, and to alter it and redistribute it
-   freely, subject to the following restrictions:
-   1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-   2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-   3. This notice may not be removed or altered from any source
-   distribution.
- */
-
-/**
- * @author Muzer(muzerly@gmail.com)
- * @link http://code.google.com/p/jiglibflash
- */
-
-package jiglib.vehicles
+﻿package jiglib.vehicles
 {
-
-
 	import flash.geom.Vector3D;
 	
 	import jiglib.math.JNumber3D;
@@ -168,9 +141,10 @@ package jiglib.vehicles
 				wheel.update(dt);
 			}
 
-			var deltaAccelerate:Number = dt;
-			var deltaSteering:Number = dt * _steerRate;
-			var dAccelerate:Number = _destAccelerate - _accelerate;
+			var deltaAccelerate:Number,deltaSteering:Number,dAccelerate:Number,dSteering:Number,alpha:Number,angleSgn:Number;
+			deltaAccelerate = dt;
+			deltaSteering = dt * _steerRate;
+			dAccelerate = _destAccelerate - _accelerate;
 			if (dAccelerate < -deltaAccelerate)
 			{
 				dAccelerate = -deltaAccelerate;
@@ -181,7 +155,7 @@ package jiglib.vehicles
 			}
 			_accelerate += dAccelerate;
 
-			var dSteering:Number = _destSteering - _steering;
+			dSteering = _destSteering - _steering;
 			if (dSteering < -deltaSteering)
 			{
 				dSteering = -deltaSteering;
@@ -198,8 +172,8 @@ package jiglib.vehicles
 				wheel.setLock(_HBrake > 0.5);
 			}
 
-			var alpha:Number = Math.abs(_maxSteerAngle * _steering);
-			var angleSgn:Number = (_steering > 0) ? 1 : -1;
+			alpha = Math.abs(_maxSteerAngle * _steering);
+			angleSgn = (_steering > 0) ? 1 : -1;
 			for each (var _steerWheel:JWheel in _steerWheels)
 			{
 				_steerWheel.setSteerAngle(angleSgn * alpha);

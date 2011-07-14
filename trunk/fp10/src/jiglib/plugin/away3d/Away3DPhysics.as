@@ -1,5 +1,6 @@
 package jiglib.plugin.away3d {
 	import flash.geom.Vector3D;
+	import flash.geom.Matrix3D;
 	import flash.display.BitmapData;
 	
 	import away3d.containers.View3D;
@@ -12,13 +13,11 @@ package jiglib.plugin.away3d {
 	import jiglib.geometry.JPlane;
 	import jiglib.geometry.JSphere;
 	import jiglib.geometry.JTerrain;
+	import jiglib.geometry.JTriangleMesh;
 	import jiglib.physics.RigidBody;
-	import jiglib.plugin.AbstractPhysics;	
+	import jiglib.plugin.AbstractPhysics;
 	import jiglib.plugin.away3d.Away3DTerrain;
 
-	/**
-	 * @author bartekd
-	 */
 	public class Away3DPhysics extends AbstractPhysics {
 		
 		private var view:View3D;
@@ -85,6 +84,13 @@ package jiglib.plugin.away3d {
 			addBody(terrain);
 			
 			return terrain;
+		}
+		
+		public function createMesh(skin:Mesh,initPosition:Vector3D,initOrientation:Matrix3D,maxTrianglesPerCell:int = 10, minCellSize:Number = 10):JTriangleMesh{
+			var mesh:JTriangleMesh=new JTriangleMesh(new Away3dMesh(skin),initPosition,initOrientation,maxTrianglesPerCell,minCellSize);
+			addBody(mesh);
+			
+			return mesh;
 		}
 	}
 }
