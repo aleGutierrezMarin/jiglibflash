@@ -23,7 +23,6 @@
 	/**
 	 * @author Muzer
 	 */
-	[SWF(width="960", height="540", frameRate="60")]
 	public class Away3DStackingTest extends Sprite
 	{
 		private var view:View3D;
@@ -44,16 +43,17 @@
 		
 		public function Away3DStackingTest() 
 		{
-			super();
+			this.addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+		
+		private function init(event:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE, init);
 			
+			init3D();
+			this.addChild(new Stats(view, physics));
 			stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDownHandler);
 			stage.addEventListener( KeyboardEvent.KEY_UP, keyUpHandler);
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			
-			init3D();
-			
-			this.addChild(new Stats(view, physics));
-			
 		}
 		
 		private function init3D():void
@@ -88,7 +88,7 @@
 			materia.lights = [mylight];
 			
 			ballBody = new Vector.<RigidBody>();
-			var color:uint;
+			//var color:uint;
 			for (var i:int = 0; i < 15; i++)
 			{
 				ballBody[i] = physics.createSphere(materia, 22);
@@ -162,14 +162,14 @@
 		
 		private function resetBody():void
 		{
-			var i:int=0
+			var i:int=0;
 			for each(var body:RigidBody in ballBody)
 			{
 				if (body.currentState.position.y < -200)
 				{
 					body.moveTo(new Vector3D( 0, 1000 + (50 * i + 50), 0));
 				}
-				i++
+				i++;
 			}
 			i=0;
 			for each(body in boxBody)
@@ -178,7 +178,7 @@
 				{
 					body.moveTo(new Vector3D(0, 1000 + (50 * i + 50), 0));
 				}
-				i++
+				i++;
 			}
 		}
 		
