@@ -69,8 +69,8 @@ package jiglib.plugin.away3d4 {
 			return jsphere;
 		}
 		
-		public function createTerrain(terrainHeightMap:BitmapData, material : MaterialBase, width : Number = 100, height : Number = 100, segmentsW : uint = 1, segmentsH : uint = 1, maxHeight:Number = 100):JTerrain {
-			var terrainMap:Away3D4Terrain = new Away3D4Terrain(terrainHeightMap, material, width, height, segmentsW, segmentsH, maxHeight);
+		public function createTerrain(material : MaterialBase, heightMap : BitmapData, width : Number = 1000, height : Number = 100, depth : Number = 1000, segmentsW : uint = 30, segmentsH : uint = 30, maxElevation:uint = 255, minElevation:uint = 0, smoothMap:Boolean = false):JTerrain {
+			var terrainMap:Away3D4Terrain = new Away3D4Terrain(material, heightMap, width, height, depth, segmentsW, segmentsH, maxElevation, minElevation, smoothMap);
 			view.scene.addChild(terrainMap);
 			
 			var terrain:JTerrain = new JTerrain(terrainMap);
