@@ -21,8 +21,10 @@
 	import jiglib.plugin.away3d4.*;
 	
 	/**
+	 * ...
 	 * @author Muzer
 	 */
+	[SWF(width="800", height="600", frameRate="60")]
 	public class Away3DStackingTest extends Sprite
 	{
 		private var view:View3D;
@@ -43,17 +45,15 @@
 		
 		public function Away3DStackingTest() 
 		{
-			this.addEventListener(Event.ADDED_TO_STAGE, init);
-		}
-		
-		private function init(event:Event):void {
-			removeEventListener(Event.ADDED_TO_STAGE, init);
+			super();
 			
-			init3D();
-			this.addChild(new Stats(view, physics));
 			stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDownHandler);
 			stage.addEventListener( KeyboardEvent.KEY_UP, keyUpHandler);
 			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			
+			init3D();
+			
+			this.addChild(new Stats(view, physics));
 		}
 		
 		private function init3D():void
@@ -65,14 +65,14 @@
 			view.scene.addChild(mylight);
 			mylight.color = 0xffffff;
 			mylight.diffuse = 1;
-			mylight.y = 700;
+			mylight.y = 500;
 			mylight.z = -700;
 			
 			view.camera.y = mylight.y;
 			view.camera.z = mylight.z;
-			view.camera.rotationX = -30;
+			view.camera.rotationX = 20;
 			
-			JConfig.solverType="FAST";
+			JConfig.solverType = "FAST";
 			JConfig.doShockStep = true;
 			physics = new Away3D4Physics(view, 8);
 			
@@ -88,21 +88,37 @@
 			materia.lights = [mylight];
 			
 			ballBody = new Vector.<RigidBody>();
-			//var color:uint;
+			var color:uint;
 			for (var i:int = 0; i < 15; i++)
 			{
 				ballBody[i] = physics.createSphere(materia, 22);
-				ballBody[i].moveTo(new Vector3D( -100, 50 * i + 50, -100));
+				ballBody[i].moveTo(new Vector3D( -100, 50 * i + 50, -200));
 			}
 			ballBody[0].mass = 10;
 			physics.getMesh(ballBody[0]).material=new ColorMaterial(0xff8888);
 			physics.getMesh(ballBody[0]).material.lights=[mylight];
 			
-			boxBody = new Vector.<RigidBody>();
-			for (i = 0; i < 15; i++)
+			boxBody=new Vector.<RigidBody>();
+			var xNum:int = 1;
+			var yNum:int = 15;
+			var zNum:int = 1;
+			var num:int = 0;
+			var boxSize:Vector3D = new Vector3D(50, 50, 50);
+			var xstart:Number = -xNum * boxSize.x / 2;
+			var ystart:Number = ground.currentState.position.y + boxSize.y / 2;
+			var zstart:Number = -zNum * boxSize.z / 2;
+			for (i = 0; i < xNum; i++ )
 			{
-				boxBody[i] = physics.createCube(materia, 50, 50, 50 );
-				boxBody[i].moveTo(new Vector3D(0, 50 * i + 50, 0));
+				for (var j:int = 0; j < yNum; j++ )
+				{
+					for (var k:int = 0; k < zNum; k++ )
+					{
+						boxBody[num] = physics.createCube(materia, boxSize.x, boxSize.y,  boxSize.z );
+						boxBody[num].mass = 0.1;
+						boxBody[num].moveTo(new Vector3D(xstart + (boxSize.x + 2) * i, ystart + boxSize.y * j, zstart + (boxSize.z + 2) * k));
+						num++;
+					}
+				}
 			}
 		}
 		
@@ -162,14 +178,14 @@
 		
 		private function resetBody():void
 		{
-			var i:int=0;
+			var i:int=0
 			for each(var body:RigidBody in ballBody)
 			{
 				if (body.currentState.position.y < -200)
 				{
 					body.moveTo(new Vector3D( 0, 1000 + (50 * i + 50), 0));
 				}
-				i++;
+				i++
 			}
 			i=0;
 			for each(body in boxBody)
@@ -178,7 +194,7 @@
 				{
 					body.moveTo(new Vector3D(0, 1000 + (50 * i + 50), 0));
 				}
-				i++;
+				i++
 			}
 		}
 		

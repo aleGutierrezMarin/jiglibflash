@@ -228,7 +228,7 @@
 			camera.x = 0;
 			camera.y = 500;
 			camera.z = -2000;
-			camera.rotationX = -10;
+			camera.rotationX = 10;
 			
 			view = new View3D(null,camera);
 			view.backgroundColor = 0x0c00ff;
