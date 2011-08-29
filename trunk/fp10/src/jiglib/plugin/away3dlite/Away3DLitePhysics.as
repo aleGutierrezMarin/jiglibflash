@@ -7,7 +7,6 @@ package jiglib.plugin.away3dlite
 	import away3dlite.primitives.Plane;
 	import away3dlite.primitives.Sphere;
 	
-	import flash.display.BitmapData;
 	import flash.geom.Vector3D;
 	
 	import jiglib.geometry.JBox;
@@ -65,7 +64,7 @@ package jiglib.plugin.away3dlite
 			jGround.y = level;
 			addBody(jGround);
 
-			jGround.updateObject3D();
+			jGround.moveTo(new Vector3D);
 
 			return jGround;
 		}

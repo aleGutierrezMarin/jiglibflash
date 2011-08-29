@@ -45,7 +45,9 @@ package
 		{
 			title += " | Mouse Control | Use mouse to drag red ball | ";
 
+			camera.x = 0;
 			camera.y = -1000;
+			camera.z = -1000;
 
 			init3D();
 		}
@@ -146,7 +148,7 @@ package
 			physics.step();
 
 			//system
-			camera.lookAt(new Vector3D(0, -100, 0));
+			camera.lookAt(new Vector3D(0, 0, 0));
 		}
 	}
 }
