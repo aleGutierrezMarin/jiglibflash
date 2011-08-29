@@ -2,6 +2,7 @@ package
 {
 	import away3dlite.materials.ColorMaterial;
 	import away3dlite.materials.WireframeMaterial;
+	import away3dlite.templates.PhysicsTemplate;
 
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
@@ -12,9 +13,8 @@ package
 	import jiglib.physics.*;
 	import jiglib.physics.constraint.*;
 	import jiglib.plugin.away3dlite.Away3DLiteMesh;
-	import away3dlite.templates.PhysicsTemplate;
 
-	[SWF(backgroundColor="#666666", frameRate="30", width="800", height="600")]
+	[SWF(backgroundColor = "#666666", frameRate = "30", width = "800", height = "600")]
 	/**
 	 * Example : Physics HingeJoint
 	 *
@@ -72,8 +72,8 @@ package
 				{
 					sphere = physics.createSphere(new WireframeMaterial(), 20, 3, 2);
 				}
-				sphere.maxLinVelocities = 200;
-				sphere.maxRotVelocities = 10;
+				sphere.maxLinVelocities = new Vector3D(200, 200, 200);
+				sphere.maxRotVelocities = new Vector3D(10, 10, 10);
 				sphere.moveTo(new Vector3D(0, -130 - (25 * i + 25), 0));
 
 				if (i != 0)
@@ -118,7 +118,7 @@ package
 
 			dragConstraint = new JConstraintWorldPoint(currDragBody, a, b);
 			physics.engine.addConstraint(dragConstraint);
-			
+
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
@@ -147,7 +147,7 @@ package
 				physics.engine.removeConstraint(dragConstraint);
 				currDragBody.setActive();
 			}
-			
+
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, handleMouseRelease);
 		}
