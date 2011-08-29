@@ -46,6 +46,7 @@ package jiglib.plugin.away3dlite
 
 		public function get indices():Vector.<TriangleVertexIndices>
 		{
+			/* TODO : need pull request to github 1st ;(
 			var indices:Vector.<TriangleVertexIndices> = new Vector.<TriangleVertexIndices>()
 			var ids:Vector.<int> = _mesh.indices;
 
@@ -54,6 +55,8 @@ package jiglib.plugin.away3dlite
 				indices.push(new TriangleVertexIndices(ids[i + 2], ids[i + 1], ids[i]));
 			}
 			return indices;
+			*/
+			return null;
 		}
 	}
 }
