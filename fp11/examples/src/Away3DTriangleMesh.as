@@ -4,7 +4,7 @@ package
 	import away3d.events.LoaderEvent;
 	import away3d.lights.PointLight;
 	import away3d.loaders.Loader3D;
-	import away3d.loaders.parsers.OBJParser;
+	import away3d.loaders.parsers.Parsers;
 	import away3d.materials.BitmapMaterial;
 	import away3d.materials.ColorMaterial;
 	import away3d.entities.Mesh;
@@ -93,12 +93,14 @@ package
 			JConfig.solverType="FAST";
 			physics = new Away3D4Physics(view, 8);
 			
+			Parsers.enableAllBundled();
+			
 			var _loader:Loader3D = new Loader3D();
-			_loader.load(new URLRequest('../res/scene.obj'), new OBJParser());
+			_loader.load(new URLRequest('../res/scene.obj'));
 			_loader.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onSceneResourceComplete);
 			
 			_loader = new Loader3D();
-			_loader.load(new URLRequest('../res/car.obj'), new OBJParser());
+			_loader.load(new URLRequest('../res/car.obj'));
 			_loader.addEventListener(LoaderEvent.RESOURCE_COMPLETE, onCarResourceComplete);
 		}
 		

@@ -75,7 +75,7 @@
 			materia1.lights = [mylight];
 			
 			//create terrain
-			var terrainBMD:Bitmap = new TERRIAN_MAP;
+			var terrainBMD:Bitmap = new TERRIAN_MAP();
 			terrain = physics.createTerrain(materia1, terrainBMD.bitmapData, 1000, 300, 1000, 50, 50, 300, 0, false);
 			
 			materia1 = new ColorMaterial(0xeeee00);
