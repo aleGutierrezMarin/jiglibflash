@@ -42,9 +42,8 @@ package jiglib.plugin.away3d4 {
 
 			view.scene.addChild(ground);
 			
-			var jGround:JPlane = new JPlane(new Away3D4Mesh(ground));
+			var jGround:JPlane = new JPlane(new Away3D4Mesh(ground),new Vector3D(0, 1, 0));
 			jGround.y = level;
-			jGround.rotationX = 90;
 			jGround.movable = false;
 			addBody(jGround);
 			return jGround;

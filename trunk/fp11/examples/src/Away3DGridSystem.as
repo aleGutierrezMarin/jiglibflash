@@ -113,7 +113,6 @@
 
 			// ground
 			ground = physics.createGround(new ColorMaterial(0x00ce22), 10000, 10000, 1, 1,true,0);
-			ground.rotationX = 90;
 			ground.movable = false;
 			ground.friction = 0.2;
 			ground.restitution = 0.9;
